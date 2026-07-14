@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>acceptance-report</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <style>
+    body {
+      max-width: 72em;
+    }
+    table {
+      display: table;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+<h1 id="51pm-v224-验收报告">51PM V2.2.4 验收报告</h1>
+<ul>
+<li>验收时间：2026-07-08 ~ 2026-07-09</li>
+<li>环境：测试环境（开发环境水印已确认）</li>
+<li>验收账号：邓欣羽（Web端开发）</li>
+<li>覆盖层：每个功能默认覆盖 <strong>UI 流程 / 边界 / 接口 /
+数据一致性</strong> 四层，验不了的层标 ⚠️</li>
+<li>总览：<strong>4 项功能，✅2 通过 / 🐛2 存在后端缺陷（接口层） / ⚠️3
+体验问题（轻微）</strong></li>
+</ul>
+<blockquote>
+<p>说明：④「根需求禁建任务」UI
+层通过，但<strong>接口层测试发现后端未拦截</strong>，故整体结论下调为
+🐛。</p>
+</blockquote>
+<hr />
+<h2 id="0-原始验收需求开发者提交的本周开发内容">0.
+原始验收需求（开发者提交的本周开发内容）</h2>
+<blockquote>
+<p>帮我验收 V2.2.4，在测试环境。本周开发内容如下：</p>
+<ol type="1">
+<li><strong>任务创建</strong>：增加人员组群，能够批量创建某组群会议工时</li>
+<li><strong>项目概况</strong>：需新增测试报告文档上传位置，与接口说明书的方式一致，提供上传和下载。</li>
+<li><strong>排期表</strong>：当我想查看某个项目的排期情况的时候，查询该项目仅需要显示排期中该项目的人员，而不是一打开是空白，还需要往下才能看到</li>
+<li><strong>非项目任务</strong>：刚刚在 51PM
+查到有部分成员在「2026日常管理」这个根需求下创建了任务，导致数据异常，现在已经转移。现在可以正常创建日常管理的需求了。另外为了避免此情况，排期表和非项目下创建任务时，在前端范畴限制了在根需求上创建任务</li>
+</ol>
+<p>要求：每个功能走真实流程验收，发现 BUG
+给复现步骤和截图，最后出验收报告。</p>
+</blockquote>
+<p>对应关系：需求 1 → §1，需求 2 → §2，需求 3 → §3，需求 4 →
+§4a（日常管理需求恢复创建）+ §4b（根需求禁建任务）。</p>
+<hr />
+<h2 id="1-任务创建人员组群--批量创建会议工时--white_check_mark-通过">1.
+任务创建：人员组群 + 批量创建会议工时 — ✅ 通过</h2>
+<ul>
+<li>入口：「我的工作台 → 组群配置」+「非项目 → 会议工时 →
+需求『团队会议』→ 创建任务(悬停) → 多人通用任务 → 从组群导入」</li>
+<li><strong>UI 流程</strong> ✅：
+<ol type="1">
+<li>组群配置页新建组群『V224验收组』(#7) → 添加成员 邓欣羽、华中豪 →
+保存成功，成员数=2</li>
+<li>需求『团队会议』下「创建任务 →
+多人通用任务」两步向导（BatchCreateDialog）</li>
+<li>「从组群导入」下拉出现『Web端开发(2人)』『V224验收组(2人)』→ 选后 2
+人进入指派列表</li>
+<li>填通用内容（任务选项=团队会议-其它会议 / 1H / 描述）→ 有效人数 0→2
+联动 → 确认页 2 人明细正确 → 提交</li>
+</ol></li>
+<li><strong>数据一致性</strong> ✅：任务列表新增
+任务『团队会议-其它会议』(#22511 邓欣羽)、(#22512 华中豪)，均 1H /
+进行中 / 非产出，接口 <code>add_task</code> ×2 均 code:0</li>
+<li><strong>接口/边界</strong> ✅（抽查）：走的是同一
+<code>add_task</code> 接口，边界结果见
+§4b（负工时/空名称等在接口层统一验证）</li>
+<li>截图：final-01-人员组群配置.jpg、final-01-组群批量创建结果.jpg</li>
+<li>亮点：新建组群即时出现在导入下拉；有效人数联动计数、任务名自动生成体验良好</li>
+<li>【发版素材】任务创建支持人员组群管理，可一键从组群导入成员批量创建会议工时任务，无需逐人添加，方便组织周会/月会等团队会议工时的统一录入。</li>
+</ul>
+<h2
+id="2-项目概况测试报告文档上传下载--white_check_mark-通过附体验问题-warning">2.
+项目概况：测试报告文档上传/下载 — ✅ 通过（附体验问题 ⚠️）</h2>
+<ul>
+<li>入口：「项目 → 项目列表 →
+点项目名进项目概况」右侧信息栏，新增区块「<strong>项目测试文档</strong>」（位于『定制接口文档』与『行业接口文档』之间）</li>
+<li><strong>UI 流程</strong>
+✅（项目『GWH-Cambridge』#6661）：上传项目测试文档 → 接口
+<code>update_project_test_doc</code> code:0 →
+页面即显文档链接（形式与接口文档一致）→ 编辑按钮可覆盖 →
+点击链接新标签打开文档站，成功渲染 md 内容</li>
+<li><strong>与接口说明书一致性</strong>
+✅：同样的上传入口、上传弹窗、文档链接 + 编辑/复制按钮</li>
+<li><strong>数据一致性</strong> ✅：curl 直连文档资源返回
+200，前端展示与实际可访问一致</li>
+<li><strong>边界</strong> ⚠️
+<strong>体验问题（轻微，非阻断）</strong>：上传 <code>.txt</code> 等非
+markdown 文件时接口返回成功、页面显示链接，但打开是 <strong>404 - Not
+found</strong>（文档站只渲染
+.md）。上传弹窗无文件类型限制、无格式提示。老功能『定制接口文档』行为相同，属历史一致。建议前端限制文件类型或加「仅支持
+markdown」提示。
+<ul>
+<li>复现：项目概况 → 上传项目测试文档 → 选任意 .txt → 上传成功 → 点链接
+→ 404</li>
+<li>截图：final-02b-测试文档下载页.jpg（404 现场）</li>
+</ul></li>
+<li>截图：final-02-测试文档上传后.jpg、final-02c-测试文档打开成功.jpg</li>
+<li>【发版素材】项目概况新增测试报告文档管理，与接口说明书一致的上传/下载方式，测试报告在线查看，方便项目测试交付物的统一归档与查阅。</li>
+</ul>
+<h2 id="3-排期表按项目查询直显人员--white_check_mark-通过">3.
+排期表：按项目查询直显人员 — ✅ 通过</h2>
+<ul>
+<li>入口：「排期 → 排期表」顶部「搜索项目」筛选</li>
+<li><strong>UI 流程</strong> ✅：日期范围
+2026-06-08~06-14，搜索项目选『玉禾田集团深圳光明&amp;兰州城关智慧城市环保项目』→
+查询 → 表格直接显示 7
+名排期人员（吴俊枫/陈杰/廖俊波/李鑫/邓欣羽/龚雨菁/陈中山），首行首屏可见、无需下滚
+✅</li>
+<li><strong>数据一致性</strong>
+✅：查询后「过滤空白行列」自动开启（提示「该条件下有 69
+人无任何排期」）；关闭开关对照行数 <strong>7 → 76</strong>，差值 69
+与提示数一致，过滤逻辑正确、数据对账无误</li>
+<li><strong>边界</strong> ⚠️
+<strong>体验问题（轻微）</strong>：所选项目在当前日期范围内无排期时表格完全空白，<strong>无「暂无数据
+/
+该项目本周无排期」空状态提示</strong>，易误判为页面异常。建议补空状态文案。</li>
+<li>截图：final-03-排期表按项目查询直显.jpg</li>
+<li>【发版素材】排期表查询指定项目时自动过滤无排期人员，该项目的排期人员首屏直接可见，无需再往下翻找，项目排期查看效率大幅提升。</li>
+</ul>
+<h2 id="4-非项目任务日常管理需求恢复创建--根需求禁建任务">4.
+非项目任务：日常管理需求恢复创建 + 根需求禁建任务</h2>
+<h3 id="4a-日常管理下可正常创建需求--white_check_mark-通过">4a.
+日常管理下可正常创建需求 — ✅ 通过</h3>
+<ul>
+<li>入口：「非项目 → 日常管理 → 创建需求(悬停) → F自由需求」</li>
+<li><strong>UI 流程</strong> ✅：填写需求名称/描述 →
+父需求选『2026日常管理』(#14823) → 立即创建 → 接口
+<code>project_not_task/add</code> code:0</li>
+<li><strong>数据一致性</strong> ✅：需求列表新增
+需求『V224验收-日常管理需求测试（可删除）』(#22513)，父需求正确挂在
+#14823 下</li>
+<li>截图：final-04-日常管理创建需求.jpg</li>
+</ul>
+<h3 id="4b-前端限制根需求创建任务--bug-bugui-层通过接口层未拦截">4b.
+前端限制根需求创建任务 — 🐛 BUG（UI 层通过，接口层未拦截）</h3>
+<ul>
+<li><p><strong>UI 层</strong> ✅：</p>
+<ul>
+<li>非项目侧：根需求『2026日常管理』(#14823)
+在需求列表中置灰不可点（class 含
+<code>is-disabled</code>），无法进入其任务页；对照子需求『日常管理_七月』(#22092)
+正常可点、可建任务</li>
+<li>排期表侧：多选编辑 → 创建任务 → 抽屉『快速创建任务』→
+选需求弹窗中，根需求均带「请选择其下子节点」提示且不可选中；子需求可正常选中进入创建</li>
+<li>截图：final-04b-根需求置灰不可入.jpg、final-04c-排期表根需求禁选.jpg、final-04d-排期表选子需求后步骤3.jpg</li>
+</ul></li>
+<li><p>🐛
+<strong>接口层测试（严重）——后端未拦截，前端限制可被绕过</strong>：</p>
+<ul>
+<li><strong>测试方法</strong>：复用登录会话，绕过前端 UI 直接 POST
+<code>manage_api/project_not_task/add_task</code>，pid
+传根需求『2026日常管理』(#14823)</li>
+<li><strong>结果</strong>：返回 <code>code:0</code>
+创建成功，任务『V224验收-接口级根需求禁建测试』(#22515)
+<strong>被真实建到根需求 #14823 正下方</strong>（已在需求树中核实其
+pid=14823）</li>
+<li><strong>预期 /
+实际</strong>：预期后端应拒绝在根需求下建任务（返回错误码）；实际后端放行，与本次需求「避免根需求下误建任务导致数据异常」的目标相悖</li>
+<li><strong>影响</strong>：前端限制只是遮挡入口，任何绕过前端的调用（脚本、旧版本客户端、并发接口）仍可污染根需求数据，<strong>原数据异常问题存在复发风险</strong></li>
+<li><strong>严重度</strong>：严重（防线不完整）。建议后端在
+<code>add_task</code> 增加根需求 pid 校验。</li>
+<li><strong>复现</strong>：POST <code>add_task</code>，body 中
+<code>pid=14823</code>（或任意根需求 id）→ 观察是否 code:0 成功</li>
+</ul></li>
+<li><p>🐛 <strong>接口层边界测试（一般 + 轻微）</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>用例</th>
+<th>请求</th>
+<th>返回</th>
+<th>判定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>不存在的父需求 pid=99999999</td>
+<td>add_task</td>
+<td><code>code:50 "sql: no rows in result set"</code></td>
+<td>拦截 ✅，但<strong>报错体把底层 SQL
+错误直接抛给前端</strong>（轻微信息泄露，建议改为业务化文案）</td>
+</tr>
+<tr>
+<td>空任务名称</td>
+<td>add_task name=""</td>
+<td><code>code:51 "非项目需求下的任务名称不能为空"</code></td>
+<td>正确拦截 ✅</td>
+</tr>
+<tr>
+<td>负数计划工时 plan_hour=-5</td>
+<td>add_task</td>
+<td><code>code:0</code> 成功，任务『V224边界-负工时(可删除)』(#22516)
+落库 <code>task_hour=0 / plan_hour=-5</code></td>
+<td>🐛 <strong>轻微（前端已挡）</strong> —
+前端数字步进器限制、正常操作填不了负数，此问题仅在绕过前端直调接口时出现；task_hour
+被归零但 plan_hour 负值直接入库，属后端缺兜底校验，建议防御性补 ≥0
+校验</td>
+</tr>
+</tbody>
+</table></li>
+<li><p>【发版素材】修复部分成员在『2026日常管理』根需求下误建任务导致数据异常的问题，异常数据已转移；排期表与非项目创建任务时前端已限制根需求不可选，只能在子需求下建任务，日常管理需求恢复正常创建。（注：接口层后端校验建议一并补上，见验收
+BUG）</p></li>
+</ul>
+<hr />
+<h2 id="bug-bug-汇总供开发处理">🐛 BUG 汇总（供开发处理）</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>功能</th>
+<th>严重度</th>
+<th>问题</th>
+<th>建议</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>根需求禁建任务(#4b)</td>
+<td>严重</td>
+<td>后端 <code>add_task</code> 未校验根需求
+pid，绕过前端可在根需求『2026日常管理』(#14823) 下建任务（已实测建成
+#22515），数据异常有复发风险</td>
+<td>后端增加根需求 pid 拦截</td>
+</tr>
+<tr>
+<td>2</td>
+<td>工时字段校验(#4b)</td>
+<td>轻微（前端已挡）</td>
+<td><strong>前端正常操作不会触发</strong>（数字步进器限制，填不了负数）。仅在绕过前端直调接口时，<code>plan_hour=-5</code>
+无非负校验直接入库(#22516)；task_hour 被归
+0。属后端缺兜底校验，非本次功能缺陷</td>
+<td>后端对 task_hour/plan_hour 补 ≥0 校验（防御性，非阻断）</td>
+</tr>
+<tr>
+<td>3</td>
+<td>非法 pid 报错(#4b)</td>
+<td>轻微</td>
+<td>报错体直接暴露 <code>sql: no rows in result set</code></td>
+<td>改为业务化提示文案</td>
+</tr>
+<tr>
+<td>4</td>
+<td>测试文档格式(#2)</td>
+<td>轻微</td>
+<td>非 md 文件上传成功但打开 404，无类型限制/提示</td>
+<td>前端限制文件类型或加提示</td>
+</tr>
+<tr>
+<td>5</td>
+<td>排期表空状态(#3)</td>
+<td>轻微</td>
+<td>项目无排期时表格纯空白，无空状态文案</td>
+<td>补「暂无数据」提示</td>
+</tr>
+</tbody>
+</table>
+<h2 id="交接给发版技能">交接给发版技能</h2>
+<p>各功能【发版素材】段落 + 定妆图（final-*.jpg）可直接作为
+51pm-release-notes 输入。 截图目录（Windows
+资源管理器地址栏可直接粘贴访问）：
+<code>\\wsl.localhost\Ubuntu\home\dengxinyu\Developer\browser-harness\agent-workspace\acceptance\V2.2.4\</code></p>
+<hr />
+<h2 id="发版内容v224-真实定稿">发版内容（V2.2.4 真实定稿）</h2>
+<blockquote>
+<p>用户人工定稿版。分类、影响强度、措辞以此为准。</p>
+</blockquote>
+<pre><code>V2.2.4
+影响强度
+强度中等，新增模型外包、创建群组、我的任务日历模块，优化任务创建、排期查看等多场景使用体验
+
+新增功能
+需关注人员：全员
+1.「创建人员群组」：
+支持同时创建多个人员群组，并在创建任务时快速导入群组成员，降低会议、培训等多人通用任务指派人员创建成本；
+
+需关注人员：PM、TB/BD、QA
+1.「项目-项目测试文档」：
+开放项目测试文档，提供上传、编辑、下载功能，方便统一查看项目测试信息；
+
+体验优化
+需关注人员：全员
+1.「排期-过滤空白行列」：
+排期筛选项目后，支持过滤无排期人员，避免TB查看项目排期时出现大量空白内容；
+
+2.「任务创建」：
+排期与非项目创建任务时，仅支持在子需求下创建任务，规范需求选择范围，界面通过树状关系分清需求之间的关系，防止创建任务时错选需求；</code></pre>
+<h3 id="warning-交付前需人工确认验收独有发现未纳入上方对外发版内容">⚠️
+交付前需人工确认（验收独有发现，未纳入上方对外发版内容）</h3>
+<p>以下为接口层验收发现，属后端防御性问题、正常前端操作不受影响，<strong>是否修复由开发判断，通常不写入对外发版</strong>：</p>
+<ol type="1">
+<li><strong>根需求禁建仅前端限制，后端接口未拦截</strong>（严重）：绕过前端直调
+<code>add_task</code> 仍可在根需求下建任务（实测建成
+#22515），原数据异常有复发风险，建议后端补 pid 校验。上方体验优化第 2
+条「仅支持在子需求下创建任务」目前<strong>仅在前端成立</strong>。</li>
+<li>计划工时无非负校验（轻微，前端已挡）、非法 pid 报错泄露 SQL
+语句（轻微）——后端兜底问题，正常用户不可见。</li>
+</ol>
+<hr />
+<h2
+id="发版内容按-51pm-release-notes-规范逐条套用生成--仅覆盖本次验收的-4-项">发版内容（按
+51pm-release-notes 规范逐条套用生成 · 仅覆盖本次验收的 4 项）</h2>
+<blockquote>
+<p>本节由验收报告 + 发版 skill 生成，已逐条对照 skill 判断表：①②
+按「新增功能 vs
+体验优化判断表」归<strong>新增功能</strong>（全新能力/独立文档位）；影响强度按规则表判<strong>中等</strong>（仅就本次验收
+4
+项而言；如含未验收的模型外包/我的任务日历等模块，以上方真实定稿的强度句为准）；④
+按「BUG
+转正向」规则写成正向能力，不提数据异常；价值括号按「红黑榜」写业务结果。
+与上方「真实定稿」是同源两版：定稿为准，本节演示 skill 套用结果。</p>
+</blockquote>
+<h3 id="发布记录表补充行">发布记录表（补充行）</h3>
+<table>
+<thead>
+<tr>
+<th>版本号</th>
+<th>更新时间</th>
+<th>核心更新内容</th>
+<th>影响角色</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>V2.2.4</td>
+<td>2026-07-09</td>
+<td>新增创建人员群组、项目测试文档，优化排期项目查询、任务创建需求选择</td>
+<td>全员、PM、TB/BD、QA</td>
+</tr>
+</tbody>
+</table>
+<h3 id="版本详情块">版本详情块</h3>
+<pre><code>V2.2.4  发布于2026-07-09
+影响强度
+强度中等，新增创建人员群组与项目测试文档，优化排期项目查询与任务创建需求选择。
+
+新增功能
+需关注人员：全员
+1.「创建人员群组」：（降低多人通用任务的指派人员创建成本）
+支持同时创建多个人员群组并维护成员，创建会议、培训等多人任务时快速导入群组成员，无需逐人添加；
+
+需关注人员：PM、TB/BD、QA
+1.「项目-项目测试文档」：（统一沉淀项目测试交付物）
+开放项目测试文档位，提供上传、编辑、下载功能，方式与接口说明书一致，方便统一查看与归档项目测试信息；
+
+体验优化
+需关注人员：全员
+1.「排期-过滤空白行列」
+排期筛选项目后，支持过滤无排期人员，避免查看项目排期时出现大量空白内容；
+
+2.「任务创建」
+排期与非项目创建任务时，仅支持在子需求下创建任务，界面以树状关系分清需求层级，规范需求选择范围，防止错选需求；</code></pre>
+</body>
+</html>

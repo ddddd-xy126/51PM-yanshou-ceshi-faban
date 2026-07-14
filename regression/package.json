@@ -1,0 +1,16 @@
+{
+  "name": "51pm-regression",
+  "version": "1.0.0",
+  "private": true,
+  "description": "51PM 验收回归脚本库（独立于 Hermes，配合 Copilot 验收流程使用）",
+  "scripts": {
+    "login": "node scripts/save-login-state.js",
+    "proxy": "node scripts/start-proxy.js",
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0"
+  }
+}

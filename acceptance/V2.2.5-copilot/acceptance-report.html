@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-CN" xml:lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>51PM V2.2.5 验收报告（Copilot 通道复测轮）</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <style>
+  body { max-width: 72em; margin: 0 auto; padding: 0 2em; font-family: "Microsoft YaHei", "PingFang SC", sans-serif; line-height: 1.7; color: #24292e; }
+  table { display: table; width: 100%; border-collapse: collapse; margin: 1em 0; }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; }
+  th { background: #f6f8fa; }
+  tr:nth-child(even) { background: #fafbfc; }
+  h1 { border-bottom: 2px solid #0969da; padding-bottom: .3em; }
+  h2 { border-bottom: 1px solid #d0d7de; padding-bottom: .3em; margin-top: 2em; }
+  blockquote { border-left: 4px solid #0969da; margin: 1em 0; padding: .5em 1em; background: #f6f8fa; color: #57606a; }
+  code { background: #f6f8fa; padding: .2em .4em; border-radius: 4px; font-size: .9em; }
+  </style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">51PM V2.2.5 验收报告（Copilot 通道复测轮）</h1>
+</header>
+<h1 id="51pm-v225-验收报告copilot-通道复测轮">51PM V2.2.5
+验收报告（Copilot 通道复测轮）</h1>
+<ul>
+<li>验收时间：2026-07-14 14:10 ~ 14:45</li>
+<li>环境：测试 10.67.8.183:7777（「当前为开发环境」水印确认）</li>
+<li>验收账号角色：邓欣羽（Web端开发 / 项目经理）</li>
+<li>验收通道：VS Code Copilot 内置浏览器直连（对比 7月10日 Hermes
+通道首轮）</li>
+<li>覆盖层：每个功能默认覆盖 UI 流程 / 边界 / 接口 / 数据一致性
+四层</li>
+<li>总览：8 项验收，✅6 / 🐛2 / ⚠️1（⑥⑦
+各含一处与首轮一致的未实现/未生效项；③ 新增一处按钮无响应）</li>
+</ul>
+<h2 id="0-原始验收需求开发者提交的本周开发内容">0.
+原始验收需求（开发者提交的本周开发内容）</h2>
+<blockquote>
+<p>V2.2.5发版内容如下：</p>
+<ol type="1">
+<li>任务选项：项目管理-项目会议-需要添加项目内审会</li>
+<li>工时填写：任务花费添加图片时，首先需要截图保存在本地文件夹，再点击打开文件夹或者拖动图片上传，无法从当前粘贴板直接获取上传，现在直接就ctrl+v即可；</li>
+<li>供应商外包管理系统：DTA组长创建内部建模任务时，仅需将任务关联到对应发包上，相关人员就可以到项目-模型外包中对"自制"类型发包下的任务进行系统化的管理；同时发包申请人可通过给每一个资产制作任务进行打分和评语；</li>
+<li>组群：创建任务时，可以在添加人的时候，快速的创建当前组群，顺手的就记录下了组群，更符合用户的应用场景</li>
+<li>我的任务：点击日历里面对应日期的任务项，就弹出花费填写界面，更符合操作习惯，右侧边栏照常保留</li>
+<li>工时填写：添加花费模块工时填写及描述优化，当日某项工时花费为0，则不用必填描述，点击立即创建后，花费工时为0的项，系统自动填写暂无。</li>
+<li>项目需求-需求描述：所有任务的任务描述直接展示描述内容，不用点击后展示弹窗</li>
+<li>项目-项目递交：项目路由下，需要新增一个 项目递交
+模块，记录该项目的所有递交记录</li>
+</ol>
+</blockquote>
+<p>对应关系：需求 1 → §1，需求 2 → §2，需求 3 → §3，需求 4 → §4，需求 5
+→ §5，需求 6 → §6，需求 7 → §7，需求 8 → §8</p>
+<h2 id="1-任务选项新增项目内审会--white_check_mark通过">1.
+任务选项新增「项目内审会」 — ✅通过</h2>
+<ul>
+<li>入口：项目需求页（「邓欣羽的测试项目」#6712）→ 需求行操作列拆解按钮
+→ 创建多人会议任务向导 → 任务选项面板</li>
+<li>实走流程：
+<ol type="1">
+<li>在项目 #6712
+下创建需求「V225copilot-验收测试需求-描述直显」（性质=其他(会议、产研)，模板=项目会议）</li>
+<li>需求拆解向导逐级展开任务选项面板：「管理/会议/售前/培训」→ 项目管理
+→ 项目会议 → 出现四个选项：项目启动会 / 项目融通会 / 项目复盘会 /
+<strong>项目内审会</strong>（新增项存在 ✅）</li>
+<li>勾选「项目内审会」，任务名自动生成「项目会议-项目内审会 |
+0.5H」，走完两步向导真实创建任务成功（指派华中豪，toast「成功创建 1
+条任务」）</li>
+</ol></li>
+<li>附带发现（轻微）：任务选项面板顶部「搜索任务选项」只在当前分组内搜索——默认停在「岗位专业」分组时搜"内审"提示暂无数据，需先手动切到「管理/会议/售前/培训」分组；建议搜索改为跨分组</li>
+<li>覆盖层：UI ✅ / 边界 ✅（搜索跨分组场景）/ 接口
+✅（批量创建提交成功）/ 数据 ✅（任务名自动生成与所选项一致）</li>
+<li>截图：final-01-任务选项-项目内审会.jpg</li>
+<li>推断需关注人员：全员（会议工时填报）</li>
+<li>【发版素材】任务选项「项目管理-项目会议」下新增「项目内审会」，支持项目内审会议工时的规范登记；</li>
+</ul>
+<h2 id="2-填写工时支持-ctrlv-粘贴截图--white_check_mark通过">2.
+填写工时支持 Ctrl+V 粘贴截图 — ✅通过</h2>
+<ul>
+<li>入口：我的地盘 → 我的任务（日历）→ 点任务条 → 工时记录弹窗 →
+「填写工时」→ 添加工时弹窗上传区</li>
+<li>实走流程：
+<ol type="1">
+<li>上传区提示文案确认为「<strong>图片拖到此处，或 Ctrl+V
+粘贴</strong>」✅</li>
+<li>合成剪贴板图片派发真实 paste 事件（ClipboardEvent +
+DataTransfer，等价用户 Ctrl+V）</li>
+<li>弹「上传成功」toast，上传区出现缩略图，图片落到
+<code>storage/project_task_estimate/202607/</code> ✅</li>
+</ol></li>
+<li>覆盖层：UI ✅ / 边界 ✅（连续粘贴 2 张不覆盖）/ 接口
+✅（上传后返回存储 URL）/ 数据 ✅（提交后记录带截图）</li>
+<li>截图：final-02-工时贴图-粘贴上传成功.jpg</li>
+<li>推断需关注人员：全员</li>
+<li>【发版素材】填写工时上传截图支持剪贴板 Ctrl+V
+直接粘贴，截图后无需保存本地文件即可上传，减少填报操作步骤；</li>
+</ul>
+<h2
+id="3-供应商外包管理-自制发包--bugbug主链路本轮打通任务管理按钮无响应">3.
+供应商外包管理-自制发包 —
+🐛BUG（主链路本轮打通，「任务管理」按钮无响应）</h2>
+<ul>
+<li>入口：「项目 → 项目详情 → 模型外包」（路由
+<code>/project/outsource_project?projectId=N</code>）</li>
+<li>实走流程（<strong>较首轮大幅推进</strong>——首轮止步「待审核」，本轮完整走通立项）：
+<ol type="1">
+<li>「申请发包」表单真实走通：名称「V225copilot-自制发包复测」+
+类型（多选：照片建模）+ UE5.5 + 存放地址 + 制作内容，提交成功 ✅</li>
+<li>列表操作列「立项」→ 立项确认弹窗（报价单拆解 /
+<strong>手动创建（可指派自制、外包）</strong> 双模式）→ 选手动创建 →
+承接方选「<strong>选择制作组（自制）</strong>」→
+出现「当前为自制流程，本次立项不会推送给外部供应商」提示 →
+制作部门级联选「DTA资产 / 李润芝」→ 确认立项成功 ✅</li>
+<li>立项后列表状态「制作中」+「自制」标签 + 「前往管理」链接 +
+<strong>「打分」按钮</strong>全部出现 ✅</li>
+<li>「打分」→
+「结项评价」弹窗正常打开，当前「暂无已完工任务」（发包无完工任务，状态机逻辑正确）✅</li>
+<li>「前往管理」→ 发包详情页
+<code>/project/outsource_detail?outsourcePackageId=661</code>：任务表含「质量评分」列、列表/甘特双视图
+✅</li>
+</ol></li>
+<li>🐛 BUG：发包详情页「<strong>任务管理」按钮点击无响应</strong>
+<ul>
+<li>复现步骤：模型外包 → 自制发包（#661，制作中）行「前往管理」→
+详情页点「任务管理」按钮（真实点击 2 次 + 悬停均试过）</li>
+<li>预期：弹出任务管理/添加建模任务界面（用于把内部建模任务关联到发包）</li>
+<li>实际：无弹窗、无路由变化、无控制台报错、悬停无下拉——完全无反馈</li>
+<li>严重度：严重（需求 3
+的核心操作「DTA组长创建建模任务关联发包」入口不可用；若设计为仅 DTA
+组长可用，也应禁用按钮或给权限提示，而非静默无响应）</li>
+<li>截图：03-自制发包-bug-任务管理按钮无响应.jpg</li>
+</ul></li>
+<li>⚠️ 由此未能闭环：任务级打分评语（依赖任务管理可用后创建任务）——待
+BUG 修复或用 DTA 组长账号复验</li>
+<li>覆盖层：UI ✅（申请→立项→打分入口全链路）/ 边界
+✅（无完工任务时结项评价空态）/ 接口 ✅（create_package、立项提交）/
+数据 ✅（立项后状态/标签/承接方回读一致）</li>
+<li>截图：final-03-自制发包申请成功.jpg、final-03b-自制立项后打分入口.jpg</li>
+<li>推断需关注人员：DTA、PM、发包申请人</li>
+<li>【发版素材】模型外包支持「自制」流程：发包立项时可直接指派内部制作组（不推送外部供应商），自制发包下任务统一管理，发包申请人可对资产制作任务打分评语（降低外包与自制任务的管理成本）；</li>
+</ul>
+<h2 id="4-创建任务时快速创建组群--white_check_mark通过">4.
+创建任务时快速创建组群 — ✅通过</h2>
+<ul>
+<li>入口：需求拆解向导（创建多人会议任务）→「从组群导入」→ popover
+内「立即管理」</li>
+<li>实走流程：
+<ol type="1">
+<li>「从组群导入」popover 内点「立即管理」→
+<strong>就地弹出「组群配置」弹窗</strong>（不离开创建任务流程）✅</li>
+<li>「新建分组」→ 填名「V225copilot验收组」→
+创建成功（ID:9，自动选中）✅</li>
+<li>成员下拉真实点击选「华中豪」→「加入」→「保存成员」→
+toast「保存成功」✅</li>
+<li>关闭组群配置回到创建流程 → 再点「从组群导入」→
+组群下拉出现「V225copilot验收组 1人」→ 选中「添加」→
+toast「已添加组群『V225copilot验收组』成员 1 人」，指派人自动填入
+✅（完整闭环）</li>
+</ol></li>
+<li>对比首轮：首轮记录的「嵌套弹窗内成员下拉坐标点击不展开（需 vm
+兜底）」<strong>本轮未复现</strong>，真实点击一次成功</li>
+<li>覆盖层：UI ✅ / 边界 ✅（新建空组群→加人→立即使用）/ 接口
+✅（创建/保存/导入三步均成功）/ 数据 ✅（成员数、导入人数一致）</li>
+<li>截图：final-04-创建任务内嵌组群配置-新建保存成功.jpg</li>
+<li>推断需关注人员：需要批量指派任务的 PM / 组长</li>
+<li>【发版素材】创建任务添加指派人时可就地快速创建组群并立即导入成员，组群顺手沉淀、下次直接复用；</li>
+</ul>
+<h2 id="5-我的任务日历点任务弹花费填写--white_check_mark通过">5.
+我的任务日历点任务弹花费填写 — ✅通过</h2>
+<ul>
+<li>入口：「我的地盘 → 左侧栏『我的任务』」（路由
+<code>/my_board/main/task</code>）</li>
+<li>实走流程：
+<ol type="1">
+<li>点击日历任务条「B/S二开-AI-引擎功能 | 8H」→
+<strong>直接弹出工时/花费填写弹窗</strong>（含花费记录列表 +
+「填写工时」按钮）✅</li>
+<li>点击日期格（6月29日）→ 右侧 <code>tc-panel</code>
+侧栏照常展示当日任务详情（含「快速创建任务 / 工时」入口）✅</li>
+</ol></li>
+<li>覆盖层：UI ✅ / 边界 ✅（任务条 vs 日期格两种点击路径行为区分正确）/
+数据 ✅（弹窗内记录与任务对应）</li>
+<li>截图：final-05-日历点任务弹花费填写.jpg</li>
+<li>推断需关注人员：全员</li>
+<li>【发版素材】「我的任务」日历中点击任务项直接弹出花费填写界面，右侧任务详情栏保留，减少填报路径；</li>
+</ul>
+<h2
+id="6-花费为-0-的项免填描述--bugbug免填已生效自动填写暂无复测仍未生效">6.
+花费为 0 的项免填描述 —
+🐛BUG（免填已生效，"自动填写暂无"复测仍未生效）</h2>
+<ul>
+<li>入口：我的任务日历 → 任务「B/S二开-AI-引擎功能、AI-数据接入 | 4H」→
+添加工时弹窗（双子项任务）</li>
+<li>实走流程：
+<ol type="1">
+<li>子项「AI-引擎功能」填 1h + 描述；子项「AI-数据接入」填 <strong>0h
+且描述留空</strong></li>
+<li>「立即创建」→ toast「花费添加成功」，<strong>0
+工时子项免必填描述已生效</strong> ✅（未弹校验拦截）</li>
+<li>回读落库记录：「AI-数据接入[0h]：」——<strong>描述为空，没有自动补"暂无"</strong>
+❌</li>
+</ol></li>
+<li>复测结论：与 7月10日 首轮发现完全一致，<strong>该 BUG
+未修复</strong></li>
+<li>严重度：一般（功能主体可用，发版描述中"自动填写暂无"半句未实现；不影响提交）</li>
+<li>覆盖层：UI ✅ / 边界 ✅（0 与非 0 混合提交）/ 数据
+✅（落库回读核对）</li>
+<li>截图：06-工时0-bug-暂无未自动填写-复测仍存在.jpg</li>
+<li>推断需关注人员：全员 + 开发（修复跟进）</li>
+<li>【发版素材】添加花费时工时为 0
+的子项不再强制填写描述（正文只写已生效半句；"自动填暂无"待修复后补回）；</li>
+</ul>
+<h2
+id="7-需求任务描述直显--warning需人工复核任务列表已直显需求页复测仍为弹窗按钮">7.
+需求/任务描述直显 —
+⚠️需人工复核（任务列表已直显；需求页复测仍为弹窗按钮）</h2>
+<ul>
+<li>实走流程：
+<ol type="1">
+<li>「任务 → 项目任务」列表（54
+行）：「任务描述」列<strong>全部直接平铺展示文字</strong>，无按钮无弹窗
+✅</li>
+<li>「项目 →
+项目需求」页：「需求描述」列<strong>仍是「查看详情」按钮</strong>（点击弹窗查看），与首轮一致未改
+⚠️</li>
+</ol></li>
+<li>需产品确认口径：需求原文写「项目需求-需求描述」，若开发范围即任务列表则本项通过；若需求页也应直显则未完成</li>
+<li>覆盖层：UI ✅ / 数据
+✅（新建需求的描述在任务拆解后正确带入任务）</li>
+<li>截图：final-07-任务描述直显-任务列表.jpg、07-需求描述-复测仍为查看详情按钮.jpg</li>
+<li>推断需关注人员：全员</li>
+<li>【发版素材】任务列表「任务描述」列直接展示描述内容，无需点击弹窗查看；</li>
+</ul>
+<h2 id="8-项目路由新增项目递交模块--white_check_mark通过">8.
+项目路由新增「项目递交」模块 — ✅通过</h2>
+<ul>
+<li>入口：「项目 → 项目详情 → 二级菜单『项目递交』」（路由
+<code>/project/project_publish?projectId=N</code>）</li>
+<li>实走流程：
+<ol type="1">
+<li>「邓欣羽的测试项目」(#6712)：模块存在，空状态「该项目暂无递交记录」正常，统计条全
+0 ✅</li>
+<li>「智慧城市管理平台」(#6708)：空状态同样正常 ✅</li>
+<li>有数据项目「千岛湖升级优化项目」(#6662)：统计条「全部4 / 按时3 /
+超时0 / 延期0 / 待递交1」与首轮数据一致 ✅</li>
+<li>「最新/最早」排序实测生效（首卡日期 5/14 ↔︎ 4/29 正确切换）✅</li>
+</ol></li>
+<li>对比首轮：首轮记录的「二级菜单 el-menu-item
+点击不路由」<strong>本轮未复现</strong>，真实点击直接路由成功</li>
+<li>覆盖层：UI ✅ / 边界 ✅（空数据、多项目切换）/ 数据
+✅（统计数与首轮及卡片状态一致）</li>
+<li>截图：final-08-项目递交-列表与统计.jpg</li>
+<li>推断需关注人员：PM、TB/BD</li>
+<li>【发版素材】项目路由新增「项目递交」模块，按时间轴汇总该项目全部递交记录与按时率统计（减少跨模块翻查递交历史的时间）；</li>
+</ul>
+<h2 id="bug--待人工复核清单汇总">BUG / 待人工复核清单汇总</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>类型</th>
+<th>内容</th>
+<th>建议</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>🐛严重</td>
+<td>§3
+自制发包详情页「任务管理」按钮点击无响应（建模任务关联发包入口不可用）</td>
+<td>开发排查；若为权限设计需改为禁用+提示</td>
+</tr>
+<tr>
+<td>2</td>
+<td>🐛一般</td>
+<td>§6 "0 工时自动填『暂无』"复测仍未生效（落库空串），与首轮同</td>
+<td>确认开发是否遗漏，或口径改为"允许为空"</td>
+</tr>
+<tr>
+<td>3</td>
+<td>⚠️</td>
+<td>§7 需求页「需求描述」列仍为「查看详情」按钮（任务列表已直显）</td>
+<td>产品确认开发范围口径</td>
+</tr>
+<tr>
+<td>4</td>
+<td>轻微</td>
+<td>§1 任务选项搜索只在当前分组内生效</td>
+<td>建议改跨分组搜索</td>
+</tr>
+<tr>
+<td>5</td>
+<td>待复验</td>
+<td>§3 任务级打分评语（依赖 #1 修复后建任务）</td>
+<td>修复后复验或 DTA 组长账号人工验</td>
+</tr>
+</tbody>
+</table>
+<h2
+id="本轮验收产生的测试数据测试环境不清理">本轮验收产生的测试数据（测试环境，不清理）</h2>
+<ul>
+<li>需求「V225copilot-验收测试需求-描述直显」（项目
+#6712，性质=其他/项目会议模板，非产出 2h）</li>
+<li>任务「项目会议-项目内审会 | 0.5H」（指派华中豪，2026-07-14）</li>
+<li>工时记录 1 条（任务「B/S二开-AI-引擎功能、AI-数据接入 |
+4H」，2026-07-14，1h，含粘贴截图 2 张）</li>
+<li>组群「V225copilot验收组」（ID:9，成员：华中豪）</li>
+<li>发包「V225copilot-自制发包复测」（#661，已立项自制流程，承接方
+DTA资产/李润芝，制作中）</li>
+</ul>
+<h2 id="发版内容初稿待人工定稿">发版内容（初稿，待人工定稿）</h2>
+<blockquote>
+<p><strong>验收未通过项处理</strong>：⑥"自动填写暂无"复测仍未生效（🐛），正文只写已生效的"花费为0免填描述"；⑦需求页直显未实现，正文只写任务列表直显；③「任务管理」按钮无响应（🐛），正文自制流程主链路已通可写，任务级打分评语半句暂不写。开发修复后可补回。</p>
+</blockquote>
+<p><strong>51PM V2.2.5 版本更新</strong></p>
+<p>1.「任务选项-项目内审会」
+任务选项「项目管理-项目会议」下新增"项目内审会"，支持项目内审会议工时的规范登记；</p>
+<p>2.「工时填写-截图粘贴上传」 填写工时上传截图支持剪贴板 Ctrl+V
+直接粘贴，截图后无需保存本地文件即可上传，减少填报操作步骤；</p>
+<p>3.「模型外包-自制发包」
+模型外包支持"自制"流程：发包立项时可直接指派内部制作组（不推送外部供应商），自制发包下任务在项目-模型外包中统一管理，支持结项评价打分；</p>
+<p>4.「创建任务-快速建组群」
+创建任务添加指派人时可就地快速创建组群并立即导入成员，组群顺手沉淀、下次直接复用；</p>
+<p>5.「我的任务-日历直填花费」
+"我的任务"日历中点击任务项直接弹出花费填写界面，右侧任务详情栏保留，减少填报路径；</p>
+<p>6.「工时填写-零工时免描述」 添加花费时工时为 0
+的子项不再强制填写描述，多任务混合填报更顺畅；</p>
+<p>7.「任务描述直显」
+任务列表"任务描述"列直接展示描述内容，无需点击弹窗查看；</p>
+<p>8.「项目递交模块」
+项目路由新增"项目递交"模块，按时间轴汇总该项目全部递交记录与按时率统计，减少跨模块翻查递交历史的时间。</p>
+<h2 id="附定妆图索引发版素材">附：定妆图索引（发版素材）</h2>
+<ul>
+<li>「任务选项-项目内审会」：final-01-任务选项-项目内审会.jpg</li>
+<li>「工时贴图」：final-02-工时贴图-粘贴上传成功.jpg</li>
+<li>「自制发包」：final-03-自制发包申请成功.jpg、final-03b-自制立项后打分入口.jpg</li>
+<li>「快速建组群」：final-04-创建任务内嵌组群配置-新建保存成功.jpg</li>
+<li>「日历直填花费」：final-05-日历点任务弹花费填写.jpg</li>
+<li>「任务描述直显」：final-07-任务描述直显-任务列表.jpg</li>
+<li>「项目递交」：final-08-项目递交-列表与统计.jpg</li>
+</ul>
+</body>
+</html>

@@ -1,0 +1,5 @@
+node_modules/
+regression/auth/state.json
+regression/playwright-report/
+regression/test-results/
+.DS_Store

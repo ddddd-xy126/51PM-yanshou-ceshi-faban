@@ -35,9 +35,9 @@
 > ★ 全流程总控 SKILL：[skills/SKILL.md](skills/SKILL.md) —— 在 Copilot 对话框发「验收 V2.x.x + 本周开发内容」即可按下面四阶段自动串联执行。
 
 1. **回归**（几分钟）：`cd regression && npx playwright test`
-   - 全绿 → 老功能没被改坏
+   - 全绿 → 老功能没被改坏（哨兵用例 BUG 未修复时为预期失败，也计绿）
    - 意外红 → 可能是回归 BUG，看 `npx playwright show-report`
-   - 「已知BUG跟踪」用例红是正常的（开发修复后自动转绿，转绿后把它改成常规断言）
+   - 「已知BUG跟踪」用例报 unexpected pass（红）= 开发已修复：删掉 `test.fail()` 标记转常规断言
 2. **新功能探索**：在 VS Code Copilot 对话框贴本周开发内容，按 [skills/release_acceptance.md](skills/release_acceptance.md) 流程现场验收（产物写入 `acceptance/{版本}/`）
 3. **沉淀**：新功能验收通过后，让 Copilot 把走通的路径追加成 `tests/v{版本}.spec.js`，下周它就进回归
 4. **回填**：新入口/新坑写进 [skills/entry_map.md](skills/entry_map.md)

@@ -14,7 +14,8 @@ module.exports = defineConfig({
     ['html', { open: 'never', outputFolder: 'playwright-report' }],
   ],
   use: {
-    baseURL: 'http://10.67.8.183:7777',
+    // 默认测试环境；需要在其他环境跑只读冒烟时：$env:BASE_URL='http://…'; npx playwright test
+    baseURL: process.env.BASE_URL || 'http://10.67.8.183:7777',
     storageState: 'auth/state.json', // 由 npm run login 生成
     screenshot: 'only-on-failure',
     trace: 'retain-on-failure',

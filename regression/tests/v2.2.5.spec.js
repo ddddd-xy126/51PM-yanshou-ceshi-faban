@@ -65,16 +65,24 @@ test.describe('V2.2.5 回归', () => {
     );
     expect(headers).toContain('质量评分');
     // 已立项自制发包（V225copilot-自制发包复测）应有「打分」按钮
+    // 注意：这是数据前置条件，缺失时硬性失败提示补数据，不静默跳过
     const bodyText = await page.evaluate(() => document.body.innerText);
-    if (bodyText.includes('V225copilot-自制发包复测')) {
-      expect(bodyText).toContain('打分');
-      expect(bodyText).toContain('前往管理');
-    }
+    expect(
+      bodyText,
+      '测试数据缺失：模型外包列表应有「V225copilot-自制发包复测」发包（若被清理需先重建再跑）'
+    ).toContain('V225copilot-自制发包复测');
+    expect(bodyText).toContain('打分');
+    expect(bodyText).toContain('前往管理');
   });
 
   test('③ 已知BUG跟踪：发包详情页「任务管理」按钮应有响应', async ({ page }) => {
-    // V2.2.5-copilot 轮发现的 BUG：点击无响应。修复后本用例应转绿。
-    await page.goto('/project/outsource_detail?outsourcePackageId=661&projectId=6712');
+    // V2.2.5-copilot 轮发现的 BUG：点击无响应。
+    // test.fail()：BUG 未修复时断言失败=预期结果（显示绿，整体可全绿）；
+    // 开发修复后本用例会报 unexpected pass（红）→ 届时删掉 test.fail() 转常规断言，并到 entry_map 销账。
+    test.fail(true, '已知BUG：任务管理按钮点击无响应（V2.2.5-copilot 轮发现）');
+    await page.goto(
+      `/project/outsource_detail?outsourcePackageId=${h.OUTSOURCE_PACKAGE_ID}&projectId=${h.TEST_PROJECT_ID}`
+    );
     await h.waitTableSettled(page);
     const btn = page.locator('button', { hasText: '任务管理' }).first();
     await expect(btn).toBeVisible();
@@ -86,7 +94,7 @@ test.describe('V2.2.5 回归', () => {
           (d) => d.offsetWidth > 0
         ) || location.href.includes('task')
     );
-    expect(reacted, '「任务管理」按钮点击应弹窗或路由（当前为已知BUG，修复前本用例红）').toBe(true);
+    expect(reacted, '「任务管理」按钮点击应弹窗或路由（已知BUG未修复时此断言失败=预期）').toBe(true);
   });
 
   test('④ 创建任务流程内可就地管理组群', async ({ page }) => {
@@ -96,15 +104,10 @@ test.describe('V2.2.5 回归', () => {
       .locator('.el-dialog__wrapper:visible >> text=从组群导入')
       .last()
       .click();
-    await page.waitForTimeout(1200);
     const tip = page.locator('[role=tooltip]', { hasText: '从组群添加指派人' });
     await expect(tip).toBeVisible();
-    // 「立即管理」就地弹组群配置（不离开创建流程）
-    await page.evaluate(() => {
-      const t = [...document.querySelectorAll('[role=tooltip]')].filter((e) => e.offsetWidth > 0).pop();
-      [...t.querySelectorAll('*')].find((e) => e.children.length === 0 && e.innerText.trim() === '立即管理')?.click();
-    });
-    await page.waitForTimeout(1500);
+    // 「立即管理」就地弹组群配置（不离开创建流程）——真实点击验证链接可点性
+    await tip.getByText('立即管理', { exact: true }).click();
     await expect(page.locator('.el-dialog__wrapper:visible', { hasText: '组群配置' }).last()).toBeVisible();
     await expect(page.locator('button:visible', { hasText: '新建分组' }).first()).toBeVisible();
     // 历史组群仍在（V225copilot验收组）
@@ -119,21 +122,19 @@ test.describe('V2.2.5 回归', () => {
 
   test('⑤ 日历点任务条直接弹花费填写，点日期格右侧栏保留', async ({ page }) => {
     await h.gotoMyTaskCalendar(page);
-    // 点任务条 → 工时弹窗
-    await page.evaluate(() => document.querySelector('.tc-bar')?.click());
-    await page.waitForTimeout(1500);
+    // 真实点击任务条 → 工时弹窗
+    await page.locator('.tc-bar').first().click();
+    await h.waitVisibleDialog(page);
     const dlg = await page.evaluate(() => {
       const d = [...document.querySelectorAll('.el-dialog__wrapper')].filter((x) => x.offsetWidth > 0).pop();
       return d?.innerText || '';
     });
     expect(dlg).toContain('填写工时');
     await h.closeAllDialogs(page);
-    // 点日期格 → tc-panel 侧栏
-    await page.evaluate(() => {
-      const dates = [...document.querySelectorAll('.tc-cell__date')];
-      (dates.find((e) => /^\d+$/.test(e.innerText.trim())) || dates[0])?.click();
-    });
-    await page.waitForTimeout(1200);
+    // 真实点击日期格 → tc-panel 侧栏（优先选纯数字日期格）
+    const dateCells = page.locator('.tc-cell__date').filter({ hasText: /^\s*\d+\s*$/ });
+    const target = (await dateCells.count()) ? dateCells.first() : page.locator('.tc-cell__date').first();
+    await target.click();
     await expect(page.locator('.tc-panel').first()).toBeVisible();
   });
 
@@ -188,6 +189,9 @@ test.describe('V2.2.5 回归', () => {
       const all = btns.find((b) => b.innerText.includes('全部'))?.innerText.match(/\d+/)?.[0];
       return { total, all };
     });
+    // 先确认两个数字都解析到了，防止 undefined === undefined 假通过
+    expect(stats.total, '未解析到「共 N 条」总数文案').toBeTruthy();
+    expect(stats.all, '未解析到「全部」按钮上的统计数').toBeTruthy();
     expect(stats.total).toBe(stats.all); // 「全部」统计数 = 列表总条数
     // 最新/最早排序切换首卡变化
     const firstDate = () =>

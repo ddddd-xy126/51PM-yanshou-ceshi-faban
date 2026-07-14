@@ -3,6 +3,7 @@ const { expect } = require('@playwright/test');
 
 const TEST_PROJECT_ID = 6712; // 邓欣羽的测试项目
 const PUBLISH_DATA_PROJECT_ID = 6662; // 千岛湖升级优化项目（项目递交有历史数据）
+const OUTSOURCE_PACKAGE_ID = 661; // 测试项目下已立项的自制发包（V225copilot-自制发包复测）
 
 /** 关掉版本更新公告弹窗（新会话首次进页会弹「知道了」，会挡住后续弹窗/点击） */
 async function dismissAnnouncement(page) {
@@ -40,19 +41,18 @@ async function gotoProjectPage(page, route, projectId = TEST_PROJECT_ID) {
 /** 进「我的地盘 → 我的任务」日历（坑：直接改 URL 会被重定向回 main，必须点左侧菜单） */
 async function gotoMyTaskCalendar(page) {
   await page.goto('/my_board/main/main');
-  await page.waitForTimeout(2000);
+  await page.waitForSelector('li.el-menu-item', { timeout: 15_000 });
   await dismissAnnouncement(page);
-  await page.evaluate(() => {
-    const li = [...document.querySelectorAll('li.el-menu-item')].find(
-      (e) => e.innerText.trim() === '我的任务' && e.getBoundingClientRect().x < 100
-    );
-    if (!li) throw new Error('左侧栏未找到「我的任务」');
-    li.click();
-  });
+  // 真实点击左侧栏「我的任务」（:visible 过滤隐藏副本；正则锚定避免误匹前缀同名项）
+  await page
+    .locator('li.el-menu-item:visible')
+    .filter({ hasText: /^\s*我的任务\s*$/ })
+    .first()
+    .click();
   await page.waitForSelector('.tc-cell', { timeout: 15_000 });
 }
 
-/** 关闭所有可见 el-dialog（坑：headerbtn 有隐藏副本，只点可见的） */
+/** 关闭所有可见 el-dialog（清理用途非交互断言，故保留 JS 批量关闭；headerbtn 有隐藏副本，只点可见的） */
 async function closeAllDialogs(page) {
   await page.evaluate(() => {
     [...document.querySelectorAll('.el-dialog__wrapper')]
@@ -80,18 +80,14 @@ async function waitVisibleDialog(page, timeout = 12_000) {
 
 /**
  * 打开需求拆解向导（创建多人任务）。
- * 坑：操作列 el-icon-menu 因固定列双份渲染，第一个不可见，须过滤 offsetWidth>0。
+ * 坑：操作列 el-icon-menu 因固定列双份渲染，第一个不可见，用 :visible 过滤。
  */
 async function openDismantleWizard(page, projectId = TEST_PROJECT_ID) {
   await gotoProjectPage(page, 'demand', projectId);
-  const opened = await page.evaluate(() => {
-    const icons = [...document.querySelectorAll('.el-table__body .el-icon-menu')].filter(
-      (i) => i.offsetWidth > 0
-    );
-    icons[0]?.click();
-    return icons.length > 0;
-  });
-  expect(opened, '项目需求页应有可拆解的需求行（若为空需先建需求）').toBe(true);
+  const icons = page.locator('.el-table__body .el-icon-menu:visible');
+  const count = await icons.count();
+  expect(count, '项目需求页应有可拆解的需求行（若为空需先建需求）').toBeGreaterThan(0);
+  await icons.first().click();
   await waitVisibleDialog(page);
 }
 
@@ -100,34 +96,28 @@ async function openDismantleWizard(page, projectId = TEST_PROJECT_ID) {
  * 坑：面板搜索只搜当前分组，必须先切分组；不要按 Escape（会关掉整个向导）。
  */
 async function openMeetingOptions(page) {
-  await page.evaluate(() => {
-    const dlg = [...document.querySelectorAll('.el-dialog__wrapper, [role=dialog]')]
-      .filter((d) => d.offsetWidth > 0)
-      .pop();
-    const sel = [...dlg.querySelectorAll('*')].find(
-      (e) => e.children.length === 0 && e.innerText.trim() === '请选择任务选项'
-    );
-    sel?.click();
-  });
+  await page
+    .locator('.el-dialog__wrapper:visible')
+    .last()
+    .getByText('请选择任务选项', { exact: true })
+    .click();
   await page.waitForSelector('[role=tooltip] input[placeholder="搜索任务选项"]', {
     timeout: 8_000,
   });
+  // 以下三次点击靠 locator.click() 自带的可见/稳定性等待，不再需要固定 sleep
   await page
     .locator('[role=tooltip] label:visible', { hasText: '管理/会议/售前/培训' })
     .first()
     .click();
-  await page.waitForTimeout(600);
   // 坑：面板里「项目管理」是 li（listitem），「项目会议」等有子级的才是 menuitem
   await page.locator('[role=tooltip] li:visible', { hasText: '项目管理' }).first().click();
-  await page.waitForTimeout(600);
   await page.locator('[role=tooltip] [role=menuitem]:visible', { hasText: '项目会议' }).first().click();
-  await page.waitForTimeout(600);
 }
 
 /** 打开日历第一个任务条的工时弹窗，再进「添加工时」表单 */
 async function openAddTimesheetDialog(page) {
   await gotoMyTaskCalendar(page);
-  await page.evaluate(() => document.querySelector('.tc-bar')?.click());
+  await page.locator('.tc-bar').first().click();
   await waitVisibleDialog(page);
   await page
     .locator('.el-dialog__wrapper:visible button', { hasText: '填写工时' })
@@ -140,6 +130,7 @@ async function openAddTimesheetDialog(page) {
 module.exports = {
   TEST_PROJECT_ID,
   PUBLISH_DATA_PROJECT_ID,
+  OUTSOURCE_PACKAGE_ID,
   waitTableSettled,
   waitVisibleDialog,
   dismissAnnouncement,

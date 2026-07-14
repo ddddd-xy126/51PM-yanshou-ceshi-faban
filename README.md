@@ -32,6 +32,8 @@
 
 ## 每周验收工作流
 
+> ★ 全流程总控 SKILL：[skills/SKILL.md](skills/SKILL.md) —— 在 Copilot 对话框发「验收 V2.x.x + 本周开发内容」即可按下面四阶段自动串联执行。
+
 1. **回归**（几分钟）：`cd regression && npx playwright test`
    - 全绿 → 老功能没被改坏
    - 意外红 → 可能是回归 BUG，看 `npx playwright show-report`

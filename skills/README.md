@@ -35,6 +35,7 @@
 
 ## skill 索引
 
+- [SKILL.md](SKILL.md) — ★ **验收-测试-发版全流程总控**：回归→验收→沉淀→发版四阶段调度器，收到「验收 V2.x.x + 开发内容」从这里进
 - [fill_today_timesheet.md](fill_today_timesheet.md) — 查询/查看今日个人排期（**只读**，参数化用户与部门）
 - [team_schedule_report.md](team_schedule_report.md) — 按部门 + 日期范围拉团队排期、输出「日期→人员」汇报（**只读**）
 - [checkTask_confirmTask.md](checkTask_confirmTask.md) — 任务模块：按部门 + 状态 + 周期筛任务，逐个点完工（写操作，提交前必须 ask user）

@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-CN" xml:lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>51PM V2.2.6 验收报告</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <style>
+    body { max-width: 72em; }
+    table { display: table; width: 100%; }
+  </style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">51PM V2.2.6 验收报告</h1>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#51pm-v226-验收报告" id="toc-51pm-v226-验收报告">51PM
+V2.2.6 验收报告</a>
+<ul>
+<li><a href="#回归结果阶段-1" id="toc-回归结果阶段-1">回归结果（阶段
+1）</a></li>
+<li><a href="#0-原始验收需求开发者提交的本周开发内容"
+id="toc-0-原始验收需求开发者提交的本周开发内容">0.
+原始验收需求（开发者提交的本周开发内容）</a></li>
+<li><a href="#1-工时填写显示任务描述--white_check_mark通过"
+id="toc-1-工时填写显示任务描述--white_check_mark通过">1.
+工时填写显示任务描述 — ✅通过</a></li>
+<li><a href="#2-递交状态自动判定--white_check_mark通过"
+id="toc-2-递交状态自动判定--white_check_mark通过">2. 递交状态自动判定 —
+✅通过</a></li>
+<li><a href="#3-项目概览-行业接口文档--white_check_mark通过"
+id="toc-3-项目概览-行业接口文档--white_check_mark通过">3.
+项目概览-行业接口文档 — ✅通过</a></li>
+<li><a href="#4-会议动态待办项负责人--white_check_mark通过"
+id="toc-4-会议动态待办项负责人--white_check_mark通过">4.
+会议动态待办项负责人 — ✅通过</a></li>
+<li><a href="#5-统计-产能数据看板--white_check_mark通过"
+id="toc-5-统计-产能数据看板--white_check_mark通过">5. 统计-产能数据看板
+— ✅通过</a></li>
+<li><a href="#接口测试汇总与未覆盖声明"
+id="toc-接口测试汇总与未覆盖声明">接口测试汇总与未覆盖声明</a></li>
+<li><a href="#交付前需人工确认汇总"
+id="toc-交付前需人工确认汇总">交付前需人工确认（汇总）</a></li>
+<li><a href="#验收产生的测试数据测试环境无需清理"
+id="toc-验收产生的测试数据测试环境无需清理">验收产生的测试数据（测试环境，无需清理）</a></li>
+<li><a href="#发版内容初稿待人工定稿"
+id="toc-发版内容初稿待人工定稿">发版内容（初稿，待人工定稿）</a>
+<ul>
+<li><a href="#v226-发布于-2026-07-xx"
+id="toc-v226-发布于-2026-07-xx">V2.2.6 发布于 2026-07-XX</a></li>
+</ul></li>
+<li><a href="#交接给发版技能"
+id="toc-交接给发版技能">交接给发版技能</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="51pm-v226-验收报告">51PM V2.2.6 验收报告</h1>
+<ul>
+<li>验收时间：2026-07-15 11:45</li>
+<li>环境：测试 10.67.8.183:7777</li>
+<li>验收账号角色：邓欣羽（Web端开发；#6712 项目
+PM/TB/QA/场景主导人）</li>
+<li>覆盖层：每个功能默认覆盖 UI 流程 / 边界 / 接口 / 数据一致性
+四层</li>
+<li>总览：5 项验收，✅5 / 🐛0 / ⚠️0；另有 4
+项附随发现待人工确认（不阻断发版，见文丫「交付前需人工确认」表）</li>
+</ul>
+<h2 id="回归结果阶段-1">回归结果（阶段 1）</h2>
+<ul>
+<li><code>npx playwright test</code> 只读全量：<strong>8 通过 / 1
+跳过（@write）/ 1 意外失败</strong></li>
+<li>失败用例「④
+创建任务流程内可就地管理组群」复跑<strong>通过</strong>（首跑时项目需求页偶发空载，非回归
+BUG、非数据缺失——需求页现有 3 条需求）</li>
+<li>哨兵用例「发包详情『任务管理』按钮」仍预期失败（BUG
+未修复，绿色）</li>
+<li><strong>结论：老功能无回归。</strong></li>
+</ul>
+<h2 id="0-原始验收需求开发者提交的本周开发内容">0.
+原始验收需求（开发者提交的本周开发内容）</h2>
+<blockquote>
+<p>V2.2.6发版内容如下： 用户体验：
+1.工时填写：希望填写工时时，增加显示任务描述，因为DTA的任务全部名称创建在任务描述内，目前无法看到
+2.递交模块：建议QA在填写递交时，能根据时间自动判定选择"正常递交"与"提前递交"
+新增功能：
+3.项目概览：新增行业接口说明书的存放位置，需要区分工程定制接口和行业接口。
+4.项目动态：希望给会议动态的待办项添加一个选择负责人，以便待办事项的跟进，详见图
+5.统计-产能数据看板：工程产能分析&amp;小组产能看板（点击对应色块可查看详细内容）</p>
+</blockquote>
+<p>对应关系：需求 1 → §1，需求 2 → §2，需求 3 → §3，需求 4 → §4，需求 5
+→ §5</p>
+<h2 id="1-工时填写显示任务描述--white_check_mark通过">1.
+工时填写显示任务描述 — ✅通过</h2>
+<ul>
+<li>入口：「我的地盘 → 我的任务（日历）」点日历格 → 右侧任务卡片</li>
+<li>实走流程：1) 进入我的任务日历 2) 点 7月9日格子 3)
+核对侧栏任务卡字段</li>
+<li>结果：任务卡片新增「备注」字段，完整展示任务描述原文。实测两条任务：「V224边界-负工时(可删除)」显示描述"边界测试"；「AI探索-AI应用
+| 16H」显示 60+ 字长描述完整不截断；无描述任务不显示异常</li>
+<li>覆盖层：UI ✅ / 边界 ✅（长文本、无描述空态）/ 接口
+✅（任务列表接口返回的描述字段与卡片展示一致）/ 数据 ✅</li>
+<li>⚠️
+备注：「填写工时→添加工时」弹窗内部（花费人/日期/花费总计表单）<strong>未</strong>展示任务描述，描述仅显示在日历任务卡上；弹窗标题仅任务名。如需求方期望弹窗内也显示，需开发补充（见人工确认表
+#1）</li>
+<li>截图：final-工时填写任务描述.jpg</li>
+<li>推断需关注人员：全员（尤其 DTA）</li>
+<li>【发版素材】「我的任务」日历任务卡新增任务描述（备注）展示，方便填写工时时直接查看
+DTA 任务全名；</li>
+</ul>
+<h2 id="2-递交状态自动判定--white_check_mark通过">2. 递交状态自动判定 —
+✅通过</h2>
+<ul>
+<li>入口：「递交」→ 递交列表行「QA递交」→ 项目递交弹窗「项目递交
+(QA)」tab</li>
+<li>实走流程（为造前置数据走通完整递交链）：
+<ol type="1">
+<li>TB/BD 仪表盘 →「立即申请递交」→ 为
+邓欣羽的测试项目（#6712）申请进度递交，要求时间 2026-07-16
+20:00（递交申请 #423）</li>
+<li>我的信箱 →「审批递交申请(PM)」→ 转化为递交（PM 审批表单）→
+递交创建成功、状态「已排期」</li>
+<li>递交列表筛 7/15~7/17 → 打开「QA递交」弹窗</li>
+</ol></li>
+<li><strong>核心断言</strong>：弹窗打开时「递交状态」已自动预选**「提前递交」**（今天
+7/15 早于要求时间 7/16 ≥1
+天）；下拉仍可手动改（未递交/正常递交/提前递交/延期交付/PM递交 共 5
+项）；填版本号 v0.0.1 + 实际递交时间 +
+遗留问题后提交成功，列表状态列显示「提前递交」，落库正确</li>
+<li>判定逻辑（源码确认，<code>publish_list.vue</code>
+回显逻辑）：当前日期比要求递交日期早 <strong>≥1 天</strong> →
+默认「提前递交」，否则默认「正常递交」；控制台有
+<code>[递交状态判断]</code> 调试日志</li>
+<li>覆盖层：UI ✅ / 边界 ✅（源码级确认 ±1 天分界）/ 接口
+✅（<code>project_moment/get_list?project_id=6712&amp;type=1</code>
+返回待办含负责人+状态字段，total=1 与列表一致）/ 数据
+✅（提交后列表与筛选统计一致）</li>
+<li>⚠️ 备注
+1：<strong>晚于要求时间不会自动选「延期交付」</strong>（默认值只有提前/正常两种），延期场景仍需
+QA 手动选择——需确认是否符合预期（见人工确认表 #2）</li>
+<li>⚠️ 备注
+2：「QA递交」按钮由<strong>用户名白名单</strong>（<code>testListRooters</code>）控制而非项目
+QA 角色，验收账号不在白名单，验收时通过 Vue
+数据放开展示层门禁后真实点击验证；请确认正式环境 QA
+人员均在白名单内（见人工确认表 #3）</li>
+<li>截图：final-递交状态自动判定.jpg</li>
+<li>推断需关注人员：QA</li>
+<li>【发版素材】QA 填写递交时，递交状态根据 TB/BD
+要求递交时间自动判定"提前递交/正常递交"，仍可手动调整；</li>
+</ul>
+<h2 id="3-项目概览-行业接口文档--white_check_mark通过">3.
+项目概览-行业接口文档 — ✅通过</h2>
+<ul>
+<li>入口：「项目 → 项目概况」右侧「项目信息」栏</li>
+<li>实走流程：1) 进入 邓欣羽的测试项目（#6712）项目概况 2) 核对文档位 3)
+分别上传两份 txt 验证</li>
+<li>结果：项目信息栏依次存在「定制接口文档 / 项目测试文档 /
+<strong>行业接口文档</strong>」三个独立文档位；「上传行业接口文档」与「上传定制接口文档」各自弹上传窗，上传成功后各生成独立在线链接（projectapi.51aes.com，两个
+UUID 不同），<strong>互不覆盖</strong></li>
+<li>覆盖层：UI ✅ / 边界 ✅（先后上传互不影响）/ 接口 ✅（上传接口
+200、链接可访问）/ 数据 ✅（刷新后两链接保留）</li>
+<li>截图：final-行业接口文档.jpg</li>
+<li>推断需关注人员：PM、项目开发、二开</li>
+<li>【发版素材】项目概况新增「行业接口文档」独立存放位，与工程定制接口文档区分管理、互不覆盖；</li>
+</ul>
+<h2 id="4-会议动态待办项负责人--white_check_mark通过">4.
+会议动态待办项负责人 — ✅通过</h2>
+<ul>
+<li>入口：「项目 → 项目动态 → 添加动态（会议动态）→ 待办事项」</li>
+<li>实走流程：1) #6712 项目动态 → 添加动态 2) 会议类型「项目内审会」+
+会议内容 3) 待办 #1「验证待办负责人字段落库」选状态「进行中」+
+相关人员「邓欣羽」 4) 添加待办 #2（不选负责人，默认「待处理」，边界）5)
+参会人员选邓欣羽 → 提交</li>
+<li>结果：提交成功；列表「待办事项」列回显 每条待办的 状态标签 + 内容 +
+负责人（#1 显示"进行中/邓欣羽"，#2
+显示"待处理/无人"）；<strong>刷新页面后数据保留</strong>（落库确认）</li>
+<li>待办可选状态：待处理 / 进行中 /
+已完成；负责人下拉为全员人员列表</li>
+<li>覆盖层：UI ✅ / 边界 ✅（无负责人待办正常保存）/ 接口
+✅（<code>project_moment/get_list</code> 返回待办含负责人字段）/ 数据
+✅</li>
+<li>截图：final-会议动态待办负责人.jpg</li>
+<li>推断需关注人员：PM</li>
+<li>【发版素材】会议动态待办事项支持逐条指定负责人与状态（待处理/进行中/已完成），方便待办跟进；</li>
+</ul>
+<h2 id="5-统计-产能数据看板--white_check_mark通过">5. 统计-产能数据看板
+— ✅通过</h2>
+<ul>
+<li>入口：「统计 → 产能数据看板」，路由
+<code>/statistic/capacity_analysis</code>；页头「工程产能分析 /
+小组产能看板」点击切换</li>
+<li>实走流程与结果：
+<ul>
+<li><strong>工程产能分析（部门维度）</strong>：
+<ol type="1">
+<li>「总产能上限」= 该部门总人数 × 天数（285
+人天/周）；「非生产成员过滤（8）」按钮弹出排除名单（张皓然、常磊、庄程程、何魏、蔡荣、张炼、周辉、李润芝），支持增删与恢复默认——即"只计算投入生产人员"口径
+✅</li>
+<li>「总待消耗人天」= 未开工需求标准人天 + 进行中需求剩余标准人天 =
+540.813，下分**进行中 245.75（45.4%）/ 暂停 206.06（38.1%）/ 未开工
+89（16.5%）**三统计，占比合计 100% ✅</li>
+<li>「<strong>产能消耗情况</strong>」合并板块（"项目 与 非项目
+两大块产能去向明细"），下分「项目产能」「非项目产能」两个子模块
+✅；项目产能利用率 23.70% = 67.563 / 285 交叉验算一致 ✅</li>
+<li>附：产能趋势图 + 资源分配热力图（成员×日期，8h 饱和度着色）</li>
+</ol></li>
+<li><strong>小组产能看板（小组维度）</strong>： 5)
+「待消耗产能分布图」：118 个工作日 × 12
+个小组，甘特图<strong>时间轴仅工作日</strong>（7月13个工作日，跳过周末）✅；色条分
+进行中（绿）/ 未开工 / 暂停中（红）✅ 6) 色块 hover
+提示换算逻辑：如项目场景A 636H →"11.4 工作日（7人并行）总计约 79.5 人天"
+✅ 7) <strong>点击色块下钻</strong>：弹出需求列表明细（项目场景A 进行中
+21 条需求 / 总待消耗
+636H，按项目分组树状展示，含标准工时/剩余待消耗/产出工时/实际已消耗/进度/起止时间），总计与色块标签一致
+✅</li>
+</ul></li>
+<li>覆盖层：UI ✅ / 边界 ✅（非法日期 <code>start=bad</code>
+静默兜底不报错⚠️建议后端补校验、不存在部门 <code>dept=999999</code>
+返空不 500）/ 接口
+✅（<code>data_export/get_employee_project_list</code>
+正常+非法日期+越权部门三组参数均无 5xx，结构完整）/ 数据
+✅（利用率、占比、色块工时三处交叉验算一致）</li>
+<li>说明：需求图中的"部门维度/小组维度"切换在实现上对应「工程产能分析（部门级）/
+小组产能看板（小组级）」页面级切换，能力等价</li>
+<li>截图：final-产能消耗情况.jpg、final-小组产能看板.jpg、final-小组产能色块详情.jpg</li>
+<li>推断需关注人员：PMO、PM、组长</li>
+<li>【发版素材】见 §发版内容 新增功能第 1 条；</li>
+</ul>
+<h2 id="接口测试汇总与未覆盖声明">接口测试汇总与未覆盖声明</h2>
+<blockquote>
+<p>各功能的接口验证明细已写在对应功能节的「覆盖层-接口」中；本节只放不隶属单一功能的附带发现与全局声明。全部接口用例（含完整参数）已固化为
+<code>regression/tests/api-v2.2.6.spec.js</code>
+纯接口回归（不开浏览器，秒级）。</p>
+</blockquote>
+<p><strong>跨功能附带发现</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>发现</th>
+<th>证据</th>
+<th>建议</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>project_publish/get_list</code> 的 <code>project_id</code> GET
+参数疑似未参与过滤</td>
+<td>不存在 id（99999999）与正常 id（6712）均返回全量 total=12810</td>
+<td>后端确认参数解析（前端可能走
+POST/别名参数）；确实未过滤则修复（确认表 #4）</td>
+</tr>
+<tr>
+<td>2</td>
+<td>前端权限门禁后端未同步：「通过审批」按钮前端按
+<code>systemRole==='PM'</code>
+禁用，但后端审批接口对非白名单用户放行</td>
+<td>本轮验收即以此创建递交成功</td>
+<td>后端补角色校验（确认表 #3）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>未覆盖声明</strong>（如实）：写接口（会议动态提交、QA
+递交提交、递交申请/审批）仅覆盖正常路径（UI
+真实提交），未做非法参数直调；超长文本/特殊字符/极大数值等极限值本轮未覆盖。</p>
+<h2 id="交付前需人工确认汇总">交付前需人工确认（汇总）</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>事项</th>
+<th>建议</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>「添加工时」弹窗内部未显示任务描述，描述仅在日历任务卡展示</td>
+<td>与需求方确认"填写工时时可见"是否已满足；不满足则开发补充弹窗内展示</td>
+</tr>
+<tr>
+<td>2</td>
+<td>实际递交时间晚于要求时间时，递交状态不会自动判定为「延期交付」，仍默认「正常递交」</td>
+<td>确认是否设计如此（延期需走责任人/原因必填流程，自动选可能误触）</td>
+</tr>
+<tr>
+<td>3</td>
+<td>「QA递交」「通过审批」按钮由用户名白名单（<code>testListRooters</code>
+/ PM 硬编码名单）控制，非按项目角色；且后端对 PM
+审批接口未做同等校验</td>
+<td>确认正式环境 QA/PM 名单已维护；建议后端补角色校验</td>
+</tr>
+<tr>
+<td>4</td>
+<td>接口 <code>project_publish/get_list</code> 的
+<code>project_id</code> GET 参数疑似不生效（任意 id 均返回全量 12810
+条）</td>
+<td>后端确认参数解析（前端实际可能走
+POST/别名参数）；如确实未过滤建议修复</td>
+</tr>
+</tbody>
+</table>
+<h2
+id="验收产生的测试数据测试环境无需清理">验收产生的测试数据（测试环境，无需清理）</h2>
+<ul>
+<li>邓欣羽的测试项目（#6712）：递交申请 #423 + 递交记录（提前递交
+v0.0.1，要求 2026-07-16 20:00）、会议动态 1 条（项目内审会，含 2
+条待办）、行业/定制接口文档各 1 份、项目测试(QA) 字段设为邓欣羽——均已被
+<code>v2.2.6.spec.js</code> / <code>api-v2.2.6.spec.js</code>
+作为数据前置条件引用，勿删</li>
+</ul>
+<h2 id="发版内容初稿待人工定稿">发版内容（初稿，待人工定稿）</h2>
+<blockquote>
+<p>分类依据 release_notes.md
+判断表：产能看板/行业接口文档为独立页面/独立文档位 →
+新增功能；任务描述展示、递交状态判定、待办负责人为已有模块字段/交互增强
+→
+体验优化（若定稿希望与原始需求分组一致可将待办负责人上调为新增功能）。</p>
+</blockquote>
+<h3 id="v226-发布于-2026-07-xx">V2.2.6 发布于 2026-07-XX</h3>
+<h4 id="影响强度">影响强度</h4>
+<p>强度中等，新增产能数据看板与行业接口文档，优化工时填写、递交状态与会议待办体验。</p>
+<h4 id="新增功能">新增功能</h4>
+<p>需关注人员：PMO、PM、组长</p>
+<p>1.「统计-产能数据看板」：（科学评估工程团队与小组承接能力，减少人工盘点产能成本）</p>
+<ul>
+<li>「工程产能分析」升级产能计算模型，总产能上限仅统计投入生产人员，支持编辑非生产成员排除名单；</li>
+<li>总待消耗人天新增"进行中、暂停、未开工"三项细分统计；</li>
+<li>原项目产能、非项目产能板块合并为「产能消耗情况」，下分"项目产能、非项目产能"两个子模块；</li>
+<li>「小组产能看板」新增以小组为维度的待消耗产能分布图，基于工作日时间轴展示各小组进行中（绿色）与暂停（红色）待消耗工时，方便分析哪天能接入新项目、新需求；</li>
+<li>点击色块可下钻查看需求列表及各项工时明细；</li>
+</ul>
+<p><img src="final-产能消耗情况.jpg" /> <img
+src="final-小组产能看板.jpg" /> <img
+src="final-小组产能色块详情.jpg" /></p>
+<p>需关注人员：PM、项目开发</p>
+<p>2.「项目-项目概况-行业接口文档」：（区分工程定制接口与行业接口，方便统一查阅）</p>
+<ul>
+<li>项目信息栏新增「行业接口文档」独立存放位，与「定制接口文档」分开上传、互不覆盖；</li>
+<li>上传后生成独立在线文档链接；</li>
+</ul>
+<p><img src="final-行业接口文档.jpg" /></p>
+<h4 id="体验优化">体验优化</h4>
+<p>需关注人员：全员</p>
+<p>1.「我的地盘-我的任务」日历任务卡片新增任务描述展示，填写工时时可直接查看任务完整描述（DTA
+任务全名）；</p>
+<p><img src="final-工时填写任务描述.jpg" /></p>
+<p>需关注人员：QA</p>
+<p>2.「递交-QA递交」递交状态支持自动判定：根据 TB/BD
+要求递交时间与实际时间自动预选"提前递交/正常递交"，仍可手动调整；</p>
+<p><img src="final-递交状态自动判定.jpg" /></p>
+<p>需关注人员：PM</p>
+<p>3.「项目-项目动态」会议动态待办事项支持逐条指定负责人与状态（待处理/进行中/已完成），方便待办事项跟进；</p>
+<p><img src="final-会议动态待办负责人.jpg" /></p>
+<h4 id="发布记录表行供归档">发布记录表行（供归档）</h4>
+<table>
+<thead>
+<tr>
+<th>版本号</th>
+<th>更新时间</th>
+<th>核心更新内容</th>
+<th>影响角色</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>V2.2.6</td>
+<td>2026-07-XX</td>
+<td>新增产能数据看板、行业接口文档，优化工时与递交体验</td>
+<td>PMO、PM、QA、组长、全员</td>
+</tr>
+</tbody>
+</table>
+<h2 id="交接给发版技能">交接给发版技能</h2>
+<p>定妆图清单：final-工时填写任务描述.jpg、final-递交状态自动判定.jpg、final-行业接口文档.jpg、final-会议动态待办负责人.jpg、final-产能消耗情况.jpg、final-小组产能看板.jpg、final-小组产能色块详情.jpg；各功能【发版素材】段
++ 上方「发版内容」初稿，可直接作为发版定稿的输入。</p>
+</body>
+</html>

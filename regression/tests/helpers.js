@@ -1,9 +1,9 @@
 // 51PM 回归公共封装 —— 沉淀自 V2.2.5 两轮验收实测（入口与坑详见 ../skills/entry_map.md）
 const { expect } = require('@playwright/test');
 
-const TEST_PROJECT_ID = 6712; // 邓欣羽的测试项目
+const TEST_PROJECT_ID = 6712; // ⚠️2026-07-16 测试库刷新后已易主为真实项目「广西盛隆冶金项目增补」（原邓欣羽测试项目记录消失）
 const PUBLISH_DATA_PROJECT_ID = 6662; // 千岛湖升级优化项目（项目递交有历史数据）
-const OUTSOURCE_PACKAGE_ID = 661; // 测试项目下已立项的自制发包（V225copilot-自制发包复测）
+const OUTSOURCE_PACKAGE_ID = 661; // 自制发包（V225copilot-自制发包复测）；外包反馈数据用 #24 皖江江南建筑模型发包
 
 /** 关掉版本更新公告弹窗（新会话首次进页会弹「知道了」，会挡住后续弹窗/点击） */
 async function dismissAnnouncement(page) {

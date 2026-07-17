@@ -1,6 +1,6 @@
 # 51PM 验收-测试-发版 独立工作区
 
-> 自 2026-07-14 起，51PM 的验收/测试/发版全流程在本目录进行，**不再依赖 Hermes**。
+> 51PM 的验收/测试/发版全流程在本目录进行。
 > 执行方式：VS Code 里打开本目录，用 Copilot 对话框驱动（新功能探索）+ Playwright 回归脚本（老功能回归）。
 
 ## 目录结构
@@ -15,9 +15,6 @@
 │   └── ...（工时/日报/排期等其他 51pm 技能）
 ├── acceptance/          ← 历轮验收产物（报告+截图，迁自 hermes-agent，61 个文件）
 │   ├── V2.2.3/  V2.2.4/  V2.2.5/（Hermes 首轮）  V2.2.5-copilot/（Copilot 复测轮）
-├── 发版记录/            ← 旧发版仓库（迁自 D:\project\51PM发版\51PM-Version，9 个文件）
-│   ├── 发版.md                 历史最终发版文档
-│   └── 发版最新资源截图/
 └── regression/          ← ★ Playwright 回归脚本库
     ├── package.json / playwright.config.js
     ├── auth/state.json         登录态（企微 OAuth，过期后重跑 npm run login）
@@ -67,12 +64,3 @@ npx playwright test          # 跑回归
 | 递交数据项目 | 千岛湖升级优化项目 #6662（4 条递交记录） |
 | 登录 | 企微 OAuth（cas-test.51aes.com） |
 
-## 迁移记录
-
-- 2026-07-14 首批：`D:\project\hermes-agent\AgentGroups\BrowserHarness\agent-workspace\{domain-skills/51pm → skills, acceptance → acceptance}` 与 `D:\project\51PM发版\51PM-Version → 发版记录`，79 个文件逐一 MD5 校验一致。
-- 2026-07-14 补迁（全库排查后发现的遗漏）：
-  - `AgentGroups/docs/{发版验收流程.md, 能力架构与验收方案说明.md, AI应用落地概念说明.md}` → `docs/`（3 个，MD5 一致）
-  - WSL `~/.hermes/skills/browser-harness/references/51pm-*.md` → `skills/references/`（5 个 Hermes 实测沉淀笔记：验收技巧/入口勘察/排期查询，MD5 一致）
-  - WSL `acceptance.bak-20260709` 中现仓库已精简掉的 V2.2.3 过程截图 → `acceptance/_bak-20260709-独有文件/`（46 个，归档备查）
-- **原目录均未删除**（Hermes/WSL 侧 symlink 仍指向原处，若确认弃用 Hermes 流程可另行清理）。
-- 故意不迁（属 Hermes 基础设施，与 51PM 流程本身无关）：harmesAgent 的 config/USER.md、persona、prompts/cron-*（飞书 cron 播报）、scripts/（网关/Chrome/CDP 运维脚本）、BrowserHarness 工具本体。

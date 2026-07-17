@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-CN" xml:lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>51PM V2.2.3 验收报告</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <style>
+    body { max-width: 72em; }
+    table { display: table; width: 100%; }
+  </style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">51PM V2.2.3 验收报告</h1>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#51pm-v223-验收报告" id="toc-51pm-v223-验收报告">51PM
+V2.2.3 验收报告</a>
+<ul>
+<li><a href="#0-原始验收需求开发者提交的本周开发内容"
+id="toc-0-原始验收需求开发者提交的本周开发内容">0.
+原始验收需求（开发者提交的本周开发内容）</a></li>
+<li><a href="#一逐需求验收详情"
+id="toc-一逐需求验收详情">一、逐需求验收详情</a>
+<ul>
+<li><a href="#1-递交列表返回折叠修复--white_check_mark-满足"
+id="toc-1-递交列表返回折叠修复--white_check_mark-满足">1.
+递交列表返回折叠修复 — ✅ 满足</a></li>
+<li><a href="#2-项目日报导出包含制作截图选项--white_check_mark-满足"
+id="toc-2-项目日报导出包含制作截图选项--white_check_mark-满足">2.
+项目日报导出「包含制作截图」选项 — ✅ 满足</a></li>
+<li><a
+href="#3-通用批量表单提交组件--white_check_mark-满足初判-bug-已撤销"
+id="toc-3-通用批量表单提交组件--white_check_mark-满足初判-bug-已撤销">3.
+通用批量表单提交组件 — ✅ 满足（初判 🐛 已撤销）</a></li>
+<li><a href="#4-主题皮肤配色兼容走查--white_check_mark-满足"
+id="toc-4-主题皮肤配色兼容走查--white_check_mark-满足">4.
+主题皮肤配色兼容走查 — ✅ 满足</a></li>
+</ul></li>
+<li><a href="#二缺陷清单已确认的问题需修"
+id="toc-二缺陷清单已确认的问题需修">二、缺陷清单（已确认的问题，需修）</a></li>
+<li><a href="#三风险与待确认不确定--待拍板口径--未覆盖盲区"
+id="toc-三风险与待确认不确定--待拍板口径--未覆盖盲区">三、风险与待确认（不确定
+/ 待拍板口径 / 未覆盖盲区）</a></li>
+<li><a href="#四发版内容初稿待人工定稿"
+id="toc-四发版内容初稿待人工定稿">四、发版内容（初稿，待人工定稿）</a>
+<ul>
+<li><a href="#v223-发布于2026-07-17"
+id="toc-v223-发布于2026-07-17">V2.2.3 发布于2026-07-17</a></li>
+</ul></li>
+<li><a href="#附录-a回归与测试证据追溯用非验收结论"
+id="toc-附录-a回归与测试证据追溯用非验收结论">附录
+A：回归与测试证据（追溯用，非验收结论）</a>
+<ul>
+<li><a href="#a1-全量回归老功能是否被本次发版改坏"
+id="toc-a1-全量回归老功能是否被本次发版改坏">A.1
+全量回归（老功能是否被本次发版改坏）</a></li>
+<li><a href="#a2-接口用例沉淀" id="toc-a2-接口用例沉淀">A.2
+接口用例沉淀</a></li>
+<li><a href="#a3-验收产生的测试数据" id="toc-a3-验收产生的测试数据">A.3
+验收产生的测试数据</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="51pm-v223-验收报告">51PM V2.2.3 验收报告</h1>
+<ul>
+<li>验收时间：2026-07-17 12:20</li>
+<li>环境：测试 10.67.8.183:7777</li>
+<li>验收账号角色：邓欣羽（Web端开发，系统超级管理员）</li>
+<li><strong>验收结论：4 项需求全部满足</strong>；发现缺陷
+1（轻微）、风险/待确认 7</li>
+<li>老功能回归：✅ 无回归（全量 37 通过 / 4 跳过 / 0 失败，明细见附录
+A.1）</li>
+</ul>
+<blockquote>
+<p>阅读顺序：先看「一、逐需求验收详情」判断本次交付达标与否 →
+「二、缺陷」「三、风险」是待处理项 → 「四、发版初稿」→
+回归与接口等测试证据在附录，供追溯，不是验收结论本身。</p>
+</blockquote>
+<h2 id="0-原始验收需求开发者提交的本周开发内容">0.
+原始验收需求（开发者提交的本周开发内容）</h2>
+<blockquote>
+<p>帮我验收 V2.2.3。本周开发内容如下：</p>
+<ol type="1">
+<li>递交模块：通过递交列表点进项目详情页，再返回递交模块，递交列表被折叠；再次切换到其他模块再返回恢复正常</li>
+<li>项目日报、统计：日报和花费的导出，时间跨度大了就导不出来，尤其是日报，对于比较复杂的项目一次最多导出半个月的数据。怀疑是日报里包含截图，新增传参选项是都需要包含截图</li>
+<li>全局组件：项目、非项目、反馈申请的批量创建使用流程不统一，对于用户来说有体验问题，开发一个通用批量表单提交的组件，支持独立、批量、通用、垃圾回收等多功能表单容器，同时兼容不同业务类型</li>
+<li>主题皮肤：修改各处UI颜色硬编码，地毯走查各个主题配色兼容性。</li>
+</ol>
+</blockquote>
+<p>对应关系：需求 1 → §1，需求 2 → §2，需求 3 → §3（初判 🐛
+经用户指正后复验撤销，详见该节），需求 4 → §4</p>
+<hr />
+<h2 id="一逐需求验收详情">一、逐需求验收详情</h2>
+<h3 id="1-递交列表返回折叠修复--white_check_mark-满足">1.
+递交列表返回折叠修复 — ✅ 满足</h3>
+<ul>
+<li>入口：「递交」→ 递交列表 → 点项目名 → 项目概况 → 返回</li>
+<li>结论：后退 / 菜单重进两条路径返回，列表均完整展示，未复现折叠。</li>
+<li>验证证据：
+<ul>
+<li>UI ✅ 两路径返回，筛选区/时间轴/表格/分页完整</li>
+<li>边界 ✅ 再切任务、统计模块往返正常</li>
+<li>接口 — 纯前端展示，无独立接口</li>
+<li>数据 ✅ 返回后可重查 59 条</li>
+</ul></li>
+<li>定妆图 final-递交列表返回不折叠.jpg ｜ 关注：QA、PM ｜ 关联风险
+R3</li>
+</ul>
+<h3 id="2-项目日报导出包含制作截图选项--white_check_mark-满足">2.
+项目日报导出「包含制作截图」选项 — ✅ 满足</h3>
+<ul>
+<li>入口：「项目」→ 项目列表 → 查看详情 → 项目日报 → 导出</li>
+<li>结论：「包含制作截图」开关生效，关闭后大跨度日报可一次导出，命中"一次最多导半月"痛点。</li>
+<li>验证证据：
+<ul>
+<li>UI ✅ 配置弹窗含时间范围 + 截图开关 + 过大告警</li>
+<li>边界 ✅ 含图 50KB vs 不含图 13KB，证明截图为体积主因</li>
+<li>接口 ✅ <code>export_estimate_list_by_project_id</code>：正常 200
+xlsx；空 project_id→code51；非法 id→空模板不 5xx；include_images=abc→按
+false</li>
+<li>数据 ✅ 文件大小随 include_images 变化</li>
+</ul></li>
+<li>定妆图 final-日报导出含截图开关.jpg ｜ 关注：PM、TB\BD、组长 ｜
+关联风险 R4、R6</li>
+</ul>
+<h3 id="3-通用批量表单提交组件--white_check_mark-满足初判-bug-已撤销">3.
+通用批量表单提交组件 — ✅ 满足（初判 🐛 已撤销）</h3>
+<ul>
+<li>入口（三处实测）：批量添加项目反馈 / 项目需求拆解 /
+非项目独立任务·多人通用任务</li>
+<li>结论：三处统一为同一容器（class 前缀
+bcd），独立/通用/批量/垃圾回收四能力齐备，达成"流程统一"。初判"提交后不可见"复验为无
+PM 项目数据问题，误判撤销。</li>
+<li>验证证据：
+<ul>
+<li>UI ✅ 两步向导 +
+条目栏（增/切/全清/完善徽标），未完善禁用「下一步」</li>
+<li>边界 ✅ 空白条目自动丢弃、0 有效时禁用、全清可用</li>
+<li>接口 ✅
+<code>produce_demand/add_apply_demand</code>：正常落库；空商机号/空模块→code51</li>
+<li>数据 ✅ 提交 #490 后 get_my_demand_list +1 且首行回显</li>
+</ul></li>
+<li>定妆图 final-通用批量表单-批量添加反馈.jpg ｜
+关注：PM、TB\BD、工程与交付全员 ｜ 关联风险 R1、R2</li>
+</ul>
+<h3 id="4-主题皮肤配色兼容走查--white_check_mark-满足">4.
+主题皮肤配色兼容走查 — ✅ 满足</h3>
+<ul>
+<li>入口：顶部主题图标 → 主题面板（10 基础 + 8 节日 + 2 氛围开关）</li>
+<li>结论：18
+主题全量遍历切换生效，品牌色/按钮/表头/激活态跟随主题变量，扫描 0
+处旧品牌红硬编码残留，主题跨会话同步（验收后已恢复原「圣诞节」）。</li>
+<li>验证证据：
+<ul>
+<li>UI ✅ 18 主题采样四类变量各不相同且一致联动</li>
+<li>边界 ✅ 含极地蓝/中秋深色系、节日主题、往返切换</li>
+<li>接口 — 前端变量 + 偏好保存，无独立业务接口</li>
+<li>数据 ✅ localStorage pm_theme 与服务端偏好同步</li>
+</ul></li>
+<li>定妆图 final-主题面板与极地蓝皮肤.jpg ｜ 关注：全员 ｜ 关联风险
+R5</li>
+</ul>
+<hr />
+<h2
+id="二缺陷清单已确认的问题需修">二、缺陷清单（已确认的问题，需修）</h2>
+<blockquote>
+<p>本轮无功能性 🐛（需求 3
+的初判缺陷经复验撤销）；下列为验收中确认的技术缺陷。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>缺陷</th>
+<th>严重度</th>
+<th>现场 / 证据</th>
+<th>建议</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>B1</td>
+<td>非项目任务表 console 红错
+<code>Duplicate keys detected: 'pause'</code>（notTaskTable.vue）</td>
+<td>轻微</td>
+<td>打开非项目任务列表即触发 console error</td>
+<td>修复 v-for key 重复，<code>pause</code> 键去重</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2
+id="三风险与待确认不确定--待拍板口径--未覆盖盲区">三、风险与待确认（不确定
+/ 待拍板口径 / 未覆盖盲区）</h2>
+<blockquote>
+<p>与缺陷的区别：这些<strong>不是已确认必修的
+bug</strong>，而是需要产品/后端确认口径、或本轮验收没覆盖到的盲区。等级按「影响
+× 可能性」评。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>事项</th>
+<th>等级</th>
+<th>建议</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R1</td>
+<td>无 PM 项目可提交反馈申请但无人可审、提交人也看不到（样本
+#488/#489）</td>
+<td>中高</td>
+<td>下拉过滤无 PM 项目或提交时拦截提示</td>
+</tr>
+<tr>
+<td>R2</td>
+<td>#487（有 PM，待审批）也不在我的列表，与「有 PM
+即可见」不完全吻合</td>
+<td>低</td>
+<td>可见性口径可能叠加状态/角色，请产品确认</td>
+</tr>
+<tr>
+<td>R3</td>
+<td>从项目详情返回递交列表后筛选日期重置回今天，易误认为列表被清空</td>
+<td>中</td>
+<td>确认"保留筛选状态"是否在本次修复范围</td>
+</tr>
+<tr>
+<td>R4</td>
+<td>统计侧日报导出、花费/成本导出均无"包含截图"选项（开发提到"日报和花费"）</td>
+<td>中</td>
+<td>确认花费侧是否也应加该选项</td>
+</tr>
+<tr>
+<td>R5</td>
+<td>暗色主题（极地蓝/中秋）个别页面对比度属视觉判断，自动化只验了颜色跟随变量</td>
+<td>低</td>
+<td>人工视觉抽查 1~2 个暗色主题页面</td>
+</tr>
+<tr>
+<td>R6</td>
+<td>日报导出对不存在的 project_id 返回空模板 xlsx（200）而非报错</td>
+<td>低</td>
+<td>可维持现状或改 code 51 提示</td>
+</tr>
+<tr>
+<td>R7</td>
+<td>「工时数据总览」tab 自带声明"当前为前端 Mock 演示数据"</td>
+<td>中</td>
+<td>确认该 Mock 页是否应随本版对外可见</td>
+</tr>
+</tbody>
+</table>
+<p><strong>未覆盖盲区</strong>：日报导出未验超大数据量极限档（测试库无等量数据）；批量组件未做单批
+50+ 条压力录入；主题走查为 4 页 × 18
+主题程序化扫描，未逐页遍历全站。</p>
+<hr />
+<h2 id="四发版内容初稿待人工定稿">四、发版内容（初稿，待人工定稿）</h2>
+<h3 id="v223-发布于2026-07-17">V2.2.3 发布于2026-07-17</h3>
+<h4 id="影响强度">影响强度</h4>
+<p>强度中等，统一项目、非项目与反馈申请的批量创建表单，日报导出支持自选是否包含制作截图，完善全站多主题配色，修复递交列表已知问题。</p>
+<h4 id="新增功能">新增功能</h4>
+<p>需关注人员：PM、工程与交付全员</p>
+<p>1.「批量创建表单（项目/非项目/反馈申请通用）」：（降低批量录入成本，减少逐条创建的重复操作）
+项目需求拆解、非项目创建任务（独立任务/多人通用任务）、批量添加项目反馈统一升级为同一套两步式批量表单，
+支持左侧条目栏集中管理多条记录（新增、切换、一键全清），实时标记每条完善状态并显示有效条数，
+支持"独立模式"逐条填写不同字段、"通用模式"一次填写批量生效（如多人任务一次编辑分配给多人），
+确认页仅提交有效条目，空白条目自动忽略，防止误提交；</p>
+<p><img src="final-通用批量表单-批量添加反馈.jpg" /></p>
+<h4 id="体验优化">体验优化</h4>
+<p>需关注人员：PM、TB\BD、组长</p>
+<p>1.「项目日报-导出」新增导出配置：支持选择时间范围（不选则导出全部），并可自选是否包含制作截图；不含截图时大时间跨度日报可一次性稳定导出，减少按半月分段导出的人工操作；</p>
+<p><img src="final-日报导出含截图开关.jpg" /></p>
+<p>需关注人员：全员</p>
+<p>2.「主题皮肤」全站配色兼容性走查：修正各处颜色硬编码，10 款基础皮肤与
+8
+款节日限定皮肤下按钮、表格、菜单等界面元素配色统一跟随主题，主题选择跨设备同步生效；</p>
+<p><img src="final-主题面板与极地蓝皮肤.jpg" /></p>
+<h4 id="bug修复">BUG修复</h4>
+<p>需关注人员：QA、PM</p>
+<p>1.修复了「递交」从项目详情页返回递交列表时列表展示异常的问题，返回后筛选区、递交排期时间轴与列表完整展示；</p>
+<p><img src="final-递交列表返回不折叠.jpg" /></p>
+<hr />
+<h2 id="附录-a回归与测试证据追溯用非验收结论">附录
+A：回归与测试证据（追溯用，非验收结论）</h2>
+<h3 id="a1-全量回归老功能是否被本次发版改坏">A.1
+全量回归（老功能是否被本次发版改坏）</h3>
+<p>全量回归 <strong>37 通过 / 4 跳过（@write 写链路默认跳过）/ 0
+失败</strong>，用时 3.4
+分钟。全部「已知BUG跟踪」哨兵用例维持预期失败（BUG 仍在），无 unexpected
+pass，<strong>老功能未被本次发版改坏</strong>。</p>
+<h3 id="a2-接口用例沉淀">A.2 接口用例沉淀</h3>
+<p>本轮接口用例（含完整参数）已固化至
+<code>regression/tests/api-v2.2.3.spec.js</code>（纯接口回归，不开浏览器，秒级）。各功能的接口验证明细见
+§一 各节「验证证据-接口」。</p>
+<h3 id="a3-验收产生的测试数据">A.3 验收产生的测试数据</h3>
+<table>
+<thead>
+<tr>
+<th>数据</th>
+<th>位置</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>反馈申请 #488/#489（V2.2.3验收/复验-批量表单…（测试数据））</td>
+<td>CBD物业管理系统 (SJ202601230001)，待PM审批</td>
+<td>无 PM 项目边界样本（对应 R1），无人可审、提交人列表不可见</td>
+</tr>
+<tr>
+<td>反馈申请
+#490（V2.2.3复验-批量表单提交流程重走-新耀（测试数据））</td>
+<td>新耀湃科总部工厂展厅项目 (SJ202405130008)，PM=陈蓓</td>
+<td>复验样本；提交当日已被 PM
+审批「已通过」，进入正常流转（可见性回归用例样本消耗后自动
+skip，重提一条即可恢复）</td>
+</tr>
+<tr>
+<td>账号主题偏好</td>
+<td>验收中遍历 18 主题，已恢复为「圣诞节」</td>
+<td>无残留</td>
+</tr>
+</tbody>
+</table>
+</body>
+</html>

@@ -11,7 +11,7 @@
 | 测试 / 开发 | `http://10.67.8.183:7777` | 演练、调试、新功能验证。页面右侧有"当前为开发环境"水印。 |
 | 正式 / 生产 | `http://51pm.51aes.com:771` | 真实业务数据。写操作会影响排期、工时、任务状态。 |
 
-- **环境必须由用户明确指定**。用户提示词里通常会写 host 或"测试环境/正式环境"。没明说时 agent 必须 `AskUserQuestion` 问清楚再开干，不能凭最近一次默认。
+- **环境策略分两类**：验收 / 回归流程（见 [SKILL.md](SKILL.md)）**默认固定测试环境** `10.67.8.183:7777`，不再询问，仅用户明确说「正式环境」才切换；其余写操作类 skill（完工、填工时等）若用户没明说环境，仍需 `AskUserQuestion` 问清楚再开干，不能凭最近一次默认。
 - 登录走企业微信 OAuth2.0（一键登录或扫码）。**遇到登出请暂停问用户**，不要替用户输任何凭据。
 - 不要把这两个 host 写到 skill 业务逻辑外的地方（外发文档、issue、聊天截图）。
 
@@ -35,19 +35,16 @@
 
 ## skill 索引
 
-- [SKILL.md](SKILL.md) — ★ **验收-测试-发版全流程总控**：回归→验收→沉淀→发版四阶段调度器，收到「验收 V2.x.x + 开发内容」从这里进
-- [fill_today_timesheet.md](fill_today_timesheet.md) — 查询/查看今日个人排期（**只读**，参数化用户与部门）
-- [team_schedule_report.md](team_schedule_report.md) — 按部门 + 日期范围拉团队排期、输出「日期→人员」汇报（**只读**）
-- [checkTask_confirmTask.md](checkTask_confirmTask.md) — 任务模块：按部门 + 状态 + 周期筛任务，逐个点完工（写操作，提交前必须 ask user）
-- [create_daily_task.md](create_daily_task.md) — 新建当日任务/排期（**待补：流程未跑通，仅记录已知线索**）
-- [fill_workhour.md](fill_workhour.md) — 给任务填写工时/花费记录（写操作，已跑通；入口=任务列表 `button.workHour`，提交前 ask user）
+- [SKILL.md](SKILL.md) — ★ **验收-测试-发版全流程总控**：回归→验收→发版→沉淀四阶段调度器，收到「验收 V2.x.x + 开发内容」从这里进
 - [release_acceptance.md](release_acceptance.md) — 版本验收：依开发内容走流程找 BUG、边走边截图、出验收报告供发版技能使用（**必须走真实 UI 交互，禁止 Vue 直写代替操作**）
-- [release_notes.md](release_notes.md) — 发版内容撰写规范（分类判断表/强度规则/价值红黑榜；落笔前必须逐条自查）；定妆图直接引用 `agent-workspace/acceptance/{版本}/final-*.jpg`
+- [release_notes.md](release_notes.md) — 发版内容撰写规范（分类判断表/强度规则/价值红黑榜；落笔前必须逐条自查）；定妆图直接引用 `acceptance/{版本}/final-*.jpg`
 - [entry_map.md](entry_map.md) — **入口地图（全 skill 共享）**：实测确认的功能入口 + 坑备注 + 页面等待锚点；找入口先查这里，新确认的入口必须回填
 
 ## 操作前置规则（强制）
 
 > 任何 51PM skill 进入站点前都要执行此段，**禁止直接 `new_tab`**。重复 `new_tab` 会让用户的 Chrome 出现一堆同样的页面。
+>
+> ⚠️ **工具说明**：下方 Python 伪代码（`list_tabs`/`run_js`/`new_tab`）是早期 browser-harness 环境的遗留参考；验收/回归流程实际用 VS Code Copilot 浏览器工具 + Playwright（JS），请按同样的“先找已开 tab→复用→页内导航，未命中才新开”原则操作。
 
 ### Tab 复用模板（每次进 51pm 必跑）
 
@@ -81,7 +78,9 @@ else:
 
 ### ⚡ 首选：Vue data 直写（绕开 DOM 筛选 UI）
 
-51PM 是 Vue + Element UI v2。**表单可以直接拿到 root vm 后赋值 `vue.form.*` 再调 `vue.search()`**——这是 2026-05 最稳的路径，能跳过所有 DOM 点击 / dropdown / date-picker 的陭阱。只有在 Vue 实例拿不到（极少见）时才回退 DOM 路径。
+51PM 是 Vue + Element UI v2。**表单可以直接拿到 root vm 后赋值 `vue.form.*` 再调 `vue.search()`**——这是 2026-05 最稳的路径，能跳过所有 DOM 点击 / dropdown / date-picker 的陷阱。只有在 Vue 实例拿不到（极少见）时才回退 DOM 路径。
+
+> ⚠️ **验收场景例外**：验收（[release_acceptance.md](release_acceptance.md)）**必须走真实 UI 交互**，Vue 直写只用于数据断言、不代替操作（否则把待验的交互层整个绕过去）。下述“Vue 直写首选”仅适用于查询/写操作类 skill。
 
 **取 vm 的标准套路**：
 ```js
@@ -144,7 +143,7 @@ dept_id = js('''(() => {
 })()''')
 ```
 
-**为什么不走 DOM**：历史上踩过的坍——点 input 不开下拉、点中错的 input、`type_text` 误填、cascader 下拉 `getBoundingClientRect()` 返 0/0、重置后 dropdown 漂浮、status 清空但部门保留——走 Vue 直写全部消失。
+**为什么不走 DOM**：历史上踩过的坑——点 input 不开下拉、点中错的 input、`type_text` 误填、cascader 下拉 `getBoundingClientRect()` 返 0/0、重置后 dropdown 漂浮、status 清空但部门保留——走 Vue 直写全部消失。
 
 ### 通用约束
 

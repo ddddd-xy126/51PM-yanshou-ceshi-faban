@@ -1,10 +1,9 @@
 # 51PM 排期页 — 按用户查一周排期（Vue 直写，实测跑通 2026-07）
 
-比 `fill_today_timesheet.md` 的 DOM 下拉路径更稳的做法：**完全绕开下拉 UI，直接写排期页 vm 的 form**。适用于"查某人本周/某段时间排期"。
+比 `entry_map.md`「查看个人排期」条目的 DOM 下拉路径更稳的做法：**完全绕开下拉 UI，直接写排期页 vm 的 form**。适用于“查某人本周/某段时间排期”。
 
-> ⚠️ 本文件是临时落点。下次做 51PM 任务时，把内容合并进
-> `~/Developer/browser-harness/agent-workspace/domain-skills/51pm/fill_today_timesheet.md`
-> （curator 会话只有 skill_manage，写不了 domain-skills 目录）。
+> ⚠️ 本文件是临时落点。下次做 51PM 排期任务时，将内容合并进
+> `entry_map.md`「查看个人排期」条目的备注。
 
 ## 1. 取排期页 vm（判别字段用 `"user_id" in form`）
 

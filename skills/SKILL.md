@@ -19,7 +19,7 @@ graph TD
     C -->|意外红| C1[⚠️ 疑似回归BUG<br>报告用户 · 计入验收报告]
     C --> D[阶段2 新功能验收<br>拆清单→直接开跑<br>真实UI走流程 + 接口/边界/数据一致性四层覆盖]
     D --> E[阶段3 发版<br>报告内生成初稿→转 html→交付]
-    E --> F[阶段4 沉淀<br>走通路径→新 spec · 新入口→entry_map<br>交付后收尾]
+    E --> F[阶段4 沉淀<br>走通路径→新 spec · 新入口→entry_map<br>操作流程→playbooks 操作库<br>交付后收尾]
 ```
 
 ## 目录与产物约定
@@ -29,6 +29,7 @@ graph TD
 | 回归脚本                     | `regression/tests/v{版本}.spec.js`，公共封装 [regression/tests/helpers.js](../regression/tests/helpers.js) |
 | 验收报告 + 截图              | `acceptance/{版本}/acceptance-report.md` + `.html` + `final-*.jpg` 等                                      |
 | 入口地图（全 skill 共享）    | [skills/entry_map.md](entry_map.md) —— 找入口先查、新入口必回填                                            |
+| 操作库 / Playbooks（SOP）    | [skills/playbooks/](playbooks/) —— 每个功能「怎么做完一件事」的分步流程，供人/操作型 AI 复用              |
 | 发版最终文档（agent 不维护） | 用户自行在发版管理中定稿更新；agent 交付终点=验收报告内的初稿节                                            |
 
 ## 关键环境信息
@@ -116,6 +117,10 @@ $env:RUN_WRITE=1; npx playwright test --grep @write
    - 写完跑一遍新 spec 确认能过：`npx playwright test tests/v{版本}.spec.js`
 2. **接口回归用例**：验收中确认过的核心接口（阶段 2 第 4 条记录的路径+参数）沉淀成 `regression/tests/api-v{版本}.spec.js`，用 Playwright `request` fixture 纯接口断言（不开浏览器，秒级跑完）：正常参数验状态码+响应结构，边界参数（非法值/空参）验不报 500；登录态复用 `storageState` 的 cookie，只读接口为主，写接口同样走 `@write` 规范
 3. **入口回填**：本轮**新确认**和**纠正**的入口立即写入 [entry_map.md](entry_map.md)，同入口踩到的坑以 ⚠️ 写进备注列。这是强制项，每轮都做。
+4. **操作流程沉淀 → 操作库 playbook**：把本轮**真实走通**的每个功能流程（阶段 2 第 1 步的「计划流程」已在验收中跑通）提炼成/更新为 [skills/playbooks/](playbooks/) 下的一个条目。这是把"验收时已经走通、走完就丢在一次性报告里"的操作序列变成常驻可复用资产——供人（新同事/PM 当操作手册）和**操作型 AI**（如「每天定时查工时统计/数据统计」，浏览器进去照 playbook 复用）直接使用，也是可外发的产品资产。要点：
+   - 与 entry_map 分工：entry_map 记「入口在哪」（一行索引+坑），playbook 记「整件事怎么做完」（分步流程→路由→控件→读数 + **可直调接口快路径** + 坑）。二者内容不重复。
+   - 一个功能一个 md（写操作标 `【写】`、只读标 `【只读】`），按 [playbooks/README.md](playbooks/README.md) 的模板写，新增后回填该 README 的「现有条目」表。
+   - 已有同名 playbook 则更新（补新步骤/新接口/纠正坑），不新建重复文件。这是强制项，每轮都做。
 
 ---
 
@@ -144,5 +149,6 @@ $env:RUN_WRITE=1; npx playwright test --grep @write
 | [release_acceptance.md](release_acceptance.md) | 阶段 2 全部细节：清单模板、四层维度、截图规范、报告模板 |
 | [release_notes.md](release_notes.md)           | 阶段 3 发版内容撰写规范：分类/强度/句式/红黑榜          |
 | [entry_map.md](entry_map.md)                   | 入口地图：先查后填，唯一权威                            |
+| [playbooks/](playbooks/)                       | 操作库 SOP：功能「怎么做完一件事」的分步流程，阶段 4 回填 |
 | [README.md](README.md)                         | 51PM 站点结构、模块路由、Vue 直写技巧（仅数据断言用）   |
 | [references/](references/)                     | 历轮实测沉淀笔记（验收技巧、入口勘察）                  |

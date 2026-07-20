@@ -39,6 +39,7 @@
 - [release_acceptance.md](release_acceptance.md) — 版本验收：依开发内容走流程找 BUG、边走边截图、出验收报告供发版技能使用（**必须走真实 UI 交互，禁止 Vue 直写代替操作**）
 - [release_notes.md](release_notes.md) — 发版内容撰写规范（分类判断表/强度规则/价值红黑榜；落笔前必须逐条自查）；定妆图直接引用 `acceptance/{版本}/final-*.jpg`
 - [entry_map.md](entry_map.md) — **入口地图（全 skill 共享）**：实测确认的功能入口 + 坑备注 + 页面等待锚点；找入口先查这里，新确认的入口必须回填
+- [playbooks/](playbooks/) — **操作库 / SOP**：每个功能「怎么从头做完一件事」的分步流程 + 可直调接口 + 读数锚点；供人/操作型 AI 复用（如定时查工时统计）。entry_map 管「在哪」，playbook 管「怎么做完」，由验收阶段 4 回填
 
 ## 操作前置规则（强制）
 

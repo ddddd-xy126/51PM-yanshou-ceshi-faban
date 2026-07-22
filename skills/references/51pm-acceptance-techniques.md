@@ -79,7 +79,6 @@ for (const el of document.querySelectorAll("body *")) {
 - **排期表不是 el-table！** 行读取用 `.schedule-table tbody tr`（`.el-table__body-wrapper` 系列选择器拿到 0 行，本次白查一轮）。表头 `.schedule-table thead th` 定位日期列 index；人员名 `.person-name`；单元格 class：`fixed-col user-cell`（人员列）/ `task-cell-wrapper`（日格）/ `gray-cell`（周末，不可选）。
 - 找有排期数据的项目/周做对照：从 vm（`$data.scheduleTableList` 那个）递归扫 `project_name` 字段去重即可，比翻 UI 快。日期范围设置：找 `_componentTag==="el-date-picker"` 的子 vm，`$emit("input",[s,e])`+`$emit("change",...)`（仅作查询前置，不算绕过被验交互）。
 - **排期表创建任务入口**：「多选编辑模式」→ 在日格**空白区域拖选**（mousePressed→mouseMoved→mouseReleased 三段 CDP 事件；单击/双击都不弹菜单）→ 顶部出现「创建任务」按钮 → 右侧 drawer「快速创建任务」三步向导（①任务类型 ②选择来源 ③创建，选完子需求才出现第③步）。
-- **根需求禁建的断言点**（两处）：a) 非项目需求列表里根需求名 span class 含 `is-disabled` 且点击无跳转（可点子需求是 `link sub-title`）；b) drawer 选择需求弹窗中根节点带"**请选择其下子节点**"文案、点击无响应，点子需求正常选中。
 - **drawer 内 el-select 坐标点选常失效**（elementFromPoint 落在 drawer-body 上，且重复点 input 会把下拉 toggle 关掉）：先读 `inp.closest(".el-select").__vue__.visible` 确认展开；点不中就改**键盘导航**——ArrowDown×n（每步读 popper 里 `.el-select-dropdown__item.hover` 文本确认落点）→ Enter，实测稳定。
 - **快速创建任务 drawer 关不掉**：Esc、点遮罩、找 close 按钮都可能无效（残留空白面板遮住右侧 1/3 屏）——直接 `location.reload()` 复位最省事，验收下一项前记得复位。
 

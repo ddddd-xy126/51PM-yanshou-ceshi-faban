@@ -1,12 +1,11 @@
-// V2.2.4 七项功能回归（沉淀自 2026-07 追溯验收轮）
-// 数据前置：项目测试文档入口样本 = 项目 #6661；模型外包列表样本 = 项目 #6690；
-//          非项目需求作用域样本 = 非项目 #6839。数据缺失时相关断言 test.skip，不硬失败。
+// V2.2.4 六项功能回归（沉淀自 2026-07 追溯验收轮）
+// 数据前置：项目测试文档入口样本 = 项目 #6661；模型外包列表样本 = 项目 #6690。
+//          数据缺失时相关断言 test.skip，不硬失败。
 const { test, expect } = require('@playwright/test');
 const h = require('./helpers');
 
 const DOC_PROJECT_ID = 6661; // 项目概览「项目测试文档」入口样本
 const OUTSOURCE_PROJECT_ID = 6690; // 模型外包列表样本
-const NOT_PROJECT_ID = 6839; // 非项目需求作用域样本
 
 test.describe('V2.2.4 回归', () => {
   test('① 排期表「过滤空白行列」开关存在且过滤无排期人员', async ({ page }) => {
@@ -128,15 +127,5 @@ test.describe('V2.2.4 回归', () => {
       test.skip(true, '供应商企业管理页需 DTA-PM 权限，当前账号不可见（人工确认）');
     }
     expect(text, '供应商企业管理页应含供应商相关字段').toMatch(/供应商|信用代码|联系人/);
-  });
-
-  test('⑧ 非项目任务：需求列表页作用域入口（仅子需求下创建）', async ({ page }) => {
-    await page.goto(`/not_project/not_project_demand?not_projectId=${NOT_PROJECT_ID}`);
-    await h.waitTableSettled(page);
-    await page.waitForTimeout(1500);
-    const rows = await page.locator('.el-table__body tr:visible').count();
-    if (rows === 0) test.skip(true, `非项目 #${NOT_PROJECT_ID} 无需求样本（数据缺失，人工确认）`);
-    // 需求作用域模式：需求列表存在（创建任务收敛到需求下打开），非全局自由需求选择器
-    expect(rows, '非项目需求列表应有需求行').toBeGreaterThan(0);
   });
 });

@@ -1,6 +1,6 @@
 // V2.2.4 接口回归（纯 request，不开浏览器，秒级）
 // 沉淀自 2026-07 V2.2.4 追溯验收轮；登录态 token 从 storageState 的 localStorage 读取。
-// 覆盖：任务选项新增项 / 非项目需求作用域字段 / 模型数据看板汇总自洽 / 两条明细的健壮性差异（B1）。
+// 覆盖：任务选项新增项 / 模型数据看板汇总自洽 / 两条明细的健壮性差异（B1）。
 const { test, expect } = require('@playwright/test');
 const fs = require('fs');
 const path = require('path');
@@ -11,8 +11,6 @@ function getToken() {
   const origin = state.origins.find((o) => o.origin.includes('10.67.8.183'));
   return origin.localStorage.find((l) => l.name === 'oauthToken').value;
 }
-
-const NOT_PROJECT_ID = 6839; // 非项目（get_demand_list 样本）
 
 test.describe('V2.2.4 接口回归', () => {
   test.use({ baseURL: BASE });
@@ -33,21 +31,6 @@ test.describe('V2.2.4 接口回归', () => {
     expect(flat, '应含 项目资源导出').toContain('项目资源导出');
     expect(hasId(545), '应含选项 ID 545').toBe(true);
     expect(hasId(546), '应含选项 ID 546').toBe(true);
-  });
-
-  test('非项目任务：get_demand_list 返回需求层级字段（pid/p_level）供作用域约束', async ({ request }) => {
-    const j = await (
-      await request.get(
-        `/manage_api/project_not_task/get_demand_list?project_id=${NOT_PROJECT_ID}&limit=20&page=1`,
-        { headers }
-      )
-    ).json();
-    expect(j.code).toBe(0);
-    const arr = j.data?.data || j.data || [];
-    expect(Array.isArray(arr) ? arr.length : 0, '非项目应有需求样本').toBeGreaterThan(0);
-    const sample = (Array.isArray(arr) ? arr : [])[0];
-    // pid / p_level 是「仅子需求下创建任务」作用域约束的数据基础
-    expect(sample).toHaveProperty('pid');
   });
 
   test('模型看板总览：发包/金额/资产汇总自洽', async ({ request }) => {

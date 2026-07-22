@@ -38,7 +38,7 @@ graph TD
 | -------- | ----------------------------------------------------------------------------------------------------------- |
 | 测试环境 | `http://10.67.8.183:7777`（右侧有"当前为开发环境"水印；**验收默认此环境**）                                 |
 | 正式环境 | `http://51pm.51aes.com:771`（写操作逐项先问用户；两个 host 均不外发）                                       |
-| 后端 API | `10.67.8.183:8888`，前端写死 `localhost:8888` → 回归 globalSetup 自动起本机转发（单独常驻 `npm run proxy`） |
+| 后端 API | 真实后端 `10.67.8.189:8888`（**IP 会漂移**：2026-07-21 前从 .183 迁到 .189，单一真源见 [start-proxy.js](../regression/scripts/start-proxy.js) 的 `TARGET_HOST`）；前端写死 `localhost:8888` → 回归 globalSetup 自动起本机转发（单独常驻 `npm run proxy`）。判断当前后端 IP：浏览器打开 app 看 performance 里 `manage_api` 请求 host |
 | 测试数据 | 测试库与正式库完全隔离、真实项目只是副本 → **任意项目均可随便挑、直接写，无污染顾虑，不需专用测试项目**     |
 | 登录     | 企微 OAuth；登录态过期（用例批量跳登录页）→ 提示用户重跑 `npm run login`，**agent 不代输任何凭据**          |
 
@@ -50,11 +50,13 @@ graph TD
 cd regression
 # 1. 依赖就绪？（首次或环境恢复才需要）
 if (!(Test-Path node_modules)) { npm install; npx playwright install chromium }
-# 2. 登录态存在？不存在则提示用户 npm run login（企微客户端点确认，agent 等待）
-Test-Path auth/state.json
+# 2. 登录态有效性自检（关键：文件存在 ≠ token 有效）
+npm run check     # 退出码 0=有效可继续；2=已过期→停下提示用户 npm run login；3=后端不可达/IP 漂移
 ```
 
-- 登录态**文件存在但已过期**的表现：回归用例批量因跳转登录页失败 → 停下提示用户重登，不要逐条重试。
+- ⭐ **登录态自检必须在阶段0 做，别等阶段1**：`npm run check` 用存档 token 直连后端打认证接口，秒级判断有效/过期（有效 `code=0`，过期 `code=444 用户不存在`）。**只 `Test-Path auth/state.json` 是错的**——token 会因 SSO 过期而失效，文件却还在；不自检就会白跑 10+ 分钟全红回归再被误判成后端宕机（2026-07-21 V2.2.4 轮教训）。
+  - 退出码 **2（已过期）**：需用户扫码续登，**agent 不代扫任何凭据**。⚠️**扫码务必走 VS Code 集成浏览器，别用 `npm run login`**——`npm run login` 会另开一个独立的有头 Chrome 窗口，常被其它窗口挡住/弹到屏幕外，用户根本看不见二维码（2026-07-21 V2.2.4 轮用户连问三次"扫码在哪"的教训）。**正确姿势**：① 用集成浏览器 `open_browser_page` 打开 `http://10.67.8.183:7777/` → app 401 会自动跳 `cas-test.51aes.com/loginPage`，二维码 iframe 就显示在 VS Code 里，用户可见即扫；② 用户扫完页面回 `my_board/main/main` 后，`page.evaluate(()=>localStorage.getItem('oauthToken'))` 取新 token，**直接改写 `auth/state.json` 里 origins 的 `oauthToken` 值**（集成浏览器 `Storage.getCookies` 不可用、拿不到 httpOnly 的 SESSION，但后端鉴权走 `Bearer token`，只更新 oauthToken 即可让 `npm run check` 通过 `code=0`）；③ 重跑 `npm run check` 确认有效再进阶段1。（仅当集成浏览器扫码走不通时才回退 `npm run login`。）
+  - 退出码 **3（后端不可达）**：多半是后端 IP 又漂移了——浏览器打开 app 看 performance 里 `manage_api` 的真实 host，改 [start-proxy.js](../regression/scripts/start-proxy.js) 的 `TARGET_HOST`（全仓库后端地址单一真源，proxy 与 check 都引用它）。
 - **环境固定为测试环境** `10.67.8.183:7777`，不再询问。仅当用户明确说「正式环境」才切换，且写操作逐项问。
 
 ## 阶段 1：老功能回归（几分钟，全自动）
@@ -74,7 +76,8 @@ $env:RUN_WRITE=1; npx playwright test --grep @write
 | 「已知BUG跟踪」用例 unexpected pass（红） | 开发已修复该 BUG，哨兵用例的 `test.fail()` 标记过时        | 删掉 `test.fail()` 转常规断言，并把 BUG 从 entry_map 备注中销账                |
 | 其他用例意外红                            | 疑似回归 BUG                                               | 先复跑一次排除偶发；仍红则看现场，作为 🐛 记入报告继续往下跑，**不中断等用户** |
 
-- 回归失败排查顺序：登录态过期（批量跳登录页）→ 8888 转发没起 → 测试库刷新致数据缺失 → 才是真回归 BUG。
+- 回归失败排查顺序：登录态过期（批量跳登录页，**阶段0 `npm run check` 应已拦住**）→ 8888 转发没起/后端 IP 漂移 → 测试库刷新致数据缺失 → 才是真回归 BUG。
+- 🚫 几乎全红时**第一动作是 `npm run check` 复核，严禁凭裸 TCP（`Test-NetConnection`/`node http` 直连后端端口）就断言「后端宕机」**（2026-07-21 V2.2.4 轮误判教训——refused/`socket hang up` 会误导，正常应已被阶段0 拦住）。仍要深挖看 `test-results/*/error-context.md` 是 `401/登录失效` 还是连接错误。
 - **测试库刷新致数据缺失**：失败报错含「测试数据缺失 / 被清空需先重建」时，**不要重建数据、不要复跑、不要继续耗时间**——立即终止本轮回归，在报告顶部回归徽章与附录 A.1 标注「回归跳过：测试库刷新致数据缺失」并列出受影响用例，直接进阶段 2。数据重建只在用户明确要求时做。
 - 回归结论（x 通过 / y 失败 / 哨兵状态）写进阶段 2 报告的**顶部回归徽章（一行）+ 附录 A.1**，不再当开篇头条。
 

@@ -1,10 +1,13 @@
 // 本地 8888 TCP 转发：51PM 测试环境前端把 API 写死为 localhost:8888，
-// 真实后端在 10.67.8.183:8888。跑测试前必须有这条转发。
+// 真实后端在 10.67.8.189:8888。跑测试前必须有这条转发。
 // 可独立运行：node scripts/start-proxy.js
 const net = require('net');
 const http = require('http');
 
-const TARGET_HOST = '10.67.8.183';
+// ⚠️ 后端真实 IP 会漂移（2026-07-21 从 10.67.8.183 迁到 10.67.8.189，前端构建已直连 .189）。
+// 这里是全仓库后端地址的单一真源：proxy 转发目标 + 阶段0 登录态自检（check-login.js）都引用它。
+// 后端再次迁移时只改这两行。判断当前值：浏览器打开 app 后看 performance 里 manage_api 请求的 host。
+const TARGET_HOST = '10.67.8.189';
 const TARGET_PORT = 8888;
 const LISTEN_PORT = 8888;
 
@@ -59,7 +62,7 @@ function startProxy() {
   });
 }
 
-module.exports = { startProxy };
+module.exports = { startProxy, TARGET_HOST, TARGET_PORT };
 
 if (require.main === module) {
   startProxy().then((s) => {

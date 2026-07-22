@@ -5,6 +5,7 @@
   "description": "51PM 验收回归脚本库（独立于 Hermes，配合 Copilot 验收流程使用）",
   "scripts": {
     "login": "node scripts/save-login-state.js",
+    "check": "node scripts/check-login.js",
     "proxy": "node scripts/start-proxy.js",
     "test": "playwright test",
     "test:headed": "playwright test --headed",

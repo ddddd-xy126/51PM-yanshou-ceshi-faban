@@ -5,7 +5,7 @@ const { test, expect } = require('@playwright/test');
 const h = require('./helpers');
 
 test.describe('V2.2.3 回归', () => {
-  test('① 递交列表进详情返回后列表不折叠', async ({ page }) => {
+  test('① 递交列表进详情返回后列表不折叠 @project_publish', async ({ page }) => {
     await page.goto('/OPStestList/OPStestList_list');
     await h.waitTableSettled(page);
     // 放宽日期（fill 不触发的坑 → vm form + search）并动态找可点击项目名
@@ -45,7 +45,7 @@ test.describe('V2.2.3 回归', () => {
     expect(total2, '返回后重新放宽日期应能查出数据').toBeGreaterThan(0);
   });
 
-  test('② 项目日报导出弹窗含「包含制作截图」开关', async ({ page }) => {
+  test('② 项目日报导出弹窗含「包含制作截图」开关 @estimate', async ({ page }) => {
     await page.goto('/project/project_list');
     await h.waitTableSettled(page);
     const detailBtn = page.locator('button:visible', { hasText: '查看详情' }).first();
@@ -66,7 +66,7 @@ test.describe('V2.2.3 回归', () => {
     await expect(dlg.locator('.el-switch').first(), '截图开关应为 el-switch').toBeVisible();
   });
 
-  test('③ 通用批量表单：批量添加反馈为两步向导容器', async ({ page }) => {
+  test('③ 通用批量表单：批量添加反馈为两步向导容器 @produce_demand', async ({ page }) => {
     // my_board 子页直接 URL 会被重定向，必须点左侧菜单（entry_map 坑）
     await page.goto('/my_board/main/main');
     await page.waitForSelector('li.el-menu-item', { timeout: 15000 });
@@ -92,7 +92,7 @@ test.describe('V2.2.3 回归', () => {
 
   // ③b 可见性断言为纯接口逻辑，已沉淀在 api-v2.2.3.spec.js「我的反馈可见性」用例，不在 UI spec 重复
 
-  test('④ 主题面板 18 主题齐全且切换生效', async ({ page }) => {
+  test('④ 主题面板 18 主题齐全且切换生效 @pm_theme', async ({ page }) => {
     // 坑：storageState 会话下直接 goto /main 渲染空壳（仅水印），子路由正常 → 用项目列表页作载体
     await page.goto('/project/project_list');
     await h.waitTableSettled(page);
@@ -112,9 +112,14 @@ test.describe('V2.2.3 回归', () => {
         return { theme: localStorage.getItem('pm_theme'), activeColor: active ? getComputedStyle(active).color : null };
       });
     const before = await readState();
+    // el-popover 在多步交互间可能自动收起 → 切换前重新点开触发器，再用 rect 高度稳健定位面板
+    await page.locator('.ts-trigger:visible').first().click();
+    await page.waitForTimeout(800);
     await page.evaluate(() => {
-      const p = [...document.querySelectorAll('.el-popover')].find((x) => x.offsetHeight > 0 && x.innerText.includes('基础皮肤'));
-      [...p.querySelectorAll('div,span')].find((e) => e.innerText.trim().endsWith('极地蓝') && e.innerText.trim().length <= 7 && getComputedStyle(e).cursor === 'pointer').click();
+      const ps = [...document.querySelectorAll('.el-popover')].filter((x) => x.innerText.includes('基础皮肤'));
+      const p = ps.reverse().find((x) => x.getBoundingClientRect().height > 0) || ps[0];
+      if (!p) return;
+      [...p.querySelectorAll('div,span')].find((e) => e.innerText.trim().endsWith('极地蓝') && e.innerText.trim().length <= 7 && getComputedStyle(e).cursor === 'pointer')?.click();
     });
     await page.waitForTimeout(1200);
     const after = await readState();
@@ -126,7 +131,9 @@ test.describe('V2.2.3 回归', () => {
       await page.waitForTimeout(800);
       await page.evaluate((orig) => {
         const nameMap = { light: '海盐白', spring: '春日花语', midsummer: '夏日海滩', autumn: '金秋物语', winter: '冬日初雪', arctic: '极地蓝', lavender: '薰衣草紫', pink: '玫瑰粉', apple: '苹果绿', sunset: '日落橘', 'spring-festival': '春节', 'lantern-festival': '元宵节', 'labor-day': '五一劳动节', doraemon: '六一儿童节', 'dragon-boat': '端午节', 'mid-autumn': '中秋节', 'national-day': '国庆节', christmas: '圣诞节' };
-        const p = [...document.querySelectorAll('.el-popover')].find((x) => x.offsetHeight > 0 && x.innerText.includes('基础皮肤'));
+        const ps = [...document.querySelectorAll('.el-popover')].filter((x) => x.innerText.includes('基础皮肤'));
+        const p = ps.reverse().find((x) => x.getBoundingClientRect().height > 0) || ps[0];
+        if (!p) return;
         [...p.querySelectorAll('div,span')].find((e) => e.innerText.trim().endsWith(nameMap[orig]) && e.innerText.trim().length <= 7 && getComputedStyle(e).cursor === 'pointer')?.click();
       }, before.theme);
       await page.waitForTimeout(800);

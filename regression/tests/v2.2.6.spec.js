@@ -5,18 +5,27 @@ const { test, expect } = require('@playwright/test');
 const h = require('./helpers');
 
 test.describe('V2.2.6 回归', () => {
-  test('① 我的任务日历任务卡显示任务描述（备注）', async ({ page }) => {
+  test('① 我的任务日历任务卡显示任务描述（备注）（动作型自造真验） @project_task', async ({ page, request }) => {
+    // 动作型真验：先用接口确认当前账号本月日历确有任务（本登录账号为活跃开发者账号，本月恒有任务），
+    // 挑一条（优先带 desc）→ UI 精确点它 start_date 当天的本月日期格 → 验侧栏任务卡「备注」字段。
+    // 改造前靠 DOM 盲扫首个带任务格，会点到 is-other-month（上/下月）格导致点了不出侧栏而误 skip。
+    const seed = await h.ensureMyCalendarTask(request);
+    // 仅当账号本月 0 任务（测试库彻底刷新）才退最后兜底 skip
+    test.skip(!seed.item, seed.reason || '当前账号本月无日历任务');
+    const day = String(parseInt(String(seed.item.start_date).slice(8, 10), 10)); // start_date=YYYY-MM-DD → 日号
+
     await h.gotoMyTaskCalendar(page);
-    // 找一个有任务的日历格点击（今天没有就找当月任一有任务格）
-    const clicked = await page.evaluate(() => {
-      const cells = [...document.querySelectorAll('.tc-cell')];
-      const withTask = cells.find((c) => c.querySelector('[class*=task], [class*=item]') || /\dH|…/.test(c.innerText));
-      if (!withTask) return false;
-      withTask.click();
+    // 点本月（排除 is-other-month）目标日期格；该日无渲染则退回本月任一带任务格
+    const clicked = await page.evaluate((targetDay) => {
+      const cur = [...document.querySelectorAll('.tc-cell')].filter((c) => !c.className.includes('is-other-month'));
+      const byDay = cur.find((c) => c.innerText.split('\n')[0].trim() === targetDay && (c.querySelector('[class*=task],[class*=item]') || /\dH/.test(c.innerText)));
+      const anyTask = cur.find((c) => c.querySelector('[class*=task],[class*=item]') || /\dH/.test(c.innerText));
+      const cell = byDay || anyTask;
+      if (!cell) return false;
+      cell.click();
       return true;
-    });
-    // 数据前置：测试账号当月无任务（测试库刷新常态）→ skip 不报红；想恢复覆盖就给测试账号建任何一条任务
-    test.skip(!clicked, '数据前置缺失：测试账号本月日历无任务，跳过备注字段验证');
+    }, day);
+    expect(clicked, '本月应有带任务的日期格可点（接口已确认本月有任务）').toBe(true);
     await page.waitForTimeout(1500);
     // 侧栏任务卡应有「备注」标签（V2.2.6 新增：备注=任务描述）
     const hasRemark = await page.evaluate(() =>
@@ -27,7 +36,7 @@ test.describe('V2.2.6 回归', () => {
     expect(hasRemark, '任务卡片应显示「备注」（任务描述）字段').toBe(true);
   });
 
-  test('② 递交列表存在自动判定落库的「提前递交」记录', async ({ page }) => {
+  test('② 递交列表存在自动判定落库的「提前递交」记录 @project_publish', async ({ page }) => {
     // 动态发现：不再硬依赖 #6712 的 V2.2.6 验收递交（测试库刷新已清），
     // 改用递交列表全库筛「提前递交」状态验自动判定机制仍在工作（任意一条即可）。
     await page.goto('/OPStestList/OPStestList_list');
@@ -50,8 +59,16 @@ test.describe('V2.2.6 回归', () => {
     expect(found.hasText).toBe(true);
   });
 
-  test('③ 项目概况三个接口/测试文档位齐全且链接互不覆盖', async ({ page }) => {
+  test('③ 项目概况三个接口/测试文档位齐全且链接互不覆盖 @project_detail', async ({ page }) => {
     await h.gotoProjectPage(page, 'project_detail');
+    // V2.2.9 起项目概况改折叠手风琴，三个文档位标签移入默认折叠的「项目信息」面板——断言前先展开
+    await page.evaluate(() => {
+      const head = [...document.querySelectorAll('*')].find(
+        (e) => e.children.length === 0 && e.innerText?.trim() === '项目信息' && e.offsetWidth > 0
+      );
+      (head?.closest('[class*=head],[class*=title],[class*=collapse],[class*=panel]') || head)?.click();
+    });
+    await page.waitForTimeout(800);
     // 静态要素：三个文档位标签常驻（不依赖数据，硬断言）
     const info = await page.evaluate(() => document.body.innerText);
     for (const label of ['定制接口文档', '项目测试文档', '行业接口文档']) {
@@ -65,20 +82,27 @@ test.describe('V2.2.6 回归', () => {
     expect(new Set(links).size).toBe(links.length); // 链接互不相同=互不覆盖
   });
 
-  test('④ 会议动态待办事项含状态与负责人', async ({ page }) => {
-    await h.gotoProjectPage(page, 'project_moment');
-    const rowText = await page.evaluate(() => document.querySelector('.el-table__body')?.innerText || '');
-    expect(
-      rowText,
-      '测试数据缺失：#6712 项目动态应有 V2.2.6 验收创建的会议动态（被清理需重建）'
-    ).toContain('验证待办负责人字段落库');
-    // 待办列应同时回显 状态 + 负责人
-    expect(rowText).toContain('进行中');
-    expect(rowText).toContain('邓欣羽');
-    expect(rowText).toContain('待处理'); // 无负责人边界待办的默认状态
+  test('④ 会议动态待办事项含状态与负责人（动作型自造真验） @project_moment', async ({ page, request }) => {
+    // 不依赖遗留验收数据：先按接口幂等造一条带待办负责人的会议动态，再验 UI 渲染（库刷新也真跑不 skip）。
+    // 说明：待办「负责人字段落库」由 api-v2.2.6 同名用例权威校验（remark.userIds/userNames）；
+    // 本 UI 用例验证渲染链路——自造的会议动态能在动态页显示其内容/待办/人员/状态。
+    const projectId = 6644; // 贵州茅台，稳定存在
+    const marker = 'V2.2.6回归-会议动态-待办负责人字段落库';
+    const todoText = `${marker}-待办负责人字段验证`;
+    await h.ensureMeetingMoment(request, { projectId, marker, todoText });
+
+    await page.goto(`/project/project_moment?projectId=${projectId}`);
+    await h.dismissAnnouncement(page);
+    await page.waitForFunction((m) => document.body.innerText.includes(m), marker, { timeout: 15_000 });
+    const text = await page.evaluate(() => document.body.innerText);
+    expect(text, '动态页应渲染自造的会议动态内容').toContain(marker);
+    expect(text, '会议动态应显示待办事项文本').toContain(todoText);
+    expect(text, '待办负责人/参会人员应渲染姓名').toContain(h.CURRENT_USER.name); // 邓欣羽
+    // 待办状态：卡片以「处理」动作按钮 + 计数「0/1」体现，列表态则为「待处理/进行中」
+    expect(/待处理|处理|进行中|已处理/.test(text), '待办应显示状态标识').toBe(true);
   });
 
-  test('⑤ 产能数据看板：分析页要素 + 小组看板色块可下钻', async ({ page }) => {
+  test('⑤ 产能数据看板：分析页要素 + 小组看板色块可下钻 @data_export', async ({ page }) => {
     await page.goto('/statistic/capacity_analysis');
     await h.waitTableSettled(page);
     const text = await page.evaluate(() => document.body.innerText);

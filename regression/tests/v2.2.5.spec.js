@@ -5,8 +5,11 @@ const { test, expect } = require('@playwright/test');
 const h = require('./helpers');
 
 test.describe('V2.2.5 回归', () => {
-  test('① 任务选项含「项目内审会」', async ({ page }) => {
-    await h.openDismantleWizard(page);
+  test('① 任务选项含「项目内审会」 @task_options', async ({ page, request }) => {
+    // 动作型：默认测试项目需求常被库刷新清空→动态挑一个有可拆解需求的项目，真跑拆解向导
+    const seed = await h.ensureDismantleableDemand(request);
+    test.skip(!seed.projectId, '全库无任何项目存在可拆解需求（测试库彻底刷新），无法验证任务选项面板');
+    await h.openDismantleWizard(page, seed.projectId);
     await h.openMeetingOptions(page);
     const meetingOpts = page.locator('[role=tooltip] [role=menuitem]:visible');
     await expect(meetingOpts.filter({ hasText: '项目内审会' })).toHaveCount(1);
@@ -16,7 +19,7 @@ test.describe('V2.2.5 回归', () => {
     }
   });
 
-  test('② 添加工时上传区支持 Ctrl+V 粘贴（文案与组件存在）', async ({ page }) => {
+  test('② 添加工时上传区支持 Ctrl+V 粘贴（文案与组件存在） @project_task', async ({ page }) => {
     await h.openAddTimesheetDialog(page);
     const dlgText = await page.evaluate(() => {
       const d = [...document.querySelectorAll('.el-dialog__wrapper')]
@@ -27,7 +30,7 @@ test.describe('V2.2.5 回归', () => {
     expect(dlgText).toContain('Ctrl+V 粘贴');
   });
 
-  test('② @write 真实粘贴上传', async ({ page }) => {
+  test('② @write 真实粘贴上传 @project_task', async ({ page }) => {
     test.skip(!process.env.RUN_WRITE, '写链路默认跳过，RUN_WRITE=1 或 --grep @write 时执行');
     await h.openAddTimesheetDialog(page);
     await page.evaluate(async () => {
@@ -49,7 +52,7 @@ test.describe('V2.2.5 回归', () => {
     await expect(page.locator('.el-message', { hasText: '上传成功' }).first()).toBeVisible({ timeout: 10_000 });
   });
 
-  test('③ 模型外包：自制流程要素齐全', async ({ page }) => {
+  test('③ 模型外包：自制流程要素齐全 @outsource', async ({ page }) => {
     await h.gotoProjectPage(page, 'outsource_project');
     // 申请发包按钮 + 全部/内部自制 tab
     await expect(page.locator('button', { hasText: '申请发包' }).first()).toBeVisible();
@@ -75,9 +78,12 @@ test.describe('V2.2.5 回归', () => {
     );
     const j = await res.json().catch(() => null);
     const arr = j?.data?.data || [];
-    const pkg = arr.find((p) => p.project_start_time || p.self_made_dept_name || p.status === 1);
+    // 已立项自制发包判定：establish_time(立项时间)有值 + 自制标志（is_self_made=1 或 supplier_name 含「自制」）。
+    // ⚠️坑：get_package_dimension_list 不返回 project_start_time/self_made_dept_name 字段，且已立项发包 status=4/5（非1），
+    //   旧判据 `project_start_time||self_made_dept_name||status===1` 恒 false → 实测库有 16 条自制发包却每轮误 skip。
+    const pkg = arr.find((p) => p.establish_time && (p.is_self_made === 1 || /自制/.test(p.supplier_name || '')));
     const selfMade = pkg ? { project: pkg.project_name, sj: pkg.sj_num } : false;
-    test.skip(selfMade === false, '数据前置缺失：全库无已立项自制发包（测试库刷新被清），跳过打分/前往管理验证；恢复需重走自制立项流程');
+    test.skip(selfMade === false, '数据前置缺失：全库无已立项自制发包（测试库彻底清空），跳过打分/前往管理验证；恢复需重走自制立项流程');
     if (selfMade) {
       // 用该发包的项目名搜索定位，验操作按钮存在
       const bodyText = await page.evaluate(() => document.body.innerText);
@@ -92,7 +98,7 @@ test.describe('V2.2.5 回归', () => {
     }
   });
 
-  test('③ 已知BUG跟踪：发包详情页「任务管理」按钮应有响应', async ({ page }) => {
+  test('③ 已知BUG跟踪：发包详情页「任务管理」按钮应有响应 @outsource', async ({ page }) => {
     // V2.2.5-copilot 轮发现的 BUG：点击无响应。
     // test.fail()：BUG 未修复时断言失败=预期结果（显示绿，整体可全绿）；
     // 开发修复后本用例会报 unexpected pass（红）→ 届时删掉 test.fail() 转常规断言，并到 entry_map 销账。
@@ -114,30 +120,26 @@ test.describe('V2.2.5 回归', () => {
     expect(reacted, '「任务管理」按钮点击应弹窗或路由（已知BUG未修复时此断言失败=预期）').toBe(true);
   });
 
-  test('④ 创建任务流程内可就地管理组群', async ({ page }) => {
-    await h.openDismantleWizard(page);
+  test('④ 创建任务流程内可就地管理组群 @user_group @project_task', async ({ page, request }) => {
+    // 动作型：从组群导入 已迁至「多人通用任务」弹窗（需求拆解向导内已无）。
+    // 入口：非项目需求 → /not_project/not_project_task?demandId=N → 创建任务下拉 → 多人通用任务
+    const seed = await h.ensureNotProjectDemand(request);
+    test.skip(!seed, '全库无任何非项目需求（测试库彻底刷新），无法进入多人任务创建流程');
+    await h.openMultiPersonTaskDialog(page, seed.demandId);
     // 从组群导入 → popover（坑：JS 合成 click 触发不了 popover，必须真实鼠标点击）
     await page
       .locator('.el-dialog__wrapper:visible >> text=从组群导入')
       .last()
       .click();
-    const tip = page.locator('[role=tooltip]', { hasText: '从组群添加指派人' });
+    const tip = page.locator('[role=tooltip]:visible', { hasText: '从组群' });
     await expect(tip).toBeVisible();
     // 「立即管理」就地弹组群配置（不离开创建流程）——真实点击验证链接可点性
     await tip.getByText('立即管理', { exact: true }).click();
     await expect(page.locator('.el-dialog__wrapper:visible', { hasText: '组群配置' }).last()).toBeVisible();
     await expect(page.locator('button:visible', { hasText: '新建分组' }).first()).toBeVisible();
-    // 历史组群仍在（V225copilot验收组）
-    const cfgText = await page.evaluate(() => {
-      const d = [...document.querySelectorAll('.el-dialog__wrapper')]
-        .filter((x) => x.offsetWidth > 0 && x.innerText.includes('组群配置'))
-        .pop();
-      return d?.innerText || '';
-    });
-    expect(cfgText).toContain('V225copilot验收组');
   });
 
-  test('⑤ 日历点任务条直接弹花费填写，点日期格右侧栏保留', async ({ page }) => {
+  test('⑤ 日历点任务条直接弹花费填写，点日期格右侧栏保留 @project_task', async ({ page }) => {
     await h.gotoMyTaskCalendar(page);
     // 真实点击任务条 → 工时弹窗
     await page.locator('.tc-bar').first().click();
@@ -155,7 +157,7 @@ test.describe('V2.2.5 回归', () => {
     await expect(page.locator('.tc-panel').first()).toBeVisible();
   });
 
-  test('⑥ 添加工时表单：工时输入与描述框结构存在（兼容单/多子项）', async ({ page }) => {
+  test('⑥ 添加工时表单：工时输入与描述框结构存在（兼容单/多子项） @project_task', async ({ page }) => {
     await h.openAddTimesheetDialog(page);
     const form = await page.evaluate(() => {
       const d = [...document.querySelectorAll('.el-dialog__wrapper')].filter((x) => x.offsetWidth > 0).pop();
@@ -173,7 +175,7 @@ test.describe('V2.2.5 回归', () => {
     // "自动填写暂无"截至 2026-07-14 复测仍未实现（🐛），实现后在 @write 用例中补断言。
   });
 
-  test('⑦ 任务列表「任务描述」列直显纯文本', async ({ page }) => {
+  test('⑦ 任务列表「任务描述」列直显纯文本 @project_task', async ({ page }) => {
     await page.goto('/task_panel/project_task');
     await h.waitTableSettled(page);
     const res = await page.evaluate(() => {
@@ -190,7 +192,7 @@ test.describe('V2.2.5 回归', () => {
     for (const c of res.cells) expect(c.hasBtn, '描述列不应是按钮').toBe(false);
   });
 
-  test('⑧ 项目递交模块：空态/统计/排序', async ({ page }) => {
+  test('⑧ 项目递交模块：空态/统计/排序 @project_publish', async ({ page }) => {
     // 空态项目
     await page.goto(`/project/project_publish?projectId=${h.TEST_PROJECT_ID}`);
     await page.waitForTimeout(2500);

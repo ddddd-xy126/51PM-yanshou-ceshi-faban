@@ -8,7 +8,7 @@ const DOC_PROJECT_ID = 6661; // 项目概览「项目测试文档」入口样本
 const OUTSOURCE_PROJECT_ID = 6690; // 模型外包列表样本
 
 test.describe('V2.2.4 回归', () => {
-  test('① 排期表「过滤空白行列」开关存在且过滤无排期人员', async ({ page }) => {
+  test('① 排期表「过滤空白行列」开关存在且过滤无排期人员 @schedule', async ({ page }) => {
     await page.goto('/schedule/schedule_table');
     await h.waitTableSettled(page);
     await page.waitForTimeout(1500);
@@ -34,7 +34,7 @@ test.describe('V2.2.4 回归', () => {
     expect(rowsAfter, '过滤后行数不应多于过滤前').toBeLessThanOrEqual(rowsBefore);
   });
 
-  test('② 任务选项配置：项目场景-其它 含「项目资源迁移/项目资源导出」', async ({ page }) => {
+  test('② 任务选项配置：项目场景-其它 含「项目资源迁移/项目资源导出」 @task_options', async ({ page }) => {
     await page.goto('/task_option_config');
     await h.waitTableSettled(page);
     await page.waitForTimeout(1500);
@@ -65,7 +65,7 @@ test.describe('V2.2.4 回归', () => {
     expect(text, 'UI 应可见 项目资源导出').toContain('项目资源导出');
   });
 
-  test('③ 模型数据看板：总览 + 模型明细（项目维度/资产维度）', async ({ page }) => {
+  test('③ 模型数据看板：总览 + 模型明细（项目维度/资产维度） @outsource', async ({ page }) => {
     await page.goto('/statistic/outsource_panel');
     await h.waitTableSettled(page);
     await page.waitForTimeout(2500);
@@ -84,7 +84,7 @@ test.describe('V2.2.4 回归', () => {
     expect(detailText, '模型明细应含项目维度/资产维度切换').toMatch(/项目维度|资产维度/);
   });
 
-  test('④ 我的工作台：组群配置页可创建/管理人员群组', async ({ page }) => {
+  test('④ 我的工作台：组群配置页可创建/管理人员群组 @user_group', async ({ page }) => {
     await page.goto('/user_custom_group_config');
     await h.waitTableSettled(page);
     await page.waitForTimeout(1500);
@@ -98,7 +98,7 @@ test.describe('V2.2.4 回归', () => {
     expect(text, '组群配置页应展示分组/群组').toMatch(/分组|群组|组群/);
   });
 
-  test('⑤ 项目概览：右侧信息栏含「项目测试文档」入口', async ({ page }) => {
+  test('⑤ 项目概览：右侧信息栏含「项目测试文档」入口 @project_detail', async ({ page }) => {
     await page.goto(`/project/project_detail?projectId=${DOC_PROJECT_ID}`);
     await h.waitTableSettled(page);
     await page.waitForTimeout(1500);
@@ -109,7 +109,7 @@ test.describe('V2.2.4 回归', () => {
     expect(text, '项目概况栏应含「项目测试文档」入口').toContain('项目测试文档');
   });
 
-  test('⑥ 模型外包：项目发包列表入口', async ({ page }) => {
+  test('⑥ 模型外包：项目发包列表入口 @outsource', async ({ page }) => {
     await page.goto(`/project/outsource_project?projectId=${OUTSOURCE_PROJECT_ID}`);
     await h.waitTableSettled(page);
     await page.waitForTimeout(1500);

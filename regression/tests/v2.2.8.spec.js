@@ -7,7 +7,7 @@ const h = require('./helpers');
 const PAUSE_DEMAND_PROJECT = 6690; // 贡井区国资管理平台（含自动转「暂停中」的需求）
 
 test.describe('V2.2.8 回归', () => {
-  test('① 递交列表「仅查看超时递交」筛选生效', async ({ page }) => {
+  test('① 递交列表「仅查看超时递交」筛选生效 @project_publish', async ({ page }) => {
     await page.goto('/OPStestList/OPStestList_list');
     await h.waitTableSettled(page);
     // 复选框存在（true-value=1 → is_over_tb_time）
@@ -38,7 +38,7 @@ test.describe('V2.2.8 回归', () => {
     expect(totals.over, '超时子集应远小于全量').toBeLessThan(totals.all);
   });
 
-  test('② 项目人员看板：六维度/QA分组/场景下钻', async ({ page }) => {
+  test('② 项目人员看板：六维度/QA分组/场景下钻 @data_export', async ({ page }) => {
     await page.goto('/statistic/pm_panel');
     await h.waitTableSettled(page);
     const text = await page.evaluate(() => document.body.innerText);
@@ -66,7 +66,7 @@ test.describe('V2.2.8 回归', () => {
     expect(drill, '点击场景A应展开组员看板').toContain('组员看板');
   });
 
-  test('③ 项目需求：存在自动转「暂停中」的需求', async ({ page }) => {
+  test('③ 项目需求：存在自动转「暂停中」的需求 @demand', async ({ page }) => {
     // 动态发现→写死ID→失效重扫：#6690 需求 #47299/#47289 为 2026-07 验收时的 pause 样本
     await h.gotoProjectPage(page, 'demand', PAUSE_DEMAND_PROJECT);
     // 「暂停中」可能在任意页：直接读 vm 全量接口数据断言（UI 文案由渲染层映射）
@@ -99,7 +99,7 @@ test.describe('V2.2.8 回归', () => {
     expect(found, '需求列表完工状态列应显示「暂停中」').toBe(true);
   });
 
-  test('④ 模型数据看板：总览要素与汇总自洽', async ({ page }) => {
+  test('④ 模型数据看板：总览要素与汇总自洽 @outsource', async ({ page }) => {
     await page.goto('/statistic/outsource_panel');
     await h.waitTableSettled(page);
     await page.waitForTimeout(2500);
@@ -111,7 +111,7 @@ test.describe('V2.2.8 回归', () => {
     expect(text).toMatch(/发包数量\s*\d+/);
   });
 
-  test('⑤ 工作台 UGA 入口存在且级联多环境', async ({ page }) => {
+  test('⑤ 工作台 UGA 入口存在且级联多环境 @uga', async ({ page }) => {
     await page.goto('/my_board/main/main');
     await page.waitForSelector('.wb-trigger__text', { timeout: 15_000 });
     await h.dismissAnnouncement(page);

@@ -20,7 +20,7 @@ test.describe('V2.2.4 接口回归', () => {
     headers = { Authorization: t, token: t };
   });
 
-  test('任务选项：项目场景-其它 新增「项目资源迁移(545)/项目资源导出(546)」', async ({ request }) => {
+  test('任务选项：项目场景-其它 新增「项目资源迁移(545)/项目资源导出(546)」 @task_options', async ({ request }) => {
     const j = await (await request.get('/manage_api/index/get_task_options', { headers })).json();
     expect(j.code).toBe(0);
     // 结构：data.data[]{dept_name, task_options[]{label, id, children[]{label,id}}}
@@ -33,7 +33,7 @@ test.describe('V2.2.4 接口回归', () => {
     expect(hasId(546), '应含选项 ID 546').toBe(true);
   });
 
-  test('模型看板总览：发包/金额/资产汇总自洽', async ({ request }) => {
+  test('模型看板总览：发包/金额/资产汇总自洽 @outsource', async ({ request }) => {
     const j = await (
       await request.get('/manage_api/outsource/get_data_overview?period=month&producer_scope=all&score_scope=all', {
         headers,
@@ -48,7 +48,7 @@ test.describe('V2.2.4 接口回归', () => {
     expect(o.asset_total, '资产总数>0').toBeGreaterThan(0);
   });
 
-  test('模型明细：项目维度与资产维度均返回、与总览发包数自洽', async ({ request }) => {
+  test('模型明细：项目维度与资产维度均返回、与总览发包数自洽 @outsource', async ({ request }) => {
     const overview = await (
       await request.get('/manage_api/outsource/get_data_overview?period=month&producer_scope=all&score_scope=all', {
         headers,
@@ -72,7 +72,7 @@ test.describe('V2.2.4 接口回归', () => {
     expect(pkgTotal, '项目维度总数应=总览发包总数').toBe(overview.data.data.overview.package_total);
   });
 
-  test('模型看板：非法筛选参数不 5xx（总览与明细）', async ({ request }) => {
+  test('模型看板：非法筛选参数不 5xx（总览与明细） @outsource', async ({ request }) => {
     const cases = [
       '/manage_api/outsource/get_data_overview?period=xxx&producer_scope=all&score_scope=all',
       '/manage_api/outsource/get_data_overview',
@@ -84,7 +84,7 @@ test.describe('V2.2.4 接口回归', () => {
     }
   });
 
-  test('发包明细：负数 limit 有参数校验（code 52）', async ({ request }) => {
+  test('发包明细：负数 limit 有参数校验（code 52） @outsource', async ({ request }) => {
     const j = await (
       await request.get('/manage_api/outsource/get_package_dimension_list?page=1&limit=-5&is_self_made=-1&status=-1', {
         headers,
@@ -94,7 +94,7 @@ test.describe('V2.2.4 接口回归', () => {
     expect(j.code, '负数 limit 应报参数错误 code 52').toBe(52);
   });
 
-  test('已知缺陷跟踪 B1：资产明细负数 limit 触发 500（发包明细同参却校验）', async ({ request }) => {
+  test('已知缺陷跟踪 B1：资产明细负数 limit 触发 500（发包明细同参却校验） @outsource', async ({ request }) => {
     // V2.2.4 验收发现：get_asset_dimension_list limit=-5 → HTTP 500 slice panic；
     // 同版 get_package_dimension_list 同参报 code 52。校验不一致的健壮性缺陷（UI 不会触发，仅构造参数）。
     // test.fail：后端补负数分页校验后 unexpected pass，删标记转常规断言。

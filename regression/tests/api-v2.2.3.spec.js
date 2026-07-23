@@ -30,7 +30,7 @@ test.describe('V2.2.3 接口回归', () => {
     return rows.length ? rows[0].id : null;
   }
 
-  test('日报导出：include_images 参数生效（含图文件显著大于不含图）', async ({ request }) => {
+  test('日报导出：include_images 参数生效（含图文件显著大于不含图） @estimate', async ({ request }) => {
     const pid = (await pickProjectId(request)) || 6651; // 找不到时退回验收样本
     const get = async (inc) =>
       request.get(`${EXPORT}?project_id=${pid}&start_date=&end_date=&include_images=${inc}`, { headers });
@@ -44,7 +44,7 @@ test.describe('V2.2.3 接口回归', () => {
     expect(bw, '含图导出应不小于不含图').toBeGreaterThanOrEqual(bn);
   });
 
-  test('日报导出边界：空 project_id 报 51、非法 include_images 不 5xx', async ({ request }) => {
+  test('日报导出边界：空 project_id 报 51、非法 include_images 不 5xx @estimate', async ({ request }) => {
     const empty = await request.get(`${EXPORT}?project_id=&include_images=true`, { headers });
     expect(empty.status()).toBeLessThan(500);
     const j = await empty.json();
@@ -54,7 +54,7 @@ test.describe('V2.2.3 接口回归', () => {
     expect(bad.status(), 'include_images 非法值不应 5xx').toBeLessThan(500);
   });
 
-  test('批量反馈提交：空商机号/空模块被后端拒绝（code 51）', async ({ request }) => {
+  test('批量反馈提交：空商机号/空模块被后端拒绝（code 51） @produce_demand', async ({ request }) => {
     const post = (body) =>
       request.post('/manage_api/produce_demand/add_apply_demand', {
         headers: { ...headers, 'Content-Type': 'application/json' },
@@ -66,18 +66,21 @@ test.describe('V2.2.3 接口回归', () => {
     expect(noModule.code, '空模块应被拒').toBe(51);
   });
 
-  test('我的反馈可见性：本人+有PM项目的待审批申请应在 get_my_demand_list', async ({ request }) => {
-    // V2.2.3 复验结论（2026-07-17）：有 PM 项目的申请（#490）提交后立即可见；
-    // 无 PM 项目（CBD #488/#489）不可见属项目数据问题，不作断言（口径待产品确认）。
-    const all = await (await request.get('/manage_api/produce_demand/get_apply_demand_list?page=1&limit=100', { headers })).json();
-    const rows = (all.data && (all.data.data || all.data.list)) || [];
-    // 排除 #487：历史反常样本（有 PM 但不可见，口径待产品确认）
-    const targets = rows.filter((x) => x.id !== 487 && x.apply_name === '邓欣羽' && x.pm && x.apply_demand_status === '待PM审批');
-    test.skip(!targets.length, '无「本人+有PM+待PM审批」样本（被审批消耗后重提一条即可恢复）');
+  test('我的反馈可见性：本人+有PM项目的待审批申请应在 get_my_demand_list（动作型自造真验） @produce_demand', async ({ request }) => {
+    // V2.2.3 复验结论（2026-07-17）：有 PM 项目的申请提交后立即可见；无 PM 项目不可见属数据问题（口径待产品确认）。
+    // 动作型自造：先确保存在「本人+有PM+待PM审批」样本（被审批消耗后自动重提一条恢复），不依赖遗留数据、不 skip。
+    const { ensureApplyDemand } = require('./helpers');
+    const seed = await ensureApplyDemand(request);
+    // 仅当测试库彻底清空、无任何「本人+有PM」历史申请可作造数模板时才退回 skip（最后兜底）
+    test.skip(!seed.item, seed.reason || '无可用造数模板');
+    const target = seed.item;
+    expect(target.apply_demand_status, '样本应处于待PM审批').toBe('待PM审批');
+    expect(target.pm, '样本项目应有 PM').toBeTruthy();
+
     const my = await (
       await request.get('/manage_api/produce_demand/get_my_demand_list?sj_num=&page=1&limit=50&pm_id=&apply_demand_module=&apply_demand_status=&start_date=&end_date=', { headers })
     ).json();
     const myRows = (my.data && (my.data.data || my.data.list)) || [];
-    expect(targets.some((t) => myRows.some((x) => x.id === t.id)), `#${targets.map((t) => t.id).join('/#')} 中应至少一条在我的列表可见`).toBe(true);
+    expect(myRows.some((x) => x.id === target.id), `#${target.id}（本人+有PM+待PM审批）应在我的申请列表可见`).toBe(true);
   });
 });

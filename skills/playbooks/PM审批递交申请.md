@@ -64,4 +64,4 @@ Array.from(document.querySelectorAll(".el-tabs__item"))
 - ⚠️ 我的地盘子页直接 URL 重定向回 main（步骤 1）
 
 ---
-_来源：V2.2.6 / V2.2.8 验收轮 ｜ 最后验证：2026-07-18_
+_来源：V2.2.6 / V2.2.8 验收轮 ｜ 最后验证：2026-07-23_

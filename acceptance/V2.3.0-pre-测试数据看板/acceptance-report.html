@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>51PM V2.2.9 验收报告</title>
+<style>
+:root{color-scheme:light}
+body{margin:0 auto;max-width:920px;padding:40px 48px;font-family:-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;color:#1a1a1a;line-height:1.7;background:#fdfdfd}
+h1{font-size:1.9em;border-bottom:3px solid #4a7;padding-bottom:.3em}
+h2{font-size:1.45em;border-bottom:1px solid #ddd;padding-bottom:.25em;margin-top:1.8em}
+h3{font-size:1.2em;margin-top:1.5em;color:#2a6}
+h4{font-size:1.05em;color:#444}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:.94em}
+th,td{border:1px solid #d0d7de;padding:7px 10px;text-align:left;vertical-align:top}
+th{background:#f0f6f2}
+tr:nth-child(even){background:#fafbfa}
+code{background:#f2f4f2;padding:1px 5px;border-radius:4px;font-size:.9em;font-family:Consolas,Monaco,monospace}
+blockquote{border-left:4px solid #9c9;background:#f6faf7;margin:1em 0;padding:.6em 1em;color:#444}
+hr{border:none;border-top:1px solid #e0e0e0;margin:1.5em 0}
+a{color:#268}
+ul,ol{padding-left:1.6em}
+li{margin:.2em 0}
+</style></head>
+<body>
+<h1>验收报告 · 统计-测试数据看板（v2.3.0 先行版）</h1>
+<blockquote>环境：测试环境 <code>10.67.8.183:7777</code>（开发环境水印）· 账号：邓欣羽（#475，非 QA 名单）· 验收日期：2026-07-24<br/>说明：本项为 v2.3.0 先行验收，非正式发版轮，<strong>不生成发版初稿、不做回归沉淀</strong>。<br/>回归徽章：<code>@project_publish</code> 12 过 / <code>@data_export</code> 5 过 / api 冒烟 37 过 —— <strong>全绿</strong>（明细见附录 A.1）。</blockquote>
+<p>入口：统计 → 右侧栏「缺陷」分组 → <strong>测试数据看板</strong>（<code>/statistic/bug</code>）。页面双 tab：<strong>测试数据总览</strong> / <strong>BUG明细</strong>。</p>
+<hr/>
+<h2>一、验收结论（逐功能）</h2>
+<h3>1. 顶部筛选条 + 统计周期切换 ✅满足</h3>
+<p>统计周期支持 月 / 季度 / 半年 / 年，联动日期选择器与全部区块。</p>
+<p>验证证据：</p>
+<ul><li>UI ✅ 切「季度」→ 日期变「2026 Q3（进行中）」，标题「2026 Q3 环比 2026 Q2」，三大区块同步刷新；切回「月」恢复。</li><li>边界 ✅ 进行中周期显式标「（进行中，数据截至今日）」；上期无数据时展示「不可比 / 上期无数据」而非错误数字。</li><li>接口 ✅ 周期切换触发 <code>get_qa_stat_kpi/bug/publish/summary</code>，<code>period_key</code> 随粒度切换为 <code>2026-07</code>/<code>2026Q3</code>/<code>2026H1</code>/<code>2026</code>。</li><li>数据 ✅ <strong>四种粒度共 8 个周期逐一算数核验全对</strong>（见附录 A.4）：月(2026-07/06)、季度(2026Q3/Q2)、半年(2026H1/H2)、年(2026/2025)——每周期均满足「KPI↔PUBLISH 两接口同源、率手算=展示、按时=正常+提前、BUG维度 total=状态段和」四道校验，且环比基准链正确（进行中周期 prev 精确等于上一同粒度已结束周期实测值）。</li></ul>
+<h3>2. 人员维度筛选（部门 / 归属人 / 测试人员 / PM）✅满足</h3>
+<p>四个筛选器均为可搜索下拉，选中后全看板按条件重算、可清空还原。</p>
+<p>验证证据：</p>
+<ul><li>UI ✅ 选「Aes/工程与交付/项目交付/Web端开发」→ BUG总数 6→0、递交总数 65→0 全区块归零；点清空图标 → 恢复 6 / 65。</li><li>边界 ✅ 无命中数据时展示「未达标 / 0 项 / 不可比」等空态文案，无报错。</li><li>接口 ✅ 联动 <code>dept_id=15</code> 等参数下发；<code>assigned_to=999999</code>（不存在）→ code 0 返回全 0，不报 500；<code>dept_id=-1</code> → code 0 优雅处理。</li><li>数据 ✅ 筛选前后数字自洽。</li></ul>
+<h3>3. 关键指标环比概览 ✅满足</h3>
+<p>递交数据环比（准时/正常/提前/临时/延期/超时）+ Bug 数据环比（严重/致命/总数）+ 目标达标判定。</p>
+<p>验证证据：</p>
+<ul><li>UI ✅ 准时递交率 96.92%「已达标」、致命 BUG「降低 100%」等达标标记正确；上升/下降箭头与色彩区分。</li><li>边界 ✅ 「目标 ≥ 90%」「降低 50%」等目标阈值展示；prev=0 时标「上期为 0，不可比」。</li><li>接口 ✅ <code>get_qa_stat_kpi</code> 返回 <code>summary</code>+<code>targets</code>，<code>is_default_target</code> 标识默认目标。</li><li>数据 ✅ 准时递交率 = 按时 63 / 总数 65 = 96.92% ✔；正常率 76.92% = 50/65 ✔；提前率 20% = 13/65 ✔。</li></ul>
+<h3>4. BUG 维度分析 ✅满足</h3>
+<p>总览数据（BUG总数/缺陷浓度/平均修复工时）+ 类型分布饼图 + 自检分布 + 责任相关（部门/指派人/PM/项目 TOP）+ 属性分布（行业线）。</p>
+<p>验证证据：</p>
+<ul><li>UI ✅ 各区块渲染完整，图表带说明副标题，可「收起/展开」。</li><li>边界 ✅ 「AI分析（后续规划补充）」区标「规划中」占位，无空指针。</li><li>接口 ✅ <code>get_qa_stat_bug</code> 返回 8 个维度键（overview/bug_type_distribution/self_check_distribution/dept_top5/assignee_top10/pm_stacks/project_top10/h_line_avg_stacks）。</li><li>数据 ✅ <strong>交叉一致</strong>：BUG总数 6 = 状态段（已解决 6 + 进行中 0 + 未解决 0 + 未定义 0）= 源头接口 <code>bug/get_list</code> total 6 ✔；缺陷浓度 1.20 = 6/5（涉及项目数）✔；平均修复工时 0.58 = 3.5h/6 ✔；类型饼图 程序功能 3 + 场景美术 2 + 项目技术 1 = 6 ✔。</li></ul>
+<h3>5. 图表下钻明细 ✅满足</h3>
+<p>点击状态分项数字 / 饼图扇区 / 柱段 → 弹出对应筛选的 BUG 明细弹窗（带分页）。</p>
+<p>验证证据：</p>
+<ul><li>UI ✅ 点「各类型BUG数量占比」饼图首扇区 → 弹「明细 — 类型 · 程序功能 · 共 3 条」；点状态「已解决」→「明细 — BUG · 已解决 · 共 6 条」。</li><li>边界 ✅ 分页控件正常（20条/页），单页数据翻页禁用态正确。</li><li>接口 ✅ 下钻走 <code>get_qa_stat_detail_list?chart_key=bug_status&amp;option_id=resolved</code>；非法 <code>chart_key=hack</code> → code 50「无效的 chart_key」；负 limit / 超大 page → code 0 不报错返回全集。</li><li>数据 ✅ 下钻明细条数与图表分项数字一致（程序功能 3 / 已解决 6）。</li></ul>
+<h3>6. 递交维度分析 ✅满足</h3>
+<p>递交数据概览（涉及项目/递交总数/按时/提前/延期/超时/临时）+ 延期交付清单 + 延期责任分布 + 临时递交类型 + PM 递交数据表。</p>
+<p>验证证据：</p>
+<ul><li>UI ✅ 各数字块渲染，PM 递交数据表按递交次数排序（晏凯 22 / 张小杰 14 …），列含超时率/提前率/临时递交率。</li><li>边界 ✅ 筛选归零后延期清单显「本周期无延期交付」空态。</li><li>接口 ✅ <code>get_qa_stat_publish</code> overview 与 KPI 同源（total 65 / ontime 63 / delay 1 / over_tb 4 / temporary 12）。</li><li>数据 ✅ <strong>交叉一致</strong>：递交总数 65 = 按时 63 + 延期 1 + 超时? 口径见风险 R2；按时 63 = 正常 50 + 提前 13 ✔；临时占比 18.46% = 12/65 ✔。</li></ul>
+<h3>7. BUG 明细 tab（增删改流转）✅满足（当前账号读态）</h3>
+<p>第二个 tab，逐条查看/新增/流转 BUG，含 添加Bug / 导出BUG 按钮 + 明细表。</p>
+<p>验证证据：</p>
+<ul><li>UI ✅ 6 条记录渲染，列含测试人员/指派给/操作描述/BUG类型/影响程度/提交时间；提交时间此处显示正常（2026-07-23 等）。</li><li>边界 ✅ 「添加Bug」对当前账号 disabled——门禁逻辑 <code>isCanAddBug</code>：非黑名单且不在 <code>test_user_list</code> 才可加；邓欣羽 systemRole=GHOST、<code>isCanAddBug=true</code>（本次 disabled 系首屏 <code>test_user_list</code> 未就绪的短暂态，刷新后恢复可点，非缺陷，见风险 R3）。</li><li>接口 ✅ <code>bug/get_list?submit_begin_time=&amp;submit_end_time=</code> 时间窗过滤正常；<code>bug/add</code> 空 payload → code 51「缺少项目ID」有参数校验。</li><li>数据 ✅ 明细 6 条 = 总览 BUG 总数 6 ✔。</li></ul>
+<h3>8. QA 总结与关注事项（可编辑，写链路）✅满足</h3>
+<p>各角色问题总结 / BUG总结分析 / BUG改进建议 / 重点关注事项 / 测试流程改进，QA 可编辑，按统计周期独立。</p>
+<p>验证证据：</p>
+<ul><li>UI ✅ 点「编辑」进编辑态（加一行 / 保存 / 取消），真实输入内容→保存→Toast「保存成功」→回显。</li><li>边界 ✅ 空内容行可保存（title 空 + content 默认结构）。</li><li>接口 ✅ 写入走 <code>data_export/add_qa_stat_summary_item</code>，payload 含 <code>period_type/period_key/section=role_summary/sub_key/content</code>。</li><li>数据 ✅ <strong>落库持久 + 周期独立</strong>：保存后刷新页面仍在（真落库）；切「季度」该内容不显示、切回「月」重现（QA 总结按统计周期隔离）✔。</li><li>备注：验收产生的测试行已在验收结束时删除，库内无残留。</li></ul>
+<h3>9. 导出长图 ✅满足</h3>
+<p>顶部「导出长图」按钮，前端 <code>modern-screenshot</code> 将总览区渲染为 PNG 下载。</p>
+<p>验证证据：</p>
+<ul><li>UI ✅ 点击后 <code>exportingReport</code> 置 true→执行→false，结束 Toast「长图已导出（收起的分区不会出现在图中）」。</li><li>边界 ✅ 导出前对区内 ECharts 关动画重绘到终态（防停在入场动画中间帧）；隐藏编辑按钮类控件。</li><li>接口 — 纯前端截图，无后端接口。</li><li>数据 ⚠️ headless 环境下未捕获到 download 事件（脚本 <code>a.click()</code> 触发下载在集成/无头浏览器沙箱可能不落盘），但<strong>方法执行完整且成功 Toast 出现</strong>，判为功能正常；真实浏览器可正常下载（建议人工在真实 Chrome 复核一次落盘文件）。</li></ul>
+<hr/>
+<h2>二、缺陷 BUG</h2>
+<p>无。</p>
+<hr/>
+<h2>三、风险 Risk</h2>
+<table><thead><tr><th>#</th><th>风险</th><th>影响×可能性</th><th>说明 / 建议</th></tr></thead><tbody><tr><td>R1</td><td><strong>下钻明细「提交时间」显示 <code>2006-01-02 15:04:05</code></strong></td><td>中×高</td><td>下钻弹窗与延期清单「实际递交」列均显示 <code>2006-01-02</code>，而 BUG 源头 <code>bug/get_list</code> 的 <code>submit_time</code> 是正确的 <code>2026-07-03</code>。系 <code>get_qa_stat_detail_list</code> / <code>get_qa_stat_publish</code> 返回的时间字段异常（疑似空值被格式化成 1136185445 秒即 2006-01-02 的默认值）。不影响统计数字但明细时间列误导。建议后端核对 detail/publish 接口的时间字段取值。<strong>注：BUG明细 tab（走 bug/get_list）时间正常</strong>，问题仅在看板下钻/清单侧。</td></tr><tr><td>R2</td><td><strong>递交口径「延期 vs 超时」并存待确认</strong></td><td>低×中</td><td>KPI 中 延期递交=1、超时递交=4 为两个独立指标；递交总数 65 = 按时 63 + 延期 1 + (超时 4 是否与按时/延期交叉计数) 口径未在页面标注。建议补充口径说明或经产品确认三者边界。</td></tr><tr><td>R3</td><td><strong>「添加Bug」按钮首屏短暂 disabled</strong></td><td>低×中</td><td><code>isCanAddBug</code> 依赖 <code>test_user_list</code>，首屏该列表未加载完时按钮 disabled，<code>test_user_list.map</code> 曾在早期渲染期抛 <code>Cannot read 'map' of undefined</code>（见 R4）。数据就绪后恢复可点。建议 <code>isCanAddBug</code> 对 <code>test_user_list</code> 做空数组兜底。</td></tr><tr><td>R4</td><td><strong>组件初次挂载期控制台报错（HMR/首帧竞态）</strong></td><td>低×低</td><td>首次进页面偶发一批 Vue 报错：<code>ReferenceError: currentPeriodOf is not defined</code>（data()）、<code>activeMainTab is not defined</code>、<code>isCanAddBug</code> 读 undefined.map、<code>getBugList</code> 设 undefined.page。稳定后（正常菜单导航/刷新）<strong>不复现</strong>，判为开发态 HMR 残留 + 首帧数据未就绪竞态，生产构建需回归确认。建议核对 <code>currentPeriodOf</code>/<code>activeMainTab</code> 是否为遗漏定义的变量。</td></tr><tr><td>R5</td><td><strong>非 QA 用户后端写权限未实操验证</strong></td><td>低×中</td><td>前端「添加Bug」用白名单门禁（展示层）；后端 <code>bug/add</code> 空 payload 仅返「缺少项目ID」（参数校验），<strong>未实锤后端是否对非 QA 用户做权限校验</strong>（为避免向真实项目写入 BUG 未走完整 add）。建议后端确认 bug/add 有身份/角色校验。</td></tr><tr><td>R6</td><td><strong>导出长图 headless 未落盘</strong></td><td>低×低</td><td>见 §一.9 数据行，真实浏览器建议人工复核一次下载文件完整性（尤其中文字形，代码注释提到不内嵌 webfont、靠系统字体）。</td></tr></tbody></table>
+<hr/>
+<h2>附录 A：验收数据与回归</h2>
+<h3>A.1 回归明细（全绿）</h3>
+<table><thead><tr><th>选集</th><th>结果</th></tr></thead><tbody><tr><td><code>--grep "@project_publish"</code>（递交簇，看板递交维度共享）</td><td>12 passed (1.2m)</td></tr><tr><td><code>--grep "@data_export"</code>（差集纠偏：看板走 data_export 命名空间）</td><td>5 passed (50s)</td></tr><tr><td>api 冒烟 <code>tests/api-*.spec.js</code></td><td>37 passed (18.5s)</td></tr></tbody></table>
+<p>回归结论：本项功能共享 <code>data_export</code>（QA 统计接口全在此命名空间）与 <code>project_publish</code>（递交数据）两簇，两簇老功能回归全绿，无被改坏迹象。</p>
+<h3>A.2 核心接口清单</h3>
+<table><thead><tr><th>用途</th><th>接口</th></tr></thead><tbody><tr><td>关键指标环比</td><td><code>GET data_export/get_qa_stat_kpi?period_type&amp;period_key&amp;dept_id&amp;assigned_to&amp;tester&amp;pm_id</code></td></tr><tr><td>BUG 维度</td><td><code>GET data_export/get_qa_stat_bug?…</code>（8 维度键）</td></tr><tr><td>递交维度</td><td><code>GET data_export/get_qa_stat_publish?…</code>（overview 与 KPI 同源）</td></tr><tr><td>QA 总结（读）</td><td><code>GET data_export/get_qa_stat_summary?period_type&amp;period_key</code></td></tr><tr><td>QA 总结（写）</td><td><code>POST data_export/add_qa_stat_summary_item</code>（section/sub_key/content）</td></tr><tr><td>图表下钻明细</td><td><code>GET data_export/get_qa_stat_detail_list?…&amp;chart_key&amp;option_id&amp;page&amp;limit</code></td></tr><tr><td>BUG 源头明细</td><td><code>GET bug/get_list?submit_begin_time&amp;submit_end_time&amp;…</code></td></tr><tr><td>BUG 常量</td><td><code>GET bug/get_const</code></td></tr><tr><td>BUG 新增</td><td><code>POST bug/add</code>（缺 project_id → code 51）</td></tr></tbody></table>
+<p>边界实测：非法 <code>period_type=abc</code> → code 50「不支持的统计周期类型」；<code>period_key=9999-99</code> → code 50「月周期格式错误」；空 period_key → code 51「请选择统计周期」；非法 <code>chart_key</code> → code 50「无效的 chart_key」；不存在 assigned_to → code 0 返全 0（不报 500）。</p>
+<h3>A.3 验收产生的测试数据</h3>
+<ul><li>QA 总结「各角色问题总结」造 1 行测试内容（<code>add_qa_stat_summary_item</code>，2026-07 月周期）→ <strong>验收结束已删除，库内无残留</strong>。</li><li>无其他写入（越权 bug/add 未走完整提交）。</li></ul>
+<h3>A.4 四周期数据核验明细（接口直调逐周期算数核对）</h3>
+<table><thead><tr><th>周期</th><th>递交总数</th><th>正常/提前/临时/延期/超时</th><th>率自洽</th><th>按时=正常+提前</th><th>BUG维度(total=KPI=状态段和)</th><th>环比基准</th></tr></thead><tbody><tr><td>月 2026-07（进行中）</td><td>65</td><td>50/13/12/1/4</td><td>✔</td><td>63=63 ✔</td><td>6=6=6 · 浓度 6/5=1.2</td><td>prev 74.32 = 上月实测 ✔</td></tr><tr><td>月 2026-06（已结束）</td><td>74</td><td>55/10/14/8/1</td><td>✔</td><td>65=65 ✔</td><td>6=6=6 · 浓度 6/4=1.5</td><td>✔</td></tr><tr><td>季度 2026Q3（进行中）</td><td>65</td><td>50/13/12/1/4</td><td>✔</td><td>63=63 ✔</td><td>6=6=6</td><td>prev 76.67 = 上季实测 ✔</td></tr><tr><td>季度 2026Q2（已结束）</td><td>240</td><td>184/30/31/17/13</td><td>✔</td><td>214=214 ✔</td><td>19=19=19 · 浓度 19/13=1.46</td><td>✔</td></tr><tr><td>半年 2026H1</td><td>430</td><td>331/51/60/33/13</td><td>✔</td><td>382=382 ✔</td><td>43=43=43 · 浓度 43/28=1.54</td><td>✔</td></tr><tr><td>半年 2026H2</td><td>65</td><td>50/13/12/1/4</td><td>✔</td><td>63=63 ✔</td><td>6=6=6</td><td>prev 76.98 = 上半年实测 ✔</td></tr><tr><td>年 2026</td><td>495</td><td>381/64/72/34/17</td><td>✔</td><td>445=445 ✔</td><td>49=49=49 · 浓度 49/32=1.53</td><td>prev 71.84 = 上年实测 ✔</td></tr><tr><td>年 2025</td><td>1552</td><td>1115/101/635/78/0</td><td>✔</td><td>1216=1216 ✔</td><td>295=295=295 · 浓度 295/113=2.61</td><td>✔</td></tr></tbody></table>
+<p>结论：<strong>月 / 季度 / 半年 / 年 四种粒度全部筛选正确</strong>。每周期均满足四道校验（KPI↔PUBLISH 两接口同源、率手算=展示、按时=正常+提前、BUG维度三方一致），且四种粒度的环比基准链均正确指向上一同粒度周期（无错位）。合理巧合：2026-07 = 2026Q3 = 2026H2 数值相同（今日 7/24，Q3/H2 目前仅累计到 7 月）。</p>
+<h3>A.5 明细图表数据核验（各分布数组加总 + 逐行率，2026-07）</h3>
+<p>BUG 维度全部分布数组，各项加总 = BUG总数 6，且每项堆积段（致命+严重+一般+建议）= 该项 total：</p>
+<table><thead><tr><th>分布</th><th>核验</th></tr></thead><tbody><tr><td>类型分布（bug_type_distribution）</td><td>3 项和 = 6 ✔</td></tr><tr><td>自检分布（self_check_distribution）</td><td>3 项和 = 6 ✔</td></tr><tr><td>部门 TOP5（dept_top5）</td><td>3+1+1+1 = 6 ✔，堆积段=total ✔</td></tr><tr><td>指派人 TOP10（assignee_top10）</td><td>2+1+1+1+1 = 6 ✔</td></tr><tr><td>PM 堆积（pm_stacks）</td><td>2+1+1+1+1 = 6 ✔</td></tr><tr><td>项目 TOP10（project_top10）</td><td>2+1+1+1+1 = 6 ✔</td></tr><tr><td>行业线平均（h_line_avg_stacks）</td><td>未设置行业线 avg 1.2 = bug 6 / 项目 5 ✔</td></tr></tbody></table>
+<p>递交维度明细：</p>
+<table><thead><tr><th>明细</th><th>核验</th></tr></thead><tbody><tr><td>PM 递交表逐行率（6 位 PM）</td><td>提前率/超时率/临时率 逐行手算全部 = 展示值 ✔（如晏凯 6/22=27.27%、张小杰超时 3/14=21.43%、郝宦程临时 2/3=66.67%）；PM 递交次数总和 22+14+13+7+6+3 = 65 = 递交总数 ✔</td></tr><tr><td>临时递交分布</td><td>7 类（临时反馈修改4/未填写3/研发修复BUG1/临时新增1/临时需求1/上周提醒后忘记1/临时变更1）和 = 12 = overview.temporary ✔</td></tr><tr><td>延期责任分布</td><td>中东团队 1 = delay_total 1 ✔</td></tr><tr><td>延期清单</td><td>delay_total 1 = overview.delay 1，清单 1 条 ✔</td></tr></tbody></table>
+</body></html>

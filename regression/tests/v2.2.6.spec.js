@@ -5,35 +5,32 @@ const { test, expect } = require('@playwright/test');
 const h = require('./helpers');
 
 test.describe('V2.2.6 回归', () => {
-  test('① 我的任务日历任务卡显示任务描述（备注）（动作型自造真验） @project_task', async ({ page, request }) => {
-    // 动作型真验：先用接口确认当前账号本月日历确有任务（本登录账号为活跃开发者账号，本月恒有任务），
-    // 挑一条（优先带 desc）→ UI 精确点它 start_date 当天的本月日期格 → 验侧栏任务卡「备注」字段。
-    // 改造前靠 DOM 盲扫首个带任务格，会点到 is-other-month（上/下月）格导致点了不出侧栏而误 skip。
+  test('① 我的任务日历重构：任务以内联卡片展示（含描述/工时）（动作型自造真验） @project_task', async ({ page, request }) => {
+    // ⚠️ V2.2.9 我的任务日历整体重构（就地更新旧断言，2026-07-24）：
+    //   旧版=点日期格弹右侧栏、栏内任务卡有「备注」字段；
+    //   新版=页面含「任务日历/工时确认」两 tab，任务不再走侧栏，而是以内联 chip 直接渲染在日期格里，
+    //   chip 文本形如「[项目] B/S二开-AI-引擎功能 | 8H」「[非项目] 平台研发-项目管理 | 4H」（任务描述+工时内联）。
+    //   故断言从「点格出侧栏备注」改为「日历渲染出带 [项目]/[非项目] 标签 + 工时 的任务 chip」。
     const seed = await h.ensureMyCalendarTask(request);
     // 仅当账号本月 0 任务（测试库彻底刷新）才退最后兜底 skip
     test.skip(!seed.item, seed.reason || '当前账号本月无日历任务');
-    const day = String(parseInt(String(seed.item.start_date).slice(8, 10), 10)); // start_date=YYYY-MM-DD → 日号
 
     await h.gotoMyTaskCalendar(page);
-    // 点本月（排除 is-other-month）目标日期格；该日无渲染则退回本月任一带任务格
-    const clicked = await page.evaluate((targetDay) => {
-      const cur = [...document.querySelectorAll('.tc-cell')].filter((c) => !c.className.includes('is-other-month'));
-      const byDay = cur.find((c) => c.innerText.split('\n')[0].trim() === targetDay && (c.querySelector('[class*=task],[class*=item]') || /\dH/.test(c.innerText)));
-      const anyTask = cur.find((c) => c.querySelector('[class*=task],[class*=item]') || /\dH/.test(c.innerText));
-      const cell = byDay || anyTask;
-      if (!cell) return false;
-      cell.click();
-      return true;
-    }, day);
-    expect(clicked, '本月应有带任务的日期格可点（接口已确认本月有任务）').toBe(true);
     await page.waitForTimeout(1500);
-    // 侧栏任务卡应有「备注」标签（V2.2.6 新增：备注=任务描述）
-    const hasRemark = await page.evaluate(() =>
-      [...document.querySelectorAll('*')].some(
-        (e) => e.children.length === 0 && e.innerText?.trim() === '备注' && e.offsetWidth > 0
-      )
-    );
-    expect(hasRemark, '任务卡片应显示「备注」（任务描述）字段').toBe(true);
+    // 1) 重构后的两 tab 静态存在
+    const hasTabs = await page.evaluate(() => {
+      const txt = document.body.innerText || '';
+      return txt.includes('任务日历') && txt.includes('工时确认');
+    });
+    expect(hasTabs, '我的任务日历应含「任务日历/工时确认」两 tab（V2.2.9 重构）').toBe(true);
+    // 2) 日历格内渲染任务 chip：叶子文本形如「任务名 | NH」（任务描述+工时内联）
+    const chip = await page.evaluate(() => {
+      const nodes = [...document.querySelectorAll('*')].filter(
+        (e) => e.children.length === 0 && /\|\s*[\d.]+\s*H/i.test(e.innerText || '') && e.offsetWidth > 0
+      );
+      return { count: nodes.length, sample: nodes[0]?.innerText.trim().slice(0, 40) || '' };
+    });
+    expect(chip.count, '日历应内联渲染带工时的任务 chip（形如「任务名 | NH」，接口已确认本月有任务）').toBeGreaterThan(0);
   });
 
   test('② 递交列表存在自动判定落库的「提前递交」记录 @project_publish', async ({ page }) => {

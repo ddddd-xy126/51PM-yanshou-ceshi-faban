@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>51PM V2.2.9 验收报告</title>
+<style>
+:root{color-scheme:light}
+body{margin:0 auto;max-width:920px;padding:40px 48px;font-family:-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;color:#1a1a1a;line-height:1.7;background:#fdfdfd}
+h1{font-size:1.9em;border-bottom:3px solid #4a7;padding-bottom:.3em}
+h2{font-size:1.45em;border-bottom:1px solid #ddd;padding-bottom:.25em;margin-top:1.8em}
+h3{font-size:1.2em;margin-top:1.5em;color:#2a6}
+h4{font-size:1.05em;color:#444}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:.94em}
+th,td{border:1px solid #d0d7de;padding:7px 10px;text-align:left;vertical-align:top}
+th{background:#f0f6f2}
+tr:nth-child(even){background:#fafbfa}
+code{background:#f2f4f2;padding:1px 5px;border-radius:4px;font-size:.9em;font-family:Consolas,Monaco,monospace}
+blockquote{border-left:4px solid #9c9;background:#f6faf7;margin:1em 0;padding:.6em 1em;color:#444}
+hr{border:none;border-top:1px solid #e0e0e0;margin:1.5em 0}
+a{color:#268}
+ul,ol{padding-left:1.6em}
+li{margin:.2em 0}
+</style></head>
+<body>
+<h1>51PM V2.2.9 验收报告</h1>
+<ul><li>验收时间：2026-07-24</li><li>环境：测试 10.67.8.183:7777（右侧「当前为开发环境」水印）</li><li>验收账号：邓欣羽（超管视角，<code>systemRole ≠ PM</code>、不在递交白名单 <code>testListRooters</code>）</li><li><strong>验收结论：10 项需求，满足 9 / 部分满足 0 / 不满足 0 / 待确认 1</strong>（item 4「超市递交」疑为笔误，见 §三 R1）；发现缺陷 0、风险/待确认 3</li><li>老功能回归：✅ 无真回归（大范围重构轮触发 UI 全量 62 用例：复跑后无真回归 BUG；1 例因本轮重构旧断言过时，阶段 4 已就地更新；沉淀新 spec 后全套 79 用例 <strong>75 通过 / 4 跳过 / 0 失败</strong>，明细见附录 A.1）</li></ul>
+<blockquote>阅读顺序：先看「一、逐需求验收详情」判断本次交付达标与否 → 「二、缺陷」「三、风险」是待处理项 → 「四、发版初稿」→ 回归与接口等测试证据在附录，供追溯，不是验收结论本身。</blockquote>
+<h2>0. 原始验收需求</h2>
+<blockquote>本周开发内容 V2.2.9：<br/>1. 统计-工时：重构优化该模块，整合原有工时导出入口，优化"筛选-查看-导出"操作流程，所见即所得<br/>2. ECP报价：对接 ECP4.1 版本，更新报价项数据<br/>3. 侧边栏：我的非项目合并到我的项目模块，减少一个侧边菜单<br/>4. 递交：新增"仅查看超市递交"的筛选条件<br/>5. 任务-项目任务/非项目任务：新增筛选已延宕、本周任务、全部任务，任务与非任务共用容器、共享持久化搜索条件<br/>6. 我的递交-申请递交表单：重构表单，"解锁、强提示"、"协议勾选"固定 TB 填写路径，重点"绑定递交内容"，同步移动端<br/>7. 我的递交-我的递交排期：从列表升级为日历，颜色区分递交状态，点击查看详情<br/>8. 递交：新增排期日历视图，以季度为周期、日历为维度展示递交安排<br/>9. 模型外包-发包挂起/取消：编辑发包新增挂起、取消状态，取消不计入成本统计，挂起可恢复只做或取消<br/>10. 项目概况：添加可编辑字段"预计营收时间"（精确到月）</blockquote>
+<p>对应关系：需求 1 → §1 … 需求 10 → §10。</p>
+<h2>一、逐需求验收详情</h2>
+<h3>1. 统计-工时模块重构（整合导出 / 所见即所得） — ✅ 满足</h3>
+<ul><li>入口：「统计 → 工时花费统计」<code>/statistic/export_estimate</code></li><li>结论：工时统计整合为「每日工作概览 / 工时数据总览」双视图，筛选→搜索→导出在同一页面完成，导出文件即当前筛选结果，无需本地二次筛选。</li><li>验证证据：</li><li>UI ✅ 筛选区（花费人 / 部门 / 花费填写时间）→「搜索」查看 →「导出」，明细表列齐全（花费人/花费工时/填写日期/确认状态/所属任务/需求名称/需求性质/所属项目/花费描述）</li><li>交互 ✅ 设「花费人=华中豪」搜索后列表「共 2 条」，点「导出」提示「文件下载成功」</li><li>接口 ✅ 导出请求 <code>data_export/export_daily_estimate?start_date=2026-07-20&amp;end_date=2026-07-24&amp;userList=1&amp;export=1</code>，<code>userList=1</code>（华中豪 user_id=1）与当前筛选一致 → <strong>所见即所得</strong>（导出携当前筛选，表格与导出同源）</li><li>数据 ✅ 导出参数与页面筛选、列表条数一致</li><li>定妆图 final-01-worktime-export.jpg ｜ 关注：全员、PMO</li></ul>
+<h3>2. ECP 报价对接 4.1 — ✅ 满足</h3>
+<ul><li>入口：「统计 → ECP报价项」<code>/statistic/ECP_baojia</code></li><li>结论：ECP 报价查询支持按业务线/版本/模块检索，版本枚举已含 4.1.0（置顶最新），4.1 报价项数据完整可用。</li><li>验证证据：</li><li>UI ✅ 版本下拉含「4.1.0」（列表顶部，其上无更高版本）；表列：一级项~五级项/完整项/模块名称/版本号/单位</li><li>交互 ✅ 选「4.1.0」搜索返回「共 1060 条」报价项明细</li><li>接口 ✅ 报价查询接口按版本过滤生效，4.1.0 返回非空结果集</li><li>数据 ✅ 报价项按 通用模块/UI设计/标准版·专业版·定制版 等结构化呈现，真实数据</li><li>定妆图 final-02-ecp-quote-4.1.jpg ｜ 关注：TB\BD、销售运营、PM</li></ul>
+<h3>3. 侧边栏「我的非项目」合并进「我的项目」 — ✅ 满足</h3>
+<ul><li>入口：「我的地盘」左侧栏 →「我的项目」<code>/my_board/main/project</code></li><li>结论：左侧栏取消独立「我的非项目」菜单项（减少一个侧边菜单），非项目内容并入「我的项目」，通过「切换为非项目」按钮切换视野。</li><li>验证证据：</li><li>UI ✅ 左栏为 我的仪表盘/TB·BD仪表盘/行业运营仪表盘/Builder仪表盘/我的任务/我的信箱/我的递交/我的反馈/我的BUG/<strong>我的项目</strong>/我的需求——<strong>无「我的非项目」独立项</strong></li><li>交互 ✅ 「我的项目」页点「切换为非项目」，表头切换为非项目列（描述/规模/工时概览（h）/非项目日报/创建人/非项目/操作）</li><li>数据 ✅ 项目 / 非项目两视野同一容器切换，数据各自加载正确</li><li>定妆图 final-03-sidebar-merge.jpg ｜ 关注：全员</li></ul>
+<h3>4. 递交新增「仅查看超市递交」筛选 — 🟡 待确认（见 §三 R1）</h3>
+<ul><li>入口：「递交」→ 递交列表 <code>/OPStestList/OPStestList_list</code> 筛选区</li><li>结论：递交列表筛选区仅见「仅查看超时递交」复选框（V2.2.8 已上线），<strong>未见新增独立的「超市」筛选项</strong>。dev_notes 的"超市"疑为"超时"笔误；若确为笔误则本条无独立新增内容，需产品确认口径。</li><li>验证证据：</li><li>UI ✅ 筛选区复选框文案为「仅查看超时递交」，全页无「超市」字样</li><li>结论：本轮未观察到新增筛选控件；「仅查看超时递交」是 V2.2.8 交付项（对应 <code>is_over_tb_time</code>）</li><li>⚠️ 需人工确认：item 4 是"超时"笔误 / 已并入 V2.2.8 / 还是另有未上线的独立筛选（见 §三 R1）</li></ul>
+<h3>5. 任务模块重构（已延宕/本周/全部 + 共用容器 + 持久化搜索） — ✅ 满足</h3>
+<ul><li>入口：「任务」→ 任务列表 <code>/task_panel/project_task</code></li><li>结论：项目任务/非项目任务共用同一容器（同路由 tab），新增「已延宕/本周任务/全部任务」筛选，切换 tab 时筛选/搜索条件持久共享。</li><li>验证证据：</li><li>UI ✅ 「项目任务 / 非项目任务」tab + 筛选 radio「已延宕 / 本周任务 / 全部任务」并存于同页</li><li>交互 ✅ 筛选生效：「已延宕」筛出 4 行，区别于「全部/本周」（每页 20 行）</li><li>持久化 ✅ 在「项目任务」选「已延宕」后切到「非项目任务」tab，筛选「已延宕」保持（共享持久化搜索条件），URL 同容器 <code>/task_panel/project_task</code></li><li>数据 ✅ 两 tab 各自返回对应数据，筛选状态跨 tab 一致</li><li>定妆图 final-05-task-filters.jpg ｜ 关注：全员、工程与交付全员</li></ul>
+<h3>6. 我的递交-申请递交表单重构（含移动端） — ✅ 满足</h3>
+<ul><li>入口：「我的地盘 → 我的递交 → 我的递交申请」<code>/my_board/main/tb_publish</code> →「申请递交」；移动端 <code>/mobile/tb_publish</code></li><li>结论：申请递交表单重构，以「绑定递交内容」为核心，配合强提示、协议勾选与提交校验固定 TB 填写路径，避免漏选新增/变更/反馈；移动端同步重构。</li><li>验证证据：</li><li>UI ✅ 表单含 递交项目 / PM 自动显示 / 递交版本 / 要求递交时间 / 申请递交内容（0/1000），核心区「绑定递交内容」分「新增/变更」「反馈」两区，含<strong>强提示</strong>「请严格、准确勾选本次递交项，选错或漏选将导致实际递交内容与预期不符或遗漏！」及<strong>协议勾选</strong>「我确认本次递交不涉及任何新增/变更/反馈」</li><li>交互 ✅ 空表单点「立即提交」被校验拦截（请选择项目/递交版本/递交时间/申请递交内容），无法越过绑定环节</li><li>移动端 ✅ <code>/mobile/tb_publish</code> 申请递交表单同为重构版，含「绑定递交内容」+ 强提示「请严格勾选本次递交项，选错或漏选将导致实际递交与预期不符！」+「请先选择项目 / 尚未绑定递交内容」引导</li><li>定妆图 final-06-tb-apply-form.jpg ｜ 关注：TB\BD、QA</li></ul>
+<h3>7. 我的递交-我的递交排期 日历视图 — ✅ 满足</h3>
+<ul><li>入口：「我的地盘 → 我的递交 → 我的递交排期」tab</li><li>结论：我的递交排期由列表升级为日历视图，顶部状态统计 + 颜色区分递交状态，日历格内展示各递交条目。</li><li>验证证据：</li><li>UI ✅ 状态统计条（全部 50 / 待递交 0 / 已逾期 3 / 按时 42 / 超时 0 / 延期 5）+「点击递交条查看详情」提示；按月日历（周一~周日）格内展示递交条目（时间 + 项目名）</li><li>颜色 ✅ 条目背景多色区分状态（绿=按时、橙 rgba(230,162,60)=延期、红 rgba(245,108,108)=超时/逾期）</li><li>交互 ⚠️ 「点击递交条查看详情」提示存在，但条目元素（<code>span.proj</code>，publishList_TB.vue）在集成浏览器自动化下 offsetParent 为 null，点击未能触发详情弹窗（自动化定位怪癖，非功能缺陷，见 §三 R3）</li><li>定妆图 final-07-my-publish-calendar.jpg ｜ 关注：TB\BD</li></ul>
+<h3>8. 递交模块新增排期日历视图（季度） — ✅ 满足</h3>
+<ul><li>入口：「递交」→ 递交列表 →「切换至日历视图」，路由 <code>/OPStestList/OPStestList_list</code></li><li>结论：递交模块新增排期日历视图，以季度为周期、日历为维度，空间化展示递交安排，供 PM/QA 规划与回顾。</li><li>验证证据：</li><li>UI ✅ 「递交日历视图」含「上一季度 / 2026 年 Q3（7~9 月）/ 下一季度」季度导航、「本季度 85 项递交」计数、「返回表格视图」；按月日历（周一~周日）格内展示各递交条目（真实数据：东南大学数字孪生校园增补、Concord Central 等）</li><li>交互 ✅ 表格视图 ⇄ 日历视图切换正常，季度上下翻页导航可用</li><li>数据 ✅ 8 月 2 项 / 7 月 83 项，季度合计 85 项，与列表口径一致</li><li>定妆图 final-08-publish-quarter-calendar.jpg ｜ 关注：PM、QA、PMO</li></ul>
+<h3>9. 模型外包-发包挂起 / 取消 — ✅ 满足</h3>
+<ul><li>入口：「项目 → 项目详情 → 模型外包」<code>/project/outsource_project?projectId=N</code> → 编辑发包</li><li>结论：发包状态体系新增「挂起」「已取消」，编辑发包提供挂起/取消操作；挂起可恢复制作、取消为不可回退终态；<strong>挂起仍计入成本（按实际只做）、取消从成本统计中排除</strong>。全写链路已实测。</li><li>验证证据（真实 UI 写入 + 接口交叉核对，项目 #6696）：</li><li>UI ✅ 发包状态筛选枚举新增「挂起」「已取消」（原 待审核/已驳回/OA流程中/制作中/已结项）；「编辑发包」弹窗底部新增「挂起」「取消发包」按钮</li><li>挂起 ✅ 将制作中发包 #37 挂起 → 确认框「…挂起后可随时恢复到制作中」→ 状态转「挂起」；总览「制作中 27→6、挂起 3→4」，<strong><code>package_total</code>/<code>发包金额</code> 不变</strong>（挂起仍计入）</li><li>恢复只做 ✅ 再编辑挂起的 #37 → 底部为「恢复制作」「取消发包」→ 点「恢复制作」→ 状态回「制作中」（挂起⇄制作中 可逆）</li><li>取消 ✅ 取消制作中发包 #26（确认框「取消发包（不可回退）…终态无法再恢复」）→ 状态转「已取消」；成本总览 <code>package_total</code> <strong>315→314</strong>、<code>self_made_count</code> <strong>122→121</strong>、<code>status_distribution</code> <strong>无「已取消」项</strong> → 取消发包已从成本统计排除（#26 合同金额为 ¥0 故金额无变化，但计数排除已证明口径）</li><li>接口 ✅ <code>outsource/get_data_overview</code> 实时反映挂起/取消写入（挂起计入、取消排除）</li><li>定妆图 final-09-outsource-suspend.jpg ｜ 关注：DTA、PM、PMO</li></ul>
+<h3>10. 项目概况「预估营收时间」可编辑字段 — ✅ 满足</h3>
+<ul><li>入口：「项目 → 项目概况」<code>/project/project_detail?projectId=N</code> →「基本信息」面板；编辑经项目编辑表单 <code>/project/project_form/N</code></li><li>结论：项目概况新增「预估营收时间」字段，精确到月、可编辑。</li><li>验证证据：</li><li>UI ✅ 「基本信息」面板显示「预估营收时间：2026-09」（年-月，精确到月）</li><li>交互 ✅ 点面板编辑（<code>el-icon-edit-outline</code>）进入项目编辑表单，含日期编辑器「选择预估营收月份」（值 2026-09），placeholder 明确为「月份」= 月精度可编辑（本轮未保存）</li><li>⚠️ 字段实际命名为「预估营收时间 / 预估营收月份」，dev_notes 写「预计营收时间」，措辞微差（见 §三 R4）</li><li>定妆图 final-10-revenue-month.jpg ｜ 关注：PM、PMO、财务/运营</li></ul>
+<h2>二、缺陷清单（已确认的问题，需修）</h2>
+<p>本轮无已确认缺陷。</p>
+<h2>三、风险与待确认</h2>
+<table><thead><tr><th>#</th><th>事项</th><th>等级</th><th>建议</th></tr></thead><tbody><tr><td>R1</td><td>item 4「仅查看超市递交」：递交列表仅见「仅查看超时递交」（V2.2.8 已上线），未见新增独立「超市」筛选。"超市"疑为"超时"笔误</td><td>中</td><td>产品确认 item 4 是否为笔误 / 已并入 V2.2.8 / 另有未上线筛选；若为笔误则本条无独立发版内容</td></tr><tr><td>R2</td><td>item 7 我的递交排期日历「点击递交条查看详情」提示存在，但条目元素在集成浏览器自动化下不可点（offsetParent 为 null），详情弹窗未自动验证</td><td>低</td><td>交互设计上功能存在；建议人工点选确认详情弹窗内容，或提供稳定的点击目标选择器供回归沉淀</td></tr><tr><td>R3</td><td>字段命名差异：dev_notes「预计营收时间」vs 系统「预估营收时间 / 预估营收月份」</td><td>低</td><td>统一对外措辞（发版公告与系统字段名一致）</td></tr></tbody></table>
+<p><strong>未覆盖盲区声明</strong>：item 7 日历条目详情弹窗内容未深入（条目元素集成浏览器不可点，见 R2）；接口极限值（超大 limit、特殊字符）未逐一穷举；移动端仅验证申请递交表单结构，未走完整提交链路。（item 9 挂起/恢复/取消完整写链路及成本统计联动已实测，见 §1、9）</p>
+<h2>四、发版内容（初稿，待人工定稿）</h2>
+<h3>V2.2.9 发布于 2026-07-24</h3>
+<h4>影响强度</h4>
+<p>强度较大，新增递交排期日历视图与发包挂起/取消状态，重构工时统计、任务列表与申请递交表单，合并"我的非项目"入口、补充项目预估营收时间字段并对接 ECP4.1 报价数据。</p>
+<h4>新增功能</h4>
+<p>需关注人员：PM、QA、TB\BD、DTA、PMO</p>
+<p>1.「递交-排期日历视图」：（方便 PM、QA 规划未来与回顾历史递交）<br/>支持以季度为周期、日历为维度展示递交安排，<br/>支持季度上下翻页与表格/日历视图切换；</p>
+<p>2.「我的递交-递交排期日历」：（方便 TB 掌握个人递交排期）<br/>将我的递交排期由列表升级为日历展示，<br/>支持按颜色区分递交状态（按时/延期/超时/逾期），<br/>支持点击递交条目查看详情；</p>
+<p>3.「模型外包-发包挂起/取消」：（按实际制作情况核算外包成本）<br/>支持在编辑发包时将发包挂起或取消，<br/>取消的发包不再计入外包成本统计，挂起的发包可随时恢复只做或取消；</p>
+<h4>体验优化</h4>
+<p>需关注人员：全员、TB\BD、DTA、工程与交付全员</p>
+<p>1.「统计-工时统计」重构：整合原有工时导出入口，将"筛选-查看-导出"合并到同一页面，导出文件即当前筛选结果，无需本地二次筛选；</p>
+<p>2.「任务-项目/非项目任务」重构：项目任务与非项目任务共用同一容器、共享持久化搜索条件，新增"已延宕/本周任务/全部任务"筛选，切换更快、条件不丢失；</p>
+<p>3.「我的递交-申请递交表单」重构：以"绑定递交内容"为核心，通过强提示与协议勾选固定填写路径，避免漏选新增/变更/反馈，并同步优化移动端；</p>
+<p>4.「我的地盘-侧边栏」优化：将"我的非项目"合并进"我的项目"，通过视野切换访问，减少一个侧边菜单；</p>
+<p>5.「项目概况-预估营收时间」新增可编辑的"预估营收时间"字段（精确到月），完善项目营收计划信息；</p>
+<p>6.「统计-ECP报价」对接 ECP4.1 版本并更新报价项数据，确保新版本报价在系统中可用；</p>
+<h2>附录</h2>
+<h3>A.1 老功能回归明细</h3>
+<ul><li>方式：大范围重构轮（多项"重构优化"跨 project_publish / project_task / outsource / estimate / project_detail 五大簇）→ 触发 UI 全量回归 <code>npx playwright test</code>（62 用例）。</li><li>结果：53 通过 / 6 跳过 / 3 失败 → 复跑甄别后 <strong>无真回归 BUG</strong>：</li><li><code>v2.2.3 主题面板 18 主题切换 @pm_theme</code>：偶发（<code>.ts-trigger</code> 点击不稳），复跑通过；</li><li><code>api-v2.2.8 资产明细负 limit 500 哨兵 @outsource</code>：全量并发时偶发，复跑通过（哨兵仍为预期失败=绿）；</li><li><code>v2.2.6① 我的任务日历「备注」@project_task</code>：<strong>稳定失败=页面本轮已重构</strong>（新增「任务日历/工时确认」tab、进行中/即将开始/已完工筛选、任务以 chip 内联在日期格），旧「备注侧栏」断言过时——属预期内规格变更（落在本轮任务/侧栏体验升级波及面），非回归 BUG，阶段 4 就地更新 <code>v2.2.6.spec.js①</code>。</li><li>6 跳过均为历轮授权硬骨头（文档上传 / @write / 离职人员历史任务 / 自制发包），非本轮引入。</li><li><strong>阶段 4 沉淀后复跑全套</strong>（含新增 <code>v2.2.9.spec.js</code> 9 条 + <code>api-v2.2.9.spec.js</code> 7 条 + 修复后的 <code>v2.2.6.spec.js①</code>）：<strong>79 用例 75 通过 / 4 跳过 / 0 失败</strong>（全绿）。</li></ul>
+<h3>A.2 验收产生的测试数据</h3>
+<p>本轮 item 9 写链路验证在测试环境（与生产库隔离）真实落库，产生以下测试数据（无需清理）：</p>
+<ul><li>项目 #6696「Central Yards 园区免费POC」发包 <strong>#37「外立面…优化模型制作」</strong>：挂起 → 已恢复到「制作中」（状态已还原）</li><li>项目 #6696 发包 <strong>#26「20260617+机器狗骨骼动画+第一批次」</strong>：已取消（终态不可回退，合同金额 ¥0，不影响成本金额）——用于验证取消排除成本统计</li><li>item 10 项目编辑表单未保存、item 1 导出为下载操作不改库</li></ul>
+<h3>A.3 交付物</h3>
+<ul><li>定妆图 9 张：<code>acceptance/V2.2.9/final-01…10-*.jpg</code>（item 4 为待确认无独立截图）</li><li>回归/接口脚本：新增 <code>regression/tests/v2.2.9.spec.js</code>（9 条 UI）+ <code>regression/tests/api-v2.2.9.spec.js</code>（7 条接口）；就地修复 <code>v2.2.6.spec.js①</code>（我的任务日历重构）</li></ul>
+</body></html>

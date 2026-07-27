@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>51PM V2.2.9 验收报告</title>
+<style>
+:root{color-scheme:light}
+body{margin:0 auto;max-width:920px;padding:40px 48px;font-family:-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;color:#1a1a1a;line-height:1.7;background:#fdfdfd}
+h1{font-size:1.9em;border-bottom:3px solid #4a7;padding-bottom:.3em}
+h2{font-size:1.45em;border-bottom:1px solid #ddd;padding-bottom:.25em;margin-top:1.8em}
+h3{font-size:1.2em;margin-top:1.5em;color:#2a6}
+h4{font-size:1.05em;color:#444}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:.94em}
+th,td{border:1px solid #d0d7de;padding:7px 10px;text-align:left;vertical-align:top}
+th{background:#f0f6f2}
+tr:nth-child(even){background:#fafbfa}
+code{background:#f2f4f2;padding:1px 5px;border-radius:4px;font-size:.9em;font-family:Consolas,Monaco,monospace}
+blockquote{border-left:4px solid #9c9;background:#f6faf7;margin:1em 0;padding:.6em 1em;color:#444}
+hr{border:none;border-top:1px solid #e0e0e0;margin:1.5em 0}
+a{color:#268}
+ul,ol{padding-left:1.6em}
+li{margin:.2em 0}
+</style></head>
+<body>
+<h1>验收报告 · V2.3.0</h1>
+<blockquote>环境：测试环境 <code>10.67.8.183:7777</code>（开发环境水印）· 后端 <code>10.67.8.189:8888</code> · 账号：邓欣羽（#475）· 验收日期：2026-07-27<br/>回归徽章：精准回归 <code>@demand|@project_task|@estimate|@project_moment|@outsource|@data_export</code> <strong>50 过 / 2 跳（已知硬骨头）/ 0 败</strong> · api 冒烟 <strong>37 过</strong> —— <strong>全绿</strong>（明细见附录 A.1）。<br/>说明：本轮 9 项 dev_notes 全部满足、<strong>无缺陷</strong>；其中「统计-测试数据看板」已于 V2.3.0-pre 先行验收（见 <code>acceptance/V2.3.0-pre-测试数据看板/</code>），本报告复用其结论。dev_notes 标注「不参与发版初稿」的三项（每日工作概览字段 / 打分备注 / BUG类型项目技术）仍完成验收，仅不写入发版初稿。</blockquote>
+<hr/>
+<h2>一、验收结论（逐功能）</h2>
+<h3>1. 非项目层级全部重构（体验升级/重构）✅满足</h3>
+<p>非项目统一对齐项目层级：原非项目调整为<strong>分类</strong>，一级需求上浮为<strong>项目</strong>，二级需求调整为<strong>需求</strong>；无二级需求自动生成需求节点；任务及工时关联关系保持，历史数据完成迁移。</p>
+<p>验证证据：</p>
+<ul><li>UI ✅ 非项目列表页（<code>/not_project/list</code>）左侧为<strong>分类导航</strong>（全部 153 / 极致UI-UX专项组 7 / 会议工时 2 / 内部项目 5 / 产研支持 14 / 自研项目 16 / 公司培训 1 / 技能培训 8 / 售前支持 61 …）；列表每行是一个<strong>项目</strong>（51PM / 请假工时 / 公司会议 …，带 <code>NP-</code> 商机号），列含 描述 / 规模 / 工时概览(h) / 非项目日报 / 创建人。</li><li>下钻 ✅ 点项目名（如 51PM）→ <code>/not_project/not_project_demand?not_projectId=6839</code>，需求列表表头「需求 / 描述 / 工时进展 / 状态 / 优先级 / 指派给 / <strong>需求性质</strong> / 操作」<strong>与项目需求页完全对齐</strong>，每需求带「打开任务」，工时（花费/标准）显示正常。</li><li>接口 ✅ <code>not_project/get_list</code> 每条返回 <code>category_id</code>/<code>category_name</code>（分类），<code>demand_num</code>/<code>task_num</code>（51PM 408/408）；<code>not_project/get_info?id=6839</code> + <code>project_not_task/get_demand_list?...project_id=6839</code>（需求走项目化取数通道）。</li><li>数据 ✅ 历史迁移完成：153 个非项目项均带分类，需求-任务-工时关联完整（如 51PM demand_num=task_num=408、标准工时 2782）。</li></ul>
+<p>!<a href="final-非项目重构.jpg">非项目层级重构</a></p>
+<p>!<a href="final-非项目需求层级.jpg">非项目下需求页对齐项目需求页结构</a></p>
+<h3>2. 统计-工时统计花费：工时数据总览（体验升级）✅满足</h3>
+<p>工时数据总览模块完成开发（原为前端 Mock 演示页），展示工时花费数据，点击扇区/柱状可查看详情。</p>
+<p>验证证据（2026-06-01 ~ 2026-07-27 区间实测）：</p>
+<ul><li>UI ✅ 「工时花费统计」（<code>/statistic/export_estimate</code>）双视图「每日工作概览 / 工时数据总览」，总览含指标卡（总花费 21,977 / 标准 30,720 = 71.5%、项目 13,726.5 / 非项目 8,250.5、平均每日 5.78 h/天、请假与日常管理 3,288）+ 三张图（任务类型花费分布环形图 / 项目与非项目占比 / 请假类型柱状）+ 项目/非项目工时投入 TOP5。</li><li>下钻 ✅ 点任务类型扇区（建筑建模）→ 弹「「建筑建模」二级任务选项工时占比」（共 1564.5h + 二级扇区）；点「查看全部明细」→「工时明细 — 任务选项：建筑建模」明细弹窗（20 行，表头含 部门/项目·非项目/类型/需求/任务/任务选项/产出类型/花费工时/任务标准工时/确认状态/备注/日期/花费人）。</li><li>接口 ✅ 子面板 <code>HourOverviewPanel.loadData()</code>；下钻走 <code>handleTaskTypeClick</code>/<code>handleDrillViewDetail</code>/<code>openDetail</code>。</li><li>数据 ✅ <strong>交叉自洽</strong>：total 21,977 = 项目 13,726.5 + 非项目 8,250.5 ✔；请假与日常管理 3,288 = 请假 1,024 + 日常管理 2,264 ✔；请假 1,024 = 年假 484 + 事假 360 + 病假 104 + 婚假 40 + 育儿假 28 + 丧假 8 ✔；建筑建模 1564.5 = 模型制作 937.75 + 贴图 173.25 + 引擎 167.75 + UV 164.75 + 反馈调整 121 ✔。</li></ul>
+<p>!<a href="final-工时数据总览.jpg">工时数据总览</a></p>
+<h3>3. 统计-每日工作概览：新增需求名称、需求性质字段 ✅满足（不参与发版初稿）</h3>
+<p>工时花费统计的每日工作概览工时列表新增两个字段：需求名称、需求性质。</p>
+<p>验证证据：</p>
+<ul><li>UI ✅ 「每日工作概览」列表表头含「<strong>需求名称</strong>」「<strong>需求性质</strong>」两列（位于所属任务名称与所属项目名称之间）。</li><li>接口 ✅ 列表取数 <code>data_export/export_daily_estimate_old</code>，行记录返回 <code>demand_name</code>（需求名称）+ <code>demand_nature</code>（需求性质）+ <code>demand_one_type</code>/<code>demand_type_code</code>（另 <code>export_daily_estimate</code> 为 xlsx 导出接口）。</li><li>数据 ✅ 实测样本：<code>demand_name</code>=「51Builder模型服务/工程建模服务」、<code>demand_nature</code>=「新增」，字段有真实值。</li></ul>
+<p>!<a href="final-每日工作概览字段.jpg">每日工作概览-需求名称/需求性质字段</a></p>
+<h3>4. 项目-项目动态-项目问题（新增功能）✅满足</h3>
+<p>「项目动态」新增问题动态，与需关注人员关联后对应人员在「我的地盘」可查看，实现问题提出-跟踪-处理的闭环管理；卡片展示，支持筛选/编辑/删除/快捷处理。</p>
+<p>验证证据（真实 UI 全链路走通，创建→处理→编辑→删除，测试数据已清理）：</p>
+<ul><li>创建 ✅ 项目动态（<code>/project/project_moment</code>）「添加动态」→「问题动态」tab，表单含 *问题类型（需求变更/进度延期/资源不足/质量问题/沟通协作/技术难题/其他）/ *问题描述 / 问题截图 / *影响程度（低/中/高）/ *需关注人员 / 解决状态 / 解决方案 / 解决时间；填写并关联需关注人员=邓欣羽后提交「添加成功」。</li><li>卡片展示 ✅ 新问题以卡片呈现（类型 + 影响程度 + 状态 + 描述 + 需关注人 + 创建人/时间 + 处理/编辑/删除按钮）；顶部筛选「全部 / 会议 / 风险 / 问题 / 未解决 / 已解决」计数联动。</li><li>快捷处理（闭环）✅ 卡片「处理」→「处理问题」弹窗改解决状态=已解决 + 解决方案 → 保存「处理已保存」，卡片状态实时更新为「已解决」、筛选未解决 2→1 / 已解决 1→2。</li><li>编辑 ✅ 卡片「编辑」→「编辑动态」弹窗完整回显所有字段并可改（影响程度 中→高 提交「编辑成功」，卡片同步）。</li><li>删除 ✅ 卡片「删除」→ popconfirm「确定删除吗?」→ 是 →「删除成功」。</li><li>我的地盘闭环（2.2）✅ 我的仪表盘顶部卡片「需关注 N 个 未解决项目问题」，点击 → <strong>「与我相关的项目问题」弹窗</strong>集中展示需关注=本人的问题（6 张卡片均标「需关注 邓欣羽 我」），弹窗含「<strong>按项目搜索</strong>」输入框 + 「<strong>添加问题</strong>」按钮，卡片支持查看/编辑/删除/处理。</li><li>接口 ✅ <code>project_moment/get_list?module=problem</code>（Laravel 分页，列表在 data.data）；落库字段 module=problem / type / risk_level（影响程度）/ status（解决状态）/ user_ids（需关注人员）/ project_id / content。</li><li>备注 ✅ V2.2.9 遗留缺陷（问题卡片编辑/删除按钮全禁用、点卡无详情、无法闭环）<strong>本轮已修复</strong>——按钮均可用、快捷处理弹窗正常、闭环打通。</li></ul>
+<p>!<a href="final-项目问题动态.jpg">项目问题动态</a></p>
+<p>!<a href="final-我的地盘未解决问题.jpg">我的地盘-未解决项目问题集中展示（闭环入口）</a></p>
+<h3>5. 模型外包-打分：质量评分3分及以下必须写备注 ✅满足（不参与发版初稿）</h3>
+<p>质量评分 3 分及以下必须写备注说明原因，方便后续回溯。</p>
+<p>验证证据（结项评价弹窗，未提交任何真实评分）：</p>
+<ul><li>UI ✅ 发包「打分」→「结项评价」弹窗，对未评任务打质量评分 <strong>2 分</strong>（「略差」）后，评语输入框 placeholder 从「评语（选填）」变为「<strong>评语（必填）：评分 3 分及以下需说明原因</strong>，可描述制作质量、响应速度、配合程度等」。</li><li>校验 ✅ 空备注点「提交评分」→ 警告「<strong>评分 3 分及以下时，请填写评语说明原因</strong>」，提交被拦截。</li></ul>
+<p>!<a href="final-打分必填备注.jpg">打分≤3分备注变必填</a></p>
+<h3>6. 统计-BUG明细：BUG类型新增「项目技术」✅满足（不参与发版初稿）</h3>
+<p>添加 Bug 时，Bug 类型新增「项目技术」。</p>
+<p>验证证据：</p>
+<ul><li>UI ✅ 测试数据看板 → BUG明细 →「添加Bug」表单（当前账号门禁 <code>isCanAddBug</code> disabled，按标准手法 Vue 直调 <code>addForm()</code> 打开表单仅查看）Bug类型下拉选项为：模型制作 / 场景美术 / 程序功能 / 前端开发 / 环境配置 / UI显示 / 产品研发 / AES底板 / <strong>项目技术</strong>（末位新增）。</li><li>数据 ✅ V2.3.0-pre 轮已见「项目技术」在 BUG 类型分布饼图有 1 条数据，说明该类型已启用并可产生数据。</li></ul>
+<p>!<a href="final-BUG类型项目技术.jpg">BUG类型新增项目技术</a></p>
+<h3>7. 统计-测试数据看板：测试数据总览 ✅满足（V2.3.0-pre 先行验收）</h3>
+<p>新增测试数据总览，支持按统计周期 / BUG归属部门 / BUG归属人 / 测试人员 / PM 等条件筛选，查看关键指标环比、BUG维度与递交维度分析，支持图表/指标下钻查看明细、导出测试数据长图，并可维护各角色周期总结。</p>
+<p>验证证据：见 <code>acceptance/V2.3.0-pre-测试数据看板/acceptance-report.md</code>（9 个子功能逐项 ✅，含四粒度周期算数核验、下钻明细、QA 总结写链路周期隔离等）。<strong>注</strong>：pre 轮登记的 B1（BUG筛选清零递交维度）已修复销账；B2/B3/B4 三项数据对齐缺陷见 <code>acceptance/V2.3.0-pre-测试数据看板/fix-handoff.md</code>，属该先行轮遗留、与本轮 dev_notes 无关，仍待开发处理。</p>
+<p>!<a href="final-测试数据看板.jpg">测试数据看板-测试数据总览</a></p>
+<h3>8. BUG修复-模型外包结项：未完工任务无法结项提示 ✅满足</h3>
+<p>模型外包结项打分时，有未完工任务，原「对任务打分完成后点结项无反应」；本次新增「任务未完工无法结项」的提示。</p>
+<p>验证证据：</p>
+<ul><li>UI ✅ 结项评价弹窗（有 2 个已完工资产、18 个未完工任务）底部常驻明确提示「<strong>已评价 1 / 2 项　还有 18 个任务未完工，无法结项</strong>」。</li><li>拦截 ✅ 点「确认结项」弹窗保持打开、不结项（原「无反应」的黑洞已改为明确拦截 + 文案提示）；另对无任务发包点结项报「没有任务可结项」。</li></ul>
+<p>!<a href="final-结项未完工提示.jpg">结项未完工任务无法结项提示</a></p>
+<h3>9. 我的地盘-我的任务：日历右侧任务栏 UI 重构（用户体验）✅满足</h3>
+<p>重构我的任务日历中右侧任务栏 UI，呈现更直观、简约。</p>
+<p>验证证据：</p>
+<ul><li>UI ✅ 我的任务（<code>/my_board/main/task</code>，tab 任务日历/工时确认）点日期格 → 右侧任务栏（<code>tc-panel</code>）：头部「7月1日 周三 · 26 天前 · 共 2 个任务 · 快速创建任务/工时」；任务以<strong>卡片</strong>呈现（任务名 + 完成状态标签 + 类型标签[项目/非项目/请假] + 任务路径 + 起止日期 + 「填工时」按钮）。</li><li>直观性 ✅ 日历顶部状态筛选（🔥进行中 / ⏰即将开始 / ✅已完工）+ 图例（项目/非项目/请假 + 超期/截止任务红色描边呼吸提示）；布局分区清晰、信息密度合理。</li></ul>
+<p>!<a href="final-我的任务日历.jpg">我的任务日历右侧任务栏</a></p>
+<hr/>
+<h2>二、缺陷 BUG</h2>
+<p>本轮验收<strong>未发现缺陷</strong>。V2.2.9 遗留的问题动态卡片按钮禁用/无法闭环缺陷本轮已随「项目问题」重构一并修复。</p>
+<blockquote>说明：验收过程中曾疑「添加问题弹窗-影响程度校验提示文案错配为『请选择人员』」，经精确复核（触发全表单校验）确认——影响程度默认已选「低」无校验错误，实际报错仅问题类型/问题描述/需关注人员三项且文案均正确，系初判定位误差，已撤销。</blockquote>
+<hr/>
+<h2>三、风险 Risk</h2>
+<table><thead><tr><th>#</th><th>风险</th><th>影响 × 可能性</th><th>说明</th></tr></thead><tbody><tr><td>R1</td><td>「工时数据总览」筛选日期为 <code>el-date-picker</code>，自动化直改 input 会触发内部报错（需走组件方法设值）；人工正常使用不受影响</td><td>低 × 中</td><td>仅影响自动化回归取数手段，非功能缺陷；回归用例改走 vm/接口设值。</td></tr><tr><td>R2</td><td>非项目层级重构为<strong>大范围数据结构迁移</strong>，本轮抽样核验（分类导航 / 项目行 / 需求层级 / 51PM 关联）全对，但未逐条比对全部 153 个非项目的历史工时归属是否 1:1 无损迁移</td><td>中 × 低</td><td>建议开发提供迁移前后工时总量对账；抽样样本（51PM/请假工时/公司会议）关联完整。</td></tr><tr><td>R3</td><td>「添加Bug」门禁 <code>isCanAddBug</code> 对邓欣羽账号 disabled（黑名单+QA名单逻辑），本轮 BUG类型「项目技术」经 Vue 直调表单查看确认，未走真实提交落库</td><td>低 × 低</td><td>门禁为既有设计；类型选项已确认存在，pre 轮已有该类型真实数据。</td></tr><tr><td>R4</td><td>测试环境开发仍在活跃改动，工时/统计类数字会随时间漂移（pre 轮已见临时占比 18.46%→32.31%）</td><td>低 × 中</td><td>复验时以当场实测为准，勿信旧数。</td></tr></tbody></table>
+<hr/>
+<h2>发版内容（初稿，待人工定稿）</h2>
+<blockquote>依据 <a href="../../skills/release_notes.md">release_notes.md</a> 规范撰写，<strong>沿用 dev_notes 原始分类小标题</strong>（体验升级、重构优化 / 新增功能 / BUG修复 / 用户体验），未做重分类。dev_notes 标注「不参与发版初稿」的三项（每日工作概览字段 / 打分≤3必填备注 / BUG类型项目技术）已排除。除「BUG修复」外每项功能标题后均附（价值描述）。</blockquote>
+<p><strong>V2.3.0</strong></p>
+<p><strong>影响强度</strong></p>
+<p>强度较大，重构非项目层级结构，新增项目问题动态、测试数据看板与工时数据总览，并优化我的任务日历。</p>
+<p><strong>体验升级、重构优化</strong></p>
+<p>需关注人员：全员</p>
+<p>1.「非项目」：（对齐项目管理口径，统一非项目工时归集）</p>
+<p>非项目层级全部重构，统一对齐项目层级结构——原非项目调整为分类、一级需求上浮为项目、二级需求调整为需求，无二级需求的数据自动生成需求节点；</p>
+<p>任务及工时关联关系保持不变，已完成历史数据迁移与结构重构。</p>
+<p>需关注人员：全员、组长</p>
+<p>2.「统计-工时数据总览」：（可视化统计工时投入结构，提高工时盘点效率）</p>
+<p>完成工时数据总览模块开发，展示总花费/标准工时、平均每日花费、请假与日常管理工时等核心指标；</p>
+<p>提供任务类型分布、项目与非项目占比、请假类型分布及工时投入 TOP5，点击扇区/柱状可下钻查看二级占比与工时明细。</p>
+<p><strong>新增功能</strong></p>
+<p>需关注人员：全员、PM</p>
+<p>1.「项目-项目动态-项目问题」：（打通问题提出-跟踪-处理闭环，降低项目风险漏管）</p>
+<p>在项目动态新增问题动态，支持按表单创建项目问题，问题以动态卡片展示，可筛选查看、编辑、删除及快捷处理；</p>
+<p>当项目问题与需关注人员关联后，对应人员在「我的地盘-未解决项目问题」可集中查看、按项目搜索并快速处理，实现问题提出、跟踪、处理的闭环管理。</p>
+<p>需关注人员：QA、PM、PMO</p>
+<p>2.「统计-测试数据看板」：（测试质量数据一站式统计，提升质量复盘效率）</p>
+<p>新增测试数据总览，支持按统计周期、BUG归属部门、BUG归属人、测试人员及PM等条件筛选测试数据，查看关键指标环比、BUG维度分析及递交维度分析等统计数据；</p>
+<p>支持图表及指标下钻查看明细、导出测试数据长图，并可维护各角色问题总结、BUG分析、改进建议、重点关注事项及测试流程改进等周期总结内容。</p>
+<p><strong>BUG修复</strong></p>
+<p>需关注人员：DTA、PM</p>
+<p>1.修复模型外包结项打分时，存在未完工任务点击结项无反应的问题，新增「任务未完工无法结项」的明确提示。</p>
+<p><strong>用户体验</strong></p>
+<p>需关注人员：全员</p>
+<p>1.「我的地盘-我的任务」：（任务信息呈现更直观，降低查阅成本）</p>
+<p>重构我的任务日历中右侧任务栏 UI，任务以卡片形式呈现（完成状态、类型、任务路径、起止时间及快捷填工时入口），呈现上更加直观、简约。</p>
+<hr/>
+<h2>附录</h2>
+<h3>A.1 回归明细</h3>
+<ul><li>精准回归（命中簇 <code>@demand</code>/<code>@project_task</code>/<code>@estimate</code>/<code>@project_moment</code>/<code>@outsource</code>/<code>@data_export</code>）：<strong>50 过 / 2 跳 / 0 败</strong>（3.8m）。2 跳为已知硬骨头：<code>v2.2.5④@write</code> 真实粘贴上传、<code>v2.2.7③</code> 离职人员历史任务（库刷新致数据缺失）。</li><li>api 冒烟（全部 <code>api-*.spec.js</code>）：<strong>37 过</strong>（18s），含 2 个已知BUG哨兵 <code>test.fail</code>（V2.2.8 资产负 limit / V2.2.9 契约）仍为预期失败=绿。</li><li>结论：老功能未被本轮重构改坏；<code>@project_moment</code> 簇（会议动态）在项目问题重构后回归全绿，<code>@estimate</code>/<code>@project_task</code> 簇在工时总览与非项目重构后回归全绿。</li></ul>
+<h3>A.2 验收产生的测试数据</h3>
+<ul><li>项目问题动态：项目 #6644 创建的测试问题「V2.3.0验收-项目问题闭环测试…」已在验收结束时<strong>删除</strong>，库内无残留。</li><li>模型外包打分/结项：仅打开结项评价弹窗验证校验，<strong>未提交任何真实评分、未结项</strong>，无数据变更。</li><li>其余均为只读验证。</li></ul>
+<h3>A.3 交接给发版技能</h3>
+<ul><li>发版初稿已写入本报告「发版内容（初稿，待人工定稿）」节，定稿与归档由用户在发版管理自行完成。</li><li>本轮无缺陷，不生成 <code>fix-handoff.md</code>；测试数据看板 pre 轮遗留缺陷见 <code>acceptance/V2.3.0-pre-测试数据看板/fix-handoff.md</code>。</li></ul>
+</body></html>

@@ -203,6 +203,64 @@ async function ensureMeetingMoment(request, opts) {
 }
 
 /**
+ * 幂等造数：确保项目下存在带指定 marker 的「问题动态」（V2.3.0 项目问题闭环）。
+ * 端点：POST /manage_api/project_moment/add（module=problem）；risk_level=影响程度(低/中/高)、
+ * status=解决状态(未解决/已解决/无需解决)、user_ids=需关注人员（关联后对应人在「我的地盘-未解决项目问题」可见）。
+ * 需关注人员含本人时，可用于验证我的地盘闭环入口。详见 ../skills/impact_map.md project_moment 簇。
+ * @param {import('@playwright/test').APIRequestContext} request
+ * @param {{projectId?:number, marker:string, type?:string, riskLevel?:string, status?:string, user?:{id:number,name:string}}} opts
+ * @returns {Promise<{seeded:boolean, item:object}>}
+ */
+async function ensureProblemMoment(request, opts) {
+  const {
+    projectId = TEST_PROJECT_ID,
+    marker,
+    type = '质量问题',
+    riskLevel = '中',
+    status = '未解决',
+    user = CURRENT_USER,
+  } = opts;
+  const headers = authHeaders();
+  const listUrl = `${API_BASE}/manage_api/project_moment/get_list?limit=100&page=1&project_id=${projectId}&module=problem`;
+
+  const findByMarker = async () => {
+    const res = await request.get(listUrl, { headers });
+    expect(res.status(), 'get_list 应 200').toBe(200);
+    const j = await res.json();
+    expect(j.code, 'get_list code 应为 0（否则登录态失效，先跑 npm run check）').toBe(0);
+    const d = j.data;
+    const list = Array.isArray(d) ? d : d.data || d.list || d.table_data || [];
+    return list.find((x) => String(x.content || '').includes(marker)) || null;
+  };
+
+  const existing = await findByMarker();
+  if (existing) return { seeded: false, item: existing };
+
+  const payload = {
+    type,
+    content: marker,
+    risk_level: riskLevel,
+    status,
+    user_ids: [user.id],
+    user_id: [user.id],
+    remark: '',
+    create_time: '',
+    create_by: null,
+    create_name: '',
+    module: 'problem',
+    project_id: String(projectId),
+  };
+  const add = await request.post(`${API_BASE}/manage_api/project_moment/add`, { headers, data: payload });
+  expect(add.status(), 'project_moment/add 应 200').toBe(200);
+  const addJson = await add.json();
+  expect(addJson.code, `创建问题动态失败：${addJson.msg || addJson.message || ''}`).toBe(0);
+
+  const created = await findByMarker();
+  expect(created, '造数后应能在列表查到该问题动态').toBeTruthy();
+  return { seeded: true, item: created };
+}
+
+/**
  * 幂等造数：确保「模型外包」发包下存在带指定 marker 的反馈（含关联任务/模块/状态字段）。
  * 动作型自造真验，不依赖测试库残留反馈数据（被清也不 skip）。
  * 端点：POST /manage_api/outsource_feedback/create_feedback（扁平单条,新建 quality_status=0 未受理）；
@@ -459,6 +517,7 @@ module.exports = {
   getToken,
   authHeaders,
   ensureMeetingMoment,
+  ensureProblemMoment,
   ensureOutsourceFeedback,
   ensureApplyDemand,
   ensureMyCalendarTask,

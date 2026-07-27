@@ -64,6 +64,13 @@
 | 递交排期日历视图/季度（V2.2.9）| `project_publish`（OPStestList 列表日历视图）                                       |
 | 发包挂起 / 取消（V2.2.9）     | `outsource`（编辑发包状态：挂起/已取消；成本统计联动）                               |
 | 项目概况-预估营收时间（V2.2.9）| `project_detail`（project/get_project_info.info.plan_income_date）                  |
+| 非项目层级重构（V2.3.0）      | `demand`、`project_task`（not_project 项目化：category_id/category_name、project_not_task/get_demand_list） |
+| 工时数据总览（V2.3.0）        | `estimate`（HourOverviewPanel.loadData / 任务类型下钻 / TOP5）                    |
+| 每日工作概览字段（V2.3.0）    | `estimate`（export_daily_estimate_old：demand_name/demand_nature）                 |
+| 项目问题动态（V2.3.0）        | `project_moment`（module=problem，闭环到我的地盘-未解决项目问题）          |
+| 模型外包打分/结项评价（V2.3.0）| `outsource`（CloseProjectDialog：评分≤3必填备注/未完工无法结项）          |
+| BUG类型项目技术（V2.3.0）    | `data_export`（bug/get_bug_const 的 bug_type_list）                              |
+| 我的任务日历右侧栏重构（V2.3.0）| `project_task`（my_board task 视图 tc-panel）                                  |
 
 ---
 
@@ -81,25 +88,25 @@
 
 会议动态待办负责人 · 项目动态 · 问题动态
 
-> module 字段区分 meet/risk/problem；risk_level 被复用为「影响程度」，status 复用为「解决状态」。新增一种 module 要回归其它 module 的列表/筛选不串。
+> module 字段区分 meet/risk/problem；risk_level 被复用为「影响程度」，status 复用为「解决状态」。新增一种 module 要回归其它 module 的列表/筛选不串。⚠️V2.3.0：项目问题（module=problem）完成闭环重构——创建/筛选/编辑/删除/快捷处理＋需关注人员在「我的地盘-未解决项目问题」集中展示（我的仓盘卡片→「与我相关的项目问题」弹窗）；V2.2.9 遗留的问题卡片按钮禁用/无法闭环缺陷已修复。造数助手 `ensureProblemMoment`。
 
 ### `demand`（需求）
 
-项目需求页 · 自由需求 · 需求拆分 · 批量创建任务（独立任务）· 需求任务列表弹窗
+项目需求页 · 自由需求 · 需求拆分 · 批量创建任务（独立任务）· 需求任务列表弹窗 · 非项目层级重构（V2.3.0：二级需求→需求）
 
-> status 枚举 doing/done/wait/pause（V2.2.8 起自动 pause 逻辑）；需求改动常波及其下任务。
+> status 枚举 doing/done/wait/pause（V2.2.8 起自动 pause 逻辑）；需求改动常波及其下任务。⚠️V2.3.0：非项目层级重构后，非项目的「需求」已对齐项目需求页结构（not_project_demand 页表头含需求性质，走 project_not_task/get_demand_list）——改 demand/任务关联逻辑会同时波及项目与非项目两侧。
 
 ### `project_task`（任务）
 
-需求拆分 · 需求任务列表弹窗 · 批量创建任务 · 填写工时 · 任务完工 · 我的任务（日历）· 任务卡备注 · 创建任务快速建组群 · 任务列表（V2.2.9 项目/非项目共用容器重构）· 我的项目/非项目视图（V2.2.9 侧栏合并）
+需求拆分 · 需求任务列表弹窗 · 批量创建任务 · 填写工时 · 任务完工 · 我的任务（日历）· 任务卡备注 · 创建任务快速建组群 · 任务列表（V2.2.9 项目/非项目共用容器重构）· 我的项目/非项目视图（V2.2.9 侧栏合并）· 非项目层级重构（V2.3.0）· 我的任务日历右侧栏重构（V2.3.0）
 
-> 任务字段/状态/指派人改动波及工时、日历、完工、需求下钻。⚠️离职人员 assigned_to 保留（V2.2.7 修复点）。⚠️V2.2.9：任务列表项目/非项目共用容器共享持久化筛选（已延宕/本周/全部）；我的任务日历重构为「任务日历/工时确认」tab + 任务以内联 chip（「任务名 | NH」）渲染在日期格（旧「点格出侧栏备注」已废，见 v2.2.6.spec①）；「我的非项目」侧栏菜单已并入「我的项目」。
+> 任务字段/状态/指派人改动波及工时、日历、完工、需求下钻。⚠️离职人员 assigned_to 保留（V2.2.7 修复点）。⚠️V2.2.9：任务列表项目/非项目共用容器共享持久化筛选（已延宕/本周/全部）；我的任务日历重构为「任务日历/工时确认」tab + 任务以内联 chip（「任务名 | NH」）渲染在日期格（旧「点格出侧栏备注」已废，见 v2.2.6.spec①）；「我的非项目」侧栏菜单已并入「我的项目」。⚠️V2.3.0：右侧任务栏（.tc-panel）UI 重构=头部（日期/相对天数/任务数/快速创建）+任务卡片（名称/完成状态/类型标签/路径/起止/填工时）；非项目层级重构后任务/工时关联关系保持。
 
 ### `outsource` + `outsource_feedback` + `supplier_api`（模型外包全链）
 
-申请发包 · 发包审核/立项 · 外包反馈管理 · 反馈验收工作台 · 模型数据看板 · 供应商企业管理 · 供应商端入口 · 发包挂起/取消（V2.2.9）
+申请发包 · 发包审核/立项 · 外包反馈管理 · 反馈验收工作台 · 模型数据看板 · 供应商企业管理 · 供应商端入口 · 发包挂起/取消（V2.2.9）· 结项评价打分（V2.3.0）
 
-> 管理端建的项目/发包/任务实时同步供应商门户；反馈 quality_status 0/1/2/3 与验收工作台强耦合；自制 vs 供应商分支（isSelfMade）影响反馈 tab 显隐。⚠️V2.2.9：发包状态新增「挂起」「已取消」——取消不计入外包成本统计、挂起可恢复只做/取消，改动发包状态枚举会波及模型数据看板成本汇总（get_data_overview）与发包列表筛选。
+> 管理端建的项目/发包/任务实时同步供应商门户；反馈 quality_status 0/1/2/3 与验收工作台强耦合；自制 vs 供应商分支（isSelfMade）影响反馈 tab 显隐。⚠️V2.2.9：发包状态新增「挂起」「已取消」——取消不计入外包成本统计、挂起可恢复只做/取消，改动发包状态枚举会波及模型数据看板成本汇总（get_data_overview）与发包列表筛选。⚠️V2.3.0：结项评价（CloseProjectDialog）质量评分≤3 分必填备注（placeholder 变必填 + 提交拦截）；有未完工任务时弹窗底部提示「还有 N 个任务未完工，无法结项」、点结项被拦（修复原「无反应」）。
 
 ### `user_group`（人员组群）
 
@@ -115,15 +122,15 @@
 
 ### `data_export`（统计看板取数）
 
-产能数据看板 · 项目人员看板
+产能数据看板 · 项目人员看板 · 测试数据看板（V2.3.0-pre）· BUG类型枚举（V2.3.0：bug/get_bug_const）
 
-> 共用 data_export 取数层，维度/日期/部门参数的边界兜底逻辑共享。
+> 共用 data_export 取数层，维度/日期/部门参数的边界兼底逻辑共享。⚠️测试数据看板（/statistic/bug）走 get_qa_stat_{kpi,bug,publish,summary,detail_list}；BUG明细的添加/类型枚举走 bug/get_bug_const（bug_type_list 含 V2.3.0 新增「项目技术」）+ bug/get_list；添加Bug 门禁 isCanAddBug。
 
 ### `estimate`（工时/导出）
 
-填写工时 · 工时查询统计 · 日报导出 · 工时花费统计（V2.2.9 重构，整合导出）· ECP报价查询（V2.2.9）
+填写工时 · 工时查询统计 · 日报导出 · 工时花费统计（V2.2.9 重构，整合导出）· ECP报价查询（V2.2.9）· 工时数据总览（V2.3.0）· 每日工作概览字段（V2.3.0）
 
-> 工时数据是三者共同数据源，工时录入口径改动波及统计与导出。⚠️V2.2.9：工时统计重构为 /statistic/export_estimate（每日工作概览/工时数据总览双视图），导出携当前筛选（export_daily_estimate?userList=&export=1）所见即所得；ECP报价查询（get_ecp_baojia_const/list）与工时同挂 data_export 命名空间，对接 ECP4.1（version_id=13）。
+> 工时数据是三者共同数据源，工时录入口径改动波及统计与导出。⚠️V2.2.9：工时统计重构为 /statistic/export_estimate（每日工作概览/工时数据总览双视图），导出携当前筛选（export_daily_estimate?userList=&export=1）所见即所得；ECP报价查询（get_ecp_baojia_const/list）与工时同挂 data_export 命名空间，对接 ECP4.1（version_id=13）。⚠️V2.3.0：工时数据总览从 Mock 转真实模块（HourOverviewPanel.loadData，指标/扇区下钻/TOP5，数据自洽 total=项目+非项目）；每日工作概览列表新增 demand_name/demand_nature（取数走 export_daily_estimate_old，非导出接口 export_daily_estimate）。
 
 ### `project_detail`（项目概况文档位）
 

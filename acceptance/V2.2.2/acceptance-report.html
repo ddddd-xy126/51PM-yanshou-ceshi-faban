@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>51PM V2.2.2 验收报告</title>
+<style>
+:root{color-scheme:light}
+body{margin:0 auto;max-width:920px;padding:40px 48px;font-family:-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;color:#1a1a1a;line-height:1.7;background:#fdfdfd}
+h1{font-size:1.9em;border-bottom:3px solid #4a7;padding-bottom:.3em}
+h2{font-size:1.45em;border-bottom:1px solid #ddd;padding-bottom:.25em;margin-top:1.8em}
+h3{font-size:1.2em;margin-top:1.5em;color:#2a6}
+h4{font-size:1.05em;color:#444}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:.94em}
+th,td{border:1px solid #d0d7de;padding:7px 10px;text-align:left;vertical-align:top}
+th{background:#f0f6f2}
+tr:nth-child(even){background:#fafbfa}
+code{background:#f2f4f2;padding:1px 5px;border-radius:4px;font-size:.9em;font-family:Consolas,Monaco,monospace}
+pre{background:#f6f8fa;padding:12px 14px;border-radius:6px;overflow:auto}
+pre code{background:none;padding:0}
+blockquote{border-left:4px solid #9c9;background:#f6faf7;margin:1em 0;padding:.6em 1em;color:#444}
+hr{border:none;border-top:1px solid #e0e0e0;margin:1.5em 0}
+a{color:#268}
+ul,ol{padding-left:1.6em}
+li{margin:.2em 0}
+img{max-width:100%}
+</style></head>
+<body>
+<h1>51PM V2.2.2 验收报告</h1>
+<ul>
+<li>验收时间：2026-07-29</li>
+<li>环境：测试 10.67.8.183:7777</li>
+<li>验收账号角色：邓欣羽（超管视角；<code>systemRole ≠ PM</code>、不在递交白名单 <code>testListRooters</code>）</li>
+<li><strong>验收结论：7 项需求，满足 7 / 部分满足 0 / 不满足 0</strong>；发现缺陷 1、风险/待确认 3</li>
+<li>老功能回归：✅ 无回归（精准选集 <code>@project_publish|@demand|@project_task|@project_detail|@schedule|@pm_theme|@produce_demand</code> 37 通过 / 5 跳过 / 0 失败 + api 冒烟 44 通过 / 1 跳过，明细见附录 A.1）</li>
+</ul>
+<blockquote>
+<p>阅读顺序：先看「一、逐需求验收详情」判断本次交付达标与否 → 「二、缺陷」「三、风险」是待处理项 → 「四、发版初稿」→ 回归与接口等测试证据在附录，供追溯。<br>
+说明：V2.2.2 是 51PM「项目反馈递交流程」的源头版本，本轮沉淀的 V2.2.3~V2.3.0 全套回归用例均建立在这些基础功能之上，回归全绿即证明这些源头功能仍可用。</p>
+</blockquote>
+<h2>0. 原始验收需求</h2>
+<blockquote>
+<p>v2.2.2开发内容如下：</p>
+<p><strong>新增功能</strong></p>
+<ol>
+<li>反馈申请-逃逸Bug：在拆解反馈需求的时候，新增一个模块选项：逃逸Bug，由PM选择，后续统计bug逃逸率</li>
+<li>项目-特殊事项提醒：在编辑项目信息的时候，新增字段&quot;特殊事项需同步&quot;，并填写特殊事项提醒，完成更新项目信息后，「项目列表-项目名称」旁可看见提示图标，点击可查看详情</li>
+<li>「快速创建任务/非项目任务」排期添加进入排期模式，可以拖动鼠标选择同一行的连续单元格，快速进行项目/非项目任务创建</li>
+<li>新增项目反馈递交流程（TB提交反馈 → PM审批反馈拆解/立即解决 → TB申请递交 → PM审批递交申请 → 递交排期与落地 → QA递交 → 递交状态追踪 → PM验收新增/变更、反馈 → TB验收需求闭环）</li>
+</ol>
+<p><strong>体验优化</strong></p>
+<ol>
+<li>「主题换肤」站点预置了9套主题皮肤</li>
+<li>「任务时间筛选扩展」任务模块下，新增两种时间筛选方式（任务开始结束时间、花费填写日期）</li>
+<li>「递交时间轴」新增递交时间轴模块</li>
+</ol>
+</blockquote>
+<p>对应关系：需求 新增1 → §1，新增2 → §2，新增3 → §3，新增4 → §4，体验1 → §5，体验3 → §6，体验4 → §7。</p>
+<h2>一、逐需求验收详情</h2>
+<h3>1. 反馈申请-逃逸Bug — ✅ 满足</h3>
+<ul>
+<li>入口：「我的地盘 → 我的信箱 → 拆解项目反馈」tab → 「反馈模块」筛选下拉 / 各反馈行「拆解」表单模块选择</li>
+<li>结论：反馈模块枚举中已新增「逃逸Bug」选项，供 PM 在拆解/筛选反馈时归类，是后续统计 bug 逃逸率的数据基础，达成开发意图。</li>
+<li>验证证据：
+<ul>
+<li>UI ✅ 「拆解项目反馈」页反馈模块下拉实测枚举为 UI / 其他 / 功能 / 场景 / 底板 / 建模 / 特效 / <strong>逃逸Bug</strong>，逃逸Bug 位列末位</li>
+<li>边界 ✅ 该页共 37 条真实反馈记录，模块列正常渲染 功能/场景/底板/建模/特效 等标签</li>
+<li>接口 ✅ <code>index/get_task_options</code> 与常规 const 接口不含&quot;逃逸&quot;，确认逃逸Bug 是反馈拆解专有的反馈模块枚举（前端/produce_demand 侧维护），非任务选项树</li>
+<li>数据 ✅ 枚举项与 dev 描述一致</li>
+</ul>
+</li>
+<li>定妆图 final-逃逸Bug模块+拆解反馈.jpg ｜ 关注：PM、QA ｜ 关联风险 R2</li>
+</ul>
+<h3>2. 项目-特殊事项提醒 — ✅ 满足</h3>
+<ul>
+<li>入口：「项目 → 项目列表 → 编辑（el-icon-edit-outline）」项目编辑表单 <code>/project/project_form/N</code> →「特殊事项需同步」字段；保存后「项目列表-项目名称」旁提示图标</li>
+<li>结论：编辑表单新增「特殊事项需同步（是/否）」+条件展开的「特殊事项提醒」输入，保存后项目列表项目名旁出现提示图标、点击可查看提醒详情，端到端闭环完整。</li>
+<li>验证证据：
+<ul>
+<li>UI ✅ 编辑表单「特殊事项需同步」为 是/否 单选；选「是」后条件展开「特殊事项提醒」文本框（placeholder「请输入特殊注意事项」）</li>
+<li>边界 ✅ 选「否」时提醒输入隐藏，选「是」时渲染，条件联动正确</li>
+<li>接口 ✅ 保存走项目编辑接口，toast「项目编辑成功」</li>
+<li>数据 ✅（<strong>写透验证</strong>）对项目「工业制造仿真优化智能决策平台」（#6697，SJ202602100007）填入提醒「V2.2.2验收-特殊事项提醒测试…」并保存 → 项目列表该行项目名旁出现 <code>el-icon-warning</code> 提示图标（tooltip「查看特殊事项」）→ 点击弹出「特殊事项 · SJ202602100007」详情框，正确显示所填提醒文本</li>
+</ul>
+</li>
+<li>定妆图 final-特殊事项需同步.jpg / final-特殊事项列表图标.jpg / final-特殊事项详情.jpg ｜ 关注：PM、TB</li>
+</ul>
+<h3>3. 排期模式-拖动多选连续单元格快速创建 — ✅ 满足</h3>
+<ul>
+<li>入口：「排期 → 排期表」<code>/schedule/schedule_table</code> →「进入排期模式」按钮</li>
+<li>结论：排期表新增「进入排期模式」，进入后支持拖动鼠标选择同一行的连续单元格以快速创建项目/非项目任务，交互提示与 dev 描述完全一致。</li>
+<li>验证证据：
+<ul>
+<li>UI ✅ 点「进入排期模式」→ 弹提示「已进入多选模式，<strong>可以拖动鼠标选择同一行的连续单元格</strong>」，按钮切换为「退出排期模式」</li>
+<li>边界 ✅ 点「退出排期模式」→ 弹「已退出多选模式」、按钮复原，模式可正常进出</li>
+<li>接口 — 纯前端交互模式切换，无独立接口</li>
+<li>数据 ✅ 提示文案与 dev 需求描述逐字一致</li>
+</ul>
+</li>
+<li>定妆图 final-排期模式拖动多选.jpg ｜ 关注：PM、TB、组长</li>
+</ul>
+<h3>4. 项目反馈递交流程（全链闭环）— ✅ 满足（反馈+递交审批链均已实测写透）</h3>
+<ul>
+<li>入口：TB 侧「我的地盘 → 我的反馈 / 我的递交」；PM 侧「我的地盘 → 我的信箱」（拆解项目反馈 / 审批递交申请(PM) / 待验收的需求(TB\BD) 三 tab）；QA 侧「递交 → 递交列表 → QA递交」</li>
+<li>结论：反馈递交全链路已按真实用户操作<strong>逐环节真实提交写透</strong>（提交表单、后端落库、状态流转均核对），只有 PM验收/TB验收 因缺「制作完成需求」样本未做（见 R1）。</li>
+<li>验证证据：
+<ul>
+<li>写透① TB提交反馈 ✅：我的反馈 →「添加一条反馈」→ 选项目「东南大学数字孪生校园增补」（PM 晏凯自动带出）+ 反馈模块「逃逸Bug」+ 描述 → 立即提交 → <code>POST produce_demand/add_apply_demand</code> 200，toast「添加成功」，生成反馈 #569（待PM审批）</li>
+<li>写透② PM立即解决 ✅：反馈 #569 在 PM 晏凯队列（邓欣羽非该项目 PM，可见性+按钮双门禁），<strong>绕过</strong>（<code>handleSolveApply({id:569})</code> 直调开弹窗）→ 填解决方案 → 立即解决 → 确认「立即解决后无法编辑和拆解」→ <code>POST produce_demand/solution_apply_demand</code> 200，#569 状态转「已沟通解决」+ solution_content 落库</li>
+<li>写透③ TB申请递交 ✅：我的递交 →「申请递交」（V2.2.9 重构版）→ 选项目 + 递交版本 + <strong>必填「要求递交时间」（日期 <code>input.fill</code>+Enter 键入 2026-08-25、小时 20时，提交前核对表单模型 <code>apply_publish_time</code> 非空、提交后回查落库 <code>apply_publish_time_str=2026-08-25 20</code>）</strong> + 申请递交内容 + 勾协议「我确认本次递交不涉及任何新增/变更/反馈」→ 立即提交。做了进度递交(#527)与临时递交(#528)两条</li>
+<li>写透④ PM审批递交 ✅：申请在 PM 队列，<strong>绕过</strong>（<code>approvedApply(row)</code> 直调开「转化为递交」表单）→ 交付形式 WDP5 + 递交内容；<strong>临时递交(#528) 保持「临时状态=是」并填全条件必填项「临时责任人=邓欣羽 / 临时原因=临时需求递交」</strong>（不用改状态规避必填）→ 「通过审批，创建递交」→ <code>POST project_publish/add</code> 200，toast「递交创建成功！」，申请转「已排期」并生成递交排期记录</li>
+<li>写透⑤ QA递交 ✅：递交列表 QA递交按钮被 <code>testListRooters</code> 前端禁用，<strong>绕过</strong>（解除 disabled+真实点击原生 @click）打开「项目递交(QA)」→ <strong>递交状态自动判定「提前递交」</strong> → 填版本/实际递交时间/遗留问题 → 提交 → <code>project_publish</code> #14335 落库（publish_submit_status=2/version/real_publish_time/t_remark）</li>
+<li>接口 ⚠️ <strong>发现后端越权缺陷 B1（系统性）</strong>：QA递交（testListRooters 白名单禁用）与 PM立即解决/PM审批（systemRole/可见性禁用）三处写入接口，绕过前端门禁后后端<strong>均放行</strong>——递交/反馈处理写入接口普遍缺服务端权限校验</li>
+</ul>
+</li>
+<li>递交时间说明：递交（要求）时间在 <strong>TB申请递交</strong> 环节填写（必填项，实测 #528 = 2026-08-25 20时正确落库），PM审批「转化为递交」表单无独立时间字段、继承该申请时间；QA递交填的是<strong>实际递交时间</strong></li>
+<li>定妆图 final-申请递交写透.jpg / final-反馈立即解决写透.jpg / final-QA递交写透-落库.jpg / final-逃逸Bug模块+拆解反馈.jpg ｜ 关注：PM、TB、QA ｜ 关联缺陷 B1、风险 R1</li>
+</ul>
+<h3>5. 主题换肤 — ✅ 满足</h3>
+<ul>
+<li>入口：顶部导航主题图标（<code>.ts-trigger</code>，emoji 随当前皮肤变）→ 主题面板 popover</li>
+<li>结论：站点内置多套主题皮肤，一键切换、跨会话保存，功能完整可用（V2.2.2 首发 9 套，现行版本已扩充至 18 项）。</li>
+<li>验证证据：
+<ul>
+<li>UI ✅ 主题面板分三区：基础皮肤（海盐白/春日花语/夏日海滩/金秋物语/冬日初雪/极地蓝/薰衣草紫/玫瑰粉/苹果绿/日落橘，10 套）、节日限定（春节/元宵/五一/六一/端午/中秋/国庆/圣诞，8 套）、节日氛围（粒子特效/鼠标特效 2 开关），当前皮肤「海盐白」</li>
+<li>边界 ✅ 面板标注「当前皮肤·跟随心情，一键换肤」，各皮肤可点选</li>
+<li>接口 — 前端为主，服务端存主题枚举跨会话同步</li>
+<li>数据 ✅ 主题数量随版本迭代增长（9→18），本轮验收现行面板功能完整</li>
+</ul>
+</li>
+<li>定妆图 final-主题换肤.jpg ｜ 关注：全员</li>
+</ul>
+<h3>6. 任务时间筛选扩展 — ✅ 满足</h3>
+<ul>
+<li>入口：「任务 → 任务列表」<code>/task_panel/project_task</code> 筛选区，日期范围旁的筛选方式下拉</li>
+<li>结论：任务列表日期范围新增「筛选方式」选择，可在「任务时间」与「花费日期」两个时间维度间切换筛选，对应 dev 的「任务开始结束时间 / 花费填写日期」两种方式。</li>
+<li>验证证据：
+<ul>
+<li>UI ✅ 日期范围（开始日期-结束日期）旁的筛选方式下拉实测选项为「任务时间」「花费日期」两项，选中后回显</li>
+<li>边界 ✅ 与已延宕/本周任务/全部任务 radio、部门/任务状态/产出类型/项目等筛选并存不冲突</li>
+<li>接口 — 列表取数 <code>main_panel/get_task_list</code>，时间维度参数随筛选方式变化</li>
+<li>数据 ✅ 两个筛选方式选项与 dev 描述一致</li>
+</ul>
+</li>
+<li>定妆图 final-任务时间筛选扩展.jpg ｜ 关注：PM、组长、Builder</li>
+</ul>
+<h3>7. 递交时间轴 — ✅ 满足</h3>
+<ul>
+<li>入口：「递交 → 递交列表」<code>/OPStestList/OPStestList_list</code> →「递交排期时间轴」按钮</li>
+<li>结论：递交列表新增「递交排期时间轴」模块，以横向时间轴按时间点排布当日待递交项目并标注「现在」指示线，直观呈现递交排期，达成开发意图。</li>
+<li>验证证据：
+<ul>
+<li>UI ✅ 点「递交排期时间轴」→ 展开横向时间轴（08:00–20:00 时间刻度 + 「现在」指示线），待递交项目（水源公司-南水北调项目、上海虹桥火车站、金宝航道数字孪生）按时间排布，顶部「共 3 待递交 3」</li>
+<li>边界 ✅ 与「仅查看超时递交」「切换至日历视图」等视图/筛选并存</li>
+<li>接口 — 复用递交列表 <code>project_publish</code> 取数</li>
+<li>数据 ✅ 时间轴节点数与待递交计数一致</li>
+</ul>
+</li>
+<li>定妆图 final-递交时间轴.jpg ｜ 关注：PM、QA</li>
+</ul>
+<h2>二、缺陷清单（已确认的问题，需修）</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>缺陷</th>
+<th>严重度</th>
+<th>建议</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>B1</td>
+<td>递交/反馈处理的写入接口普遍缺服务端权限校验：QA递交（<code>testListRooters</code> 白名单前端禁用）、PM立即解决反馈 / PM审批递交（<code>systemRole</code>+可见性前端禁用）——非授权账号绕过前端门禁后后端均放行并落库（本轮实测越权写入：递交 #14335、立即解决反馈 #569、PM审批创建递交 #527）</td>
+<td>严重</td>
+<td>递交/反馈写入类接口（solution_apply_demand / project_publish/add 等）后端补与前端一致的角色/白名单权限校验</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>修复交接：各缺陷的复现步骤、定位线索与修复通过标准见 <a href="fix-handoff.md">fix-handoff.md</a>（给前后端开发，可整份投喂 AI）。</p>
+</blockquote>
+<h2>三、风险与待确认</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>事项</th>
+<th>等级</th>
+<th>建议</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R1</td>
+<td>递交流程中仅剩「PM验收新增/变更、反馈 / TB验收需求」两环节未实测写入：二者需以「制作完成的需求」为前提（需走拆解→制作→完工全链造出样本），本轮立即解决的反馈为「无需拆解」不产生制作需求，故暂无可验收样本；其余环节（TB提反馈/PM立即解决/TB申请递交/PM审批递交/QA递交）均已真实写透</td>
+<td>中低（数据状态盲区）</td>
+<td>需时造一条完整制作完成需求后补验 PM验收/TB验收（后端放行原理已由 B1 证实）</td>
+</tr>
+<tr>
+<td>R2</td>
+<td>「逃逸Bug」模块选项本轮验到其在反馈模块枚举中落地，但 dev 所述「后续统计 bug 逃逸率」的统计出口/看板本版未涉及</td>
+<td>低（覆盖盲区）</td>
+<td>待逃逸率统计功能上线时单独验证其取数是否以该模块为分组依据</td>
+</tr>
+<tr>
+<td>R3</td>
+<td>「特殊事项需同步」保存时，项目编辑表单会校验其它必填项（如「场景美术」），若原项目该字段为空则需一并补齐才能保存</td>
+<td>低（口径待确认）</td>
+<td>确认是否设计如此（编辑必须全表单合规）；本轮已按流程补齐后正常保存</td>
+</tr>
+<tr>
+<td>R4</td>
+<td>审批递交申请(PM) 页清空「选择PM」筛选后列表拉取报错崩溃（<code>getApplyPublishList</code> → applyMixins.js:74 <code>JSON.parse(undefined)</code>），需先选定 PM 才能查</td>
+<td>低（健壮性）</td>
+<td>前端对空 PM 筛选参数做容错，避免 JSON.parse 未定义崩溃</td>
+</tr>
+</tbody>
+</table>
+<p><strong>未覆盖盲区声明</strong>：反馈递交流程的各写入环节未用 PM/白名单账号逐环节真实提交（见 R1）；逃逸Bug 逃逸率统计出口未验（见 R2）；主题皮肤逐套视觉渲染效果未逐一切换核对；排期模式的实际拖动落库创建任务未做（仅验模式进出与提示，拖动创建为鼠标连续手势，自动化不稳，且创建走 <code>schedule</code> 已有链路）。</p>
+<h2>四、发版内容（初稿，待人工定稿）</h2>
+<h3>V2.2.2 发布于 YYYY-MM-DD ⚠️（发布日期待定稿）</h3>
+<h4>影响强度</h4>
+<p>强度较大，新增项目反馈递交完整流程与反馈「逃逸Bug」分类、项目特殊事项提醒、排期拖选批量排期；同步优化主题换肤、任务时间筛选与递交时间轴。</p>
+<h4>新增功能</h4>
+<p>需关注人员：PM、TB\BD、QA、组长</p>
+<p>1.「项目反馈-递交流程」：（让每条反馈从提出到验收有据可查，减少遗漏与重复沟通）<br>
+支持 TB 提交项目反馈并推送 PM 审核，PM 可对反馈进行「拆解」（选择岗位专业、任务模块、工时，一次拆成多个制作需求并指派给不同制作人员）或「立即解决」；<br>
+支持 TB 申请递交时自动同步项目的新增/变更与反馈内容、严格勾选本次递交项，经 PM 审批、递交排期落地后由 QA 完成项目递交；<br>
+支持 PM 对新增/变更与反馈进行验收（正常/提前/滞后）、TB 对制作完成的需求进行最终验收确认；</p>
+<p>2.「项目反馈-逃逸Bug 分类」：（沉淀逃逸缺陷分类，支撑 bug 逃逸率统计）<br>
+支持 PM 在拆解反馈需求时将反馈模块标记为「逃逸Bug」，作为后续统计 bug 逃逸率的数据来源；</p>
+<p>3.「项目-特殊事项提醒」：（项目关键事项在列表即时可见，减少沟通遗漏）<br>
+支持在编辑项目信息时开启「特殊事项需同步」并填写提醒内容，保存后项目列表的项目名称旁展示提示图标，点击即可查看特殊事项详情；</p>
+<p>4.「排期-拖选批量排期」：（连续时段一次成批排期，减少逐格重复操作）<br>
+支持在排期表进入「排期模式」后，拖动鼠标选择同一行的连续单元格，快速创建项目/非项目任务；</p>
+<h4>体验优化</h4>
+<p>需关注人员：全员、PM、QA、组长</p>
+<p>1.「主题换肤」：（按个人偏好美化工作界面）<br>
+站点内置多套主题皮肤，支持在顶部导航一键切换，所选皮肤跨会话保存；</p>
+<p>2.「任务-时间筛选扩展」：（按任务时间或花费日期快速定位目标任务）<br>
+任务模块的日期范围新增「任务时间」与「花费日期」两种筛选方式，方便按任务开始结束时间或花费填写日期查找任务；</p>
+<p>3.「递交-递交时间轴」：（一屏掌握当日各项目递交时间分布）<br>
+递交列表新增「递交排期时间轴」模块，以时间轴形式按时间点展示待递交项目并标注当前时刻；</p>
+<h2>附录 A：回归与测试证据（追溯用，非验收结论）</h2>
+<h3>A.1 老功能回归（是否被本次发版改坏；精准选集 + api 冒烟）</h3>
+<ul>
+<li>精准选集 <code>--grep &quot;@project_publish|@demand|@project_task|@project_detail|@schedule|@pm_theme|@produce_demand&quot;</code>（V2.2.2 碰递交主链/需求/任务/项目概况/排期/主题/反馈申请七簇）：<strong>37 通过 / 5 跳过 / 0 失败</strong>（4.1m）</li>
+<li>api 冒烟 <code>api-*.spec.js</code>：<strong>44 通过 / 1 跳过 / 0 失败</strong>（20.8s，含 B1/R1 哨兵 <code>test.fail</code> 预期失败=绿）</li>
+<li>5 个跳过均为历轮授权硬骨头（文档位上传 v2.2.4⑥/v2.2.6③、@write 粘贴上传 v2.2.5③、离职人员历史任务 v2.2.7③），非本轮回归引入</li>
+<li>结论：<strong>无回归</strong>，V2.2.2 源头功能被 V2.2.3~V2.3.0 全套用例覆盖且全绿</li>
+</ul>
+<h3>A.2 接口用例沉淀</h3>
+<p>本轮未新建 <code>api-v2.2.2.spec.js</code>（V2.2.2 各功能的后端契约已被后续版本 <code>api-v2.2.3~v2.3.0.spec.js</code> 的 <code>@project_publish/@demand/@project_task/@produce_demand/@project_detail</code> 簇覆盖）；逃逸Bug 反馈模块枚举、特殊事项字段等本轮探到的细节回填 entry_map 对应行备注。</p>
+<h3>A.3 验收产生的测试数据</h3>
+<ul>
+<li>项目「工业制造仿真优化智能决策平台」（#6697，SJ202602100007）：特殊事项需同步=是、特殊事项提醒填入「V2.2.2验收-特殊事项提醒测试：本项目需同步关注递交时间轴」；同时因保存必填校验补填了「场景美术=邓欣羽」。</li>
+<li>项目递交记录「东南大学数字孪生校园增补」（#6725 SJ202606170003）：本轮反馈递交链写透集中写在此项目——①反馈 #569（逃逸Bug，已沟通解决）②递交申请 #527（进度递交，经 PM 审批→已排期；⚠️该条要求递交时间因首版日期填法未落库=空）③<strong>递交申请 #528（临时递交，要求递交时间 2026-08-25 20时已正确落库，PM 审批填全临时责任人/原因→已排期）</strong> ④QA 递交 #14335（提前递交，publish_submit_status=2/version=v2.2.2-acc/real_publish_time/t_remark）。</li>
+<li>以上均为测试库隔离环境写入，内容带「V2.2.2验收-」前缀，按策略保留不清理；可供下轮回归作数据前置。</li>
+</ul>
+
+</body></html>

@@ -36,7 +36,7 @@
 ## skill 索引
 
 - [SKILL.md](SKILL.md) — ★ **验收-测试-发版全流程总控**：回归→验收→发版→沉淀四阶段调度器，收到「验收 V2.x.x + 开发内容」从这里进
-- [release_acceptance.md](release_acceptance.md) — 版本验收：依开发内容走流程找 BUG、边走边截图、出验收报告供发版技能使用（**必须走真实 UI 交互，禁止 Vue 直写代替操作**）
+- [stages/](stages/) — **各阶段执行细则（唯一执行来源）**：stage01-regression（回归）/ stage2-acceptance（验收，必须走真实 UI 交互）/ stage3-release（发版+转 HTML）/ stage45-sediment（复验+沉淀）
 - [release_notes.md](release_notes.md) — 发版内容撰写规范（分类判断表/强度规则/价值红黑榜；落笔前必须逐条自查）；定妆图直接引用 `acceptance/{版本}/final-*.jpg`
 - [entry_map.md](entry_map.md) — **入口地图（全 skill 共享）**：实测确认的功能入口 + 坑备注 + 页面等待锚点；找入口先查这里，新确认的入口必须回填
 - [playbooks/](playbooks/) — **操作库 / SOP**：每个功能「怎么从头做完一件事」的分步流程 + 可直调接口 + 读数锚点；供人/操作型 AI 复用（如定时查工时统计）。entry_map 管「在哪」，playbook 管「怎么做完」，由验收阶段 4 回填
@@ -81,7 +81,7 @@ else:
 
 51PM 是 Vue + Element UI v2。**表单可以直接拿到 root vm 后赋值 `vue.form.*` 再调 `vue.search()`**——这是 2026-05 最稳的路径，能跳过所有 DOM 点击 / dropdown / date-picker 的陷阱。只有在 Vue 实例拿不到（极少见）时才回退 DOM 路径。
 
-> ⚠️ **验收场景例外**：验收（[release_acceptance.md](release_acceptance.md)）**必须走真实 UI 交互**，Vue 直写只用于数据断言、不代替操作（否则把待验的交互层整个绕过去）。下述“Vue 直写首选”仅适用于查询/写操作类 skill。
+> ⚠️ **验收场景例外**：验收（[stages/stage2-acceptance.md](stages/stage2-acceptance.md)）**必须走真实 UI 交互**，Vue 直写只用于数据断言、不代替操作（否则把待验的交互层整个绕过去）。下述“Vue 直写首选”仅适用于查询/写操作类 skill。
 
 **取 vm 的标准套路**：
 ```js

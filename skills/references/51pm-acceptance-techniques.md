@@ -1,6 +1,6 @@
 # 51PM 验收实测技巧（2026-07-08 V2.2.3 验收沉淀）
 
-真实 UI 验收（release_acceptance）跑通的路径与坑。适用于 51PM（Element UI v2 / Vue2）任何需要真实交互的场景。
+真实 UI 验收（阶段 2，见 stages/stage2-acceptance.md）跑通的路径与坑。适用于 51PM（Element UI v2 / Vue2）任何需要真实交互的场景。
 
 ## 关键入口（找了很久，直接用）
 

@@ -1,0 +1,53 @@
+{
+  "version": "V2.2.2",
+  "devNotes": "新增:①反馈申请-逃逸Bug模块选项(PM拆解反馈时选,统计bug逃逸率) ②项目-特殊事项提醒(编辑项目信息新增'特殊事项需同步'字段,项目列表名旁提示图标点看详情) ③排期模式-拖动选择同行连续单元格快速创建任务/非项目任务 ④项目反馈递交流程完整闭环(TB提反馈→PM拆解/立即解决→TB申请递交→PM审批→排期落地→QA递交→PM验收→TB验收). 体验:①主题换肤9套 ③任务时间筛选扩展(任务开始结束时间/花费填写日期) ④递交时间轴模块",
+  "updatedAt": "2026-07-29",
+  "checklist": [
+    { "name": "反馈申请-逃逸Bug模块选项", "entry": "我的信箱→拆解项目反馈→拆解表单 任务模块下拉;或批量添加反馈/需求拆解 模块选项", "tables": ["produce_demand", "demand"] },
+    { "name": "项目-特殊事项提醒", "entry": "项目→项目列表→编辑项目信息 新增'特殊事项需同步'字段;项目列表项目名旁提示图标→详情", "tables": ["project_detail"] },
+    { "name": "排期模式-拖动多选连续单元格快速创建", "entry": "快速创建任务/非项目任务→排期视图 进入排期模式 拖动选择同行连续单元格", "tables": ["schedule", "project_task"] },
+    { "name": "项目反馈递交流程-TB提交反馈", "entry": "我的地盘→我的反馈→添加反馈", "tables": ["produce_demand"] },
+    { "name": "项目反馈递交流程-PM拆解/立即解决", "entry": "我的地盘→我的信箱→拆解项目反馈(拆解/立即解决)", "tables": ["produce_demand", "demand", "project_task"] },
+    { "name": "项目反馈递交流程-TB申请递交", "entry": "我的地盘→我的递交→申请递交(自动同步新增/变更/反馈)", "tables": ["project_publish", "produce_demand"] },
+    { "name": "项目反馈递交流程-PM审批递交申请", "entry": "我的信箱→审批项目申请(PM)→通过/驳回", "tables": ["project_publish"] },
+    { "name": "项目反馈递交流程-递交排期与落地", "entry": "我的递交排期(按月/状态标识 待递交/已逾期/按时/超时/延期)", "tables": ["project_publish"] },
+    { "name": "项目反馈递交流程-QA递交", "entry": "递交→QA递交(正常/提前/延期/超时,备注原因)", "tables": ["project_publish"] },
+    { "name": "项目反馈递交流程-递交状态追踪", "entry": "递交→递交列表(计划vs实际,超时精确到小时+标识)", "tables": ["project_publish"] },
+    { "name": "项目反馈递交流程-PM验收新增变更/反馈", "entry": "项目→项目新增/变更 或 项目反馈→PM验收(正常/提前/滞后,原因)", "tables": ["produce_demand", "demand"] },
+    { "name": "项目反馈递交流程-TB验收需求(闭环)", "entry": "我的地盘→我的信箱→待验收的需求→验收确认", "tables": ["produce_demand", "demand"] },
+    { "name": "主题换肤9套", "entry": "顶部导航主题图标(.ts-trigger)→主题面板", "tables": ["pm_theme"] },
+    { "name": "任务时间筛选扩展", "entry": "任务模块 新增两种时间筛选(任务开始结束时间/花费填写日期)", "tables": ["project_task"] },
+    { "name": "递交时间轴", "entry": "递交相关页面 递交时间轴模块", "tables": ["project_publish"] }
+  ],
+  "pendingSpecUpdates": [],
+  "stages": {
+    "0": { "status": "passed", "at": "2026-07-29", "note": "npm run check code=0,后端10.67.8.189:8888;扫码续登token刷新" },
+    "1": { "status": "passed", "result": "精准回归@project_publish|@demand|@project_task|@project_detail|@schedule|@pm_theme|@produce_demand 37过/5跳/0败; api冒烟44过/1跳/0败(含B1/R1哨兵预期失败绿)" },
+    "2": { "status": "passed", "defects": ["B1(严重): 递交/反馈处理写入接口普遍缺服务端权限校验(QA递交testListRooters/PM立即解决+PM审批systemRole),绕过前端门禁后后端均放行越权写入(实测#14335/#569/#527);见fix-handoff.md"], "features": [
+      { "name": "反馈申请-逃逸Bug模块选项", "verdict": "✅", "layers": "ui+接口", "screenshots": true, "note": "拆解项目反馈-反馈模块枚举含逃逸Bug(UI/其他/功能/场景/底板/建模/特效/逃逸Bug)" },
+      { "name": "项目-特殊事项提醒", "verdict": "✅", "layers": "ui+数据(写透)", "screenshots": true, "note": "编辑表单是/否radio+条件展开特殊事项提醒textarea;保存(项目#6697工业制造仿真优化)→列表项目名旁el-icon-warning图标(tooltip查看特殊事项)→点击弹详情显示提醒文本" },
+      { "name": "排期模式-拖动多选连续单元格", "verdict": "✅", "layers": "ui", "screenshots": true, "note": "排期表'进入排期模式'→toast'已进入多选模式,可以拖动鼠标选择同一行的连续单元格'(与dev一致),按钮变退出排期模式" },
+      { "name": "项目反馈递交流程(闭环)", "verdict": "✅", "layers": "ui+全链写透+回归", "screenshots": true, "note": "反馈+递交审批链逐环节真实提交写透:①TB添加反馈add_apply_demand(反馈#569逃逸Bug)②PM立即解决solution_apply_demand(#569已沟通解决,绕过可见性+权限)③TB申请递交(申请#527进度递交,要求递交时间2026-08-25 20时+协议勾选)④PM审批approvedApply→project_publish/add(#527已排期,绕过systemRole)⑤QA递交#14335(提前递交自动判定);后端均放行=B1系统性越权;仅PM验收/TB验收无制作完成需求样本未写(R1)" },
+      { "name": "主题换肤", "verdict": "✅", "layers": "ui", "screenshots": true, "note": "主题面板:基础皮肤10+节日限定8+节日氛围特效2=18套(V2.2.2首发9套,后续扩充);当前海盐白" },
+      { "name": "任务时间筛选扩展", "verdict": "✅", "layers": "ui", "screenshots": true, "note": "任务列表日期范围旁筛选方式下拉含'任务时间''花费日期'两选项(对应dev任务开始结束时间/花费填写日期)" },
+      { "name": "递交时间轴", "verdict": "✅", "layers": "ui", "screenshots": true, "note": "递交列表'递交排期时间轴'按钮→横向时间轴08:00-20:00+现在指示线+待递交项目按时间排布(共3待递交3)" }
+    ] },
+    "3": { "status": "passed", "at": "2026-07-29", "note": "发版初稿写入报告§四(新增4/体验3,沿用用户分类);md2html.js转html完成" },
+    "4": { "status": "passed", "at": "2026-07-29", "checklist": {
+      "ui-spec": "tests/v2.2.2.spec.js —— 5 条静态UI断言(逃逸Bug/特殊事项/排期模式/任务时间筛选/递交时间轴),5过真绿",
+      "api-spec": "无新增 —— V2.2.2后端契约由 api-v2.2.3~v2.3.0 的 @project_publish/@produce_demand/@project_detail/@project_task/@schedule 簇覆盖",
+      "entry_map": "新增5行:拆解项目反馈(含逃逸Bug)/项目-特殊事项提醒/排期模式-拖动多选/任务时间筛选扩展/递交时间轴",
+      "impact_map": "§A新增7行(V2.2.2);§B追加:project_publish(反馈递交流程/递交时间轴)、project_task(任务时间筛选)、schedule(排期模式多选)、project_detail(特殊事项)、独立维度produce_demand(拆解项目反馈/逃逸Bug)",
+      "playbooks": "新增3:拆解项目反馈.md/项目特殊事项提醒.md/排期模式多选创建.md + README索引回填",
+      "pendingSpecUpdates": "本轮无规格变更(V2.2.2为源头版本,未改老功能行为)",
+      "pitfalls": "P-12(固定列点击拦截)/P-13(门禁不该punt)/P-09升级命中2(final图禁集成浏览器截、禁复用探索图)/P-14新增(表单必填项不得改状态规避;日期input.fill+Enter不用vm.$emit;多选下拉选后收起再提;禁mouse.click小坐标关下拉)"
+    } }
+  },
+  "history": [
+    { "at": "2026-07-29", "event": "stage-passed", "stage": 0 },
+    { "at": "2026-07-29", "event": "stage-passed", "stage": 1 },
+    { "at": "2026-07-29", "event": "stage-passed", "stage": 2 },
+    { "at": "2026-07-29", "event": "stage-passed", "stage": 3 },
+    { "at": "2026-07-29", "event": "stage-passed", "stage": 4 }
+  ]
+}

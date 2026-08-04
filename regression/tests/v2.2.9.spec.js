@@ -147,9 +147,11 @@ test.describe('V2.2.9 回归', () => {
 
   // item9 模型外包：发包挂起/取消（动态挑带发包项目）
   test('⑧ 发包挂起/取消：状态枚举 + 编辑发包挂起/取消发包按钮 @outsource', async ({ page, request }) => {
-    const pk = await apiJson(request, '/manage_api/outsource/get_package_list?page=1&limit=10&sj_num=');
+    const pk = await apiJson(request, '/manage_api/outsource/get_package_list?page=1&limit=50&sj_num=');
     const rows = listOf(pk.data);
-    const withPid = rows.find((r) => r.project_id);
+    // 挂起按钮仅「制作中」(status=4) 发包显示——直接定位一个制作中发包的项目（V2.3.1 实锤：非制作中包底部只有取消发包）
+    const made = rows.find((r) => r.status === 4 && r.project_id);
+    const withPid = made || rows.find((r) => r.project_id);
     test.skip(!withPid, '无带项目的发包样本');
     await page.goto(`/project/outsource_project?projectId=${withPid.project_id}`);
     await h.waitTableSettled(page);
@@ -162,7 +164,11 @@ test.describe('V2.2.9 回归', () => {
       return last ? [...last.querySelectorAll('.el-select-dropdown__item')].map((e) => e.innerText.trim()) : [];
     });
     expect(opts.includes('挂起') && opts.includes('已取消'), '发包状态筛选应含「挂起」「已取消」').toBe(true);
-    await page.keyboard.press('Escape');
+    // 选「制作中」筛选（下拉此时已打开，直接点选项）
+    await page.locator('.el-select-dropdown__item:visible:has-text("制作中")').first().click().catch(() => {});
+    await page.waitForTimeout(2500);
+    const madeCount = await page.evaluate(() => { const m = document.body.innerText.match(/共\s*(\d+)\s*条/); return m ? +m[1] : 0; });
+    test.skip(madeCount === 0, '当前项目无制作中发包，无法验挂起按钮');
     // 编辑发包弹窗底部含 挂起 / 取消发包
     const opened = await page.evaluate(() => {
       const e = [...document.querySelectorAll('.el-table__fixed-right button')].find((b) => b.innerText.trim() === '编辑');
@@ -177,7 +183,7 @@ test.describe('V2.2.9 回归', () => {
       const btns = dlg ? [...dlg.querySelectorAll('button')].map((b) => b.innerText.replace(/\s/g, '')) : [];
       return btns;
     });
-    expect(footer.includes('挂起') && footer.includes('取消发包'), '编辑发包弹窗应有「挂起」「取消发包」按钮').toBe(true);
+    expect(footer.includes('挂起') && footer.includes('取消发包'), '制作中发包编辑弹窗应有「挂起」「取消发包」按钮').toBe(true);
   });
 
   // item10 项目概况：预估营收时间（精确到月，可编辑）

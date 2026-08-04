@@ -143,33 +143,42 @@ test.describe('V2.3.0 回归', () => {
       const d = [...document.querySelectorAll('.el-dialog')].find((x) => x.offsetParent);
       return [...d.querySelectorAll('.el-form-item__label')].map((e) => e.innerText.trim()).filter(Boolean);
     });
-    for (const f of ['问题类型', '问题描述', '影响程度', '需关注人员']) {
+    for (const f of ['问题类型', '问题描述', '影响程度', '问题关注人员']) {
       expect(labels.some((l) => l.includes(f)), `问题动态表单应含「${f}」`).toBe(true);
     }
   });
 
-  // 新增2.2 我的地盘「未解决项目问题」入口 → 集中展示弹窗（含按项目搜索/添加问题）
-  test('⑦ 我的地盘「未解决项目问题」入口集中展示（闭环） @project_moment', async ({ page, request }) => {
+  // 新增2.2 我的仪表盘相关项目动态改结果卡 → 跳转左栏「我的动态」集中管理（V2.3.1 重构）
+  test('⑦ 我的动态：仪表盘相关项目动态结果卡 + 我的动态筛选/切换/添加 @project_moment', async ({ page, request }) => {
     await h.ensureProblemMoment(request, { projectId: PROBLEM_PROJECT_ID, marker: 'V2.3.0回归-项目问题卡片', user: h.CURRENT_USER });
     await page.goto('/my_board/main/main');
     await page.waitForSelector('li.el-menu-item', { timeout: 15000 });
     await h.dismissAnnouncement(page);
-    const hasEntry = await page.evaluate(() => document.body.innerText.includes('未解决项目问题'));
-    expect(hasEntry, '我的仪表盘应有「未解决项目问题」入口卡片').toBe(true);
-    // 点卡片弹出「与我相关的项目问题」集中展示
-    await page.locator('.el-col:has-text("未解决项目问题")').last().click();
-    await page.waitForTimeout(2500);
-    const dlg = await page.evaluate(() => {
-      const d = [...document.querySelectorAll('.el-dialog')].find((x) => x.offsetParent && x.innerText.includes('与我相关的项目问题'));
-      if (!d) return null;
+    // V2.3.1：原「未解决项目问题」卡改为「相关项目动态」结果记录卡 + 左栏新增「我的动态」
+    const dash = await page.evaluate(() => ({
+      hasMoment: document.body.innerText.includes('相关项目动态'),
+      hasMenu: [...document.querySelectorAll('.el-menu-item')].some((e) => e.innerText.trim() === '我的动态'),
+    }));
+    expect(dash.hasMoment, '仪表盘应有「相关项目动态」结果卡').toBe(true);
+    expect(dash.hasMenu, '左栏应新增「我的动态」菜单').toBe(true);
+    // 进入我的动态页（直接 URL 会重定向，点左栏菜单）
+    await page.locator('.el-menu-item:has-text("我的动态")').last().click().catch(() => {});
+    await page.waitForTimeout(3000);
+    if (!page.url().includes('moments')) { await page.goto('/my_board/main/moments'); await page.waitForTimeout(3000); }
+    await h.dismissAnnouncement(page);
+    const moments = await page.evaluate(() => {
+      const t = document.body.innerText;
       return {
-        hasSearch: [...d.querySelectorAll('input')].some((i) => (i.placeholder || '').includes('按项目搜索')),
-        hasAdd: [...d.querySelectorAll('button')].some((b) => b.innerText.includes('添加问题')),
+        hasFilters: /会议\s*\d/.test(t) && /风险\s*\d/.test(t) && /问题\s*\d/.test(t),
+        hasScopeToggle: t.includes('全部动态') && t.includes('与我相关'),
+        hasAdd: [...document.querySelectorAll('button')].some((b) => b.innerText.includes('添加动态')),
+        hasSearch: [...document.querySelectorAll('input')].some((i) => (i.placeholder || '').includes('按项目搜索')),
       };
     });
-    test.skip(!dlg, '未解决项目问题弹窗未打开（卡片交互差异）');
-    expect(dlg.hasSearch, '弹窗应有「按项目搜索」').toBe(true);
-    expect(dlg.hasAdd, '弹窗应有「添加问题」').toBe(true);
+    expect(moments.hasFilters, '我的动态应有会议/风险/问题筛选计数').toBe(true);
+    expect(moments.hasScopeToggle, '我的动态应有「全部动态/与我相关」切换').toBe(true);
+    expect(moments.hasAdd, '我的动态应有「添加动态」').toBe(true);
+    expect(moments.hasSearch, '我的动态应有「按项目搜索」').toBe(true);
   });
 
   // 体验3 我的任务日历右侧任务栏 UI 重构
@@ -253,20 +262,10 @@ test.describe('V2.3.0 回归', () => {
     expect(warned, '评分≤3 空备注提交应被拦截并提示').toBe(true);
   });
 
-  // 新增4 BUG明细：BUG类型新增「项目技术」（不参与发版初稿；读 bugConst.bug_type_list 断言，稳于下拉 UI）
-  test('⑩ 添加Bug：Bug类型含「项目技术」 @data_export', async ({ page }) => {
-    await page.goto('/statistic/bug');
-    await h.waitTableSettled(page);
-    await h.dismissAnnouncement(page);
-    const types = await page.evaluate(async () => {
-      const seen = new Set(); const stack = [document.querySelector('#app')]; let vm = null;
-      while (stack.length) { const el = stack.shift(); if (!el || seen.has(el)) continue; seen.add(el);
-        if (el.__vue__ && (el.__vue__.$options.__file || '') === 'src/views/routerViews/statistic/bug/index.vue') { vm = el.__vue__; break; }
-        for (const c of el.children) stack.push(c); }
-      if (vm && vm.getBugConst) { try { await vm.getBugConst(); } catch (e) {} }
-      const bc = vm && vm.bugConst;
-      return bc && bc.bug_type_list ? Object.values(bc.bug_type_list) : [];
-    });
+  // 新增4 BUG明细：BUG类型新增「项目技术」（不参与发版初稿；走接口断言，稳于 vm——V2.3.1 测试数据看板组件重构后旧 vm 路径失效）
+  test('⑩ 添加Bug：Bug类型含「项目技术」 @data_export', async ({ request }) => {
+    const j = await apiJson(request, '/manage_api/bug/get_bug_const');
+    const types = j.data && j.data.bug_type_list ? Object.values(j.data.bug_type_list) : [];
     expect(types.includes('项目技术'), 'Bug类型（bug_type_list）应含「项目技术」').toBe(true);
   });
 });

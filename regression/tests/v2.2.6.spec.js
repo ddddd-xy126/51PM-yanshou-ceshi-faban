@@ -58,14 +58,18 @@ test.describe('V2.2.6 回归', () => {
 
   test('③ 项目概况三个接口/测试文档位齐全且链接互不覆盖 @project_detail', async ({ page }) => {
     await h.gotoProjectPage(page, 'project_detail');
-    // V2.2.9 起项目概况改折叠手风琴，三个文档位标签移入默认折叠的「项目信息」面板——断言前先展开
-    await page.evaluate(() => {
-      const head = [...document.querySelectorAll('*')].find(
-        (e) => e.children.length === 0 && e.innerText?.trim() === '项目信息' && e.offsetWidth > 0
-      );
-      (head?.closest('[class*=head],[class*=title],[class*=collapse],[class*=panel]') || head)?.click();
-    });
-    await page.waitForTimeout(800);
+    // V2.3.1 起项目概况「项目信息」由手风琴改为 tab/collapse（[role=tab]）结构，
+    // 三个文档位在该面板展开后才渲染——断言前先点 tab 展开（含开→关→再开容错）。
+    const expandInfo = async () => {
+      await page
+        .locator('[role=tab]:has-text("项目信息"), .el-collapse-item__header:has-text("项目信息")')
+        .first()
+        .click()
+        .catch(() => {});
+      await page.waitForTimeout(800);
+    };
+    await expandInfo();
+    if (!(await page.evaluate(() => document.body.innerText.includes('定制接口文档')))) await expandInfo();
     // 静态要素：三个文档位标签常驻（不依赖数据，硬断言）
     const info = await page.evaluate(() => document.body.innerText);
     for (const label of ['定制接口文档', '项目测试文档', '行业接口文档']) {

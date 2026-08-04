@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>51PM V2.3.1 验收报告</title>
+<style>
+:root{color-scheme:light}
+body{margin:0 auto;max-width:920px;padding:40px 48px;font-family:-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;color:#1a1a1a;line-height:1.7;background:#fdfdfd}
+h1{font-size:1.9em;border-bottom:3px solid #4a7;padding-bottom:.3em}
+h2{font-size:1.45em;border-bottom:1px solid #ddd;padding-bottom:.25em;margin-top:1.8em}
+h3{font-size:1.2em;margin-top:1.5em;color:#2a6}
+h4{font-size:1.05em;color:#444}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:.94em}
+th,td{border:1px solid #d0d7de;padding:7px 10px;text-align:left;vertical-align:top}
+th{background:#f0f6f2}
+tr:nth-child(even){background:#fafbfa}
+code{background:#f2f4f2;padding:1px 5px;border-radius:4px;font-size:.9em;font-family:Consolas,Monaco,monospace}
+pre{background:#f6f8fa;padding:12px 14px;border-radius:6px;overflow:auto}
+pre code{background:none;padding:0}
+blockquote{border-left:4px solid #9c9;background:#f6faf7;margin:1em 0;padding:.6em 1em;color:#444}
+hr{border:none;border-top:1px solid #e0e0e0;margin:1.5em 0}
+a{color:#268}
+ul,ol{padding-left:1.6em}
+li{margin:.2em 0}
+img{max-width:100%}
+</style></head>
+<body>
+<h1>51PM V2.3.1 验收报告</h1>
+<ul>
+<li>验收时间：2026-08-03</li>
+<li>环境：测试 10.67.8.183:7777（后端 10.67.8.189:8888）</li>
+<li>验收账号角色：邓欣羽（Aes/工程与交付/项目交付/Web端开发；systemRole ≠ PM、不在递交白名单）</li>
+<li><strong>验收结论：5 项需求，满足 5 / 部分满足 0 / 不满足 0</strong>；发现缺陷 0、风险/待确认 1</li>
+<li>老功能回归：✅ 无回归（精准选集 <code>@project_publish|@outsource|@project_detail|@project_moment|@data_export</code>：首跑 51 通过 / 5 失败，5 条失败经 UI 实锈均为<strong>预期内规格变更或测试选样问题、无一真回归</strong>；阶段4 就地修复 5 条旧 spec 后复跑<strong>65 通过 / 0 失败</strong>全绿，明细见附录 A.1）</li>
+</ul>
+<blockquote>
+<p>阅读顺序：先看「一、逐需求验收详情」判断本次交付达标与否 →「二、缺陷」「三、风险」是待处理项 →「四、发版内容（初稿）」→ 回归与接口等测试证据在附录，供追溯，不是验收结论本身。</p>
+</blockquote>
+<h2>0. 原始验收需求</h2>
+<blockquote>
+<p><strong>用户体验</strong><br>
+递交模块：添加&quot;程序开发&quot;人员的筛选条件，以便程序侧拉取数据</p>
+<p><strong>新增功能</strong><br>
+模型外包：新增外包筛选条件，与自制一样<br>
+项目概览：时间轴新增预计营收时间字段</p>
+<p><strong>流程规范</strong><br>
+项目动态：修改我的仪表盘中相关项目动态只作为结果记录，点击可跳转左侧边栏【我的动态】，可筛选查看所有和个人相关的动态，包含会议、风险、问题，也可查看站点所有的动态，支持快速添加项目的动态</p>
+<p><strong>体验升级、重构优化</strong><br>
+统计-测试数据看板：与递交相关的列表中，比如可点击的卡片、柱状查看递交明细的时候，点击&quot;查看超时原因&quot;按钮，呈现该项目的超时原因</p>
+</blockquote>
+<p>对应关系：用户体验-递交程序开发筛选 → §1；新增功能-模型外包外包筛选 → §2；新增功能-项目概览预计营收时间 → §3；流程规范-项目动态/我的动态 → §4；体验升级-测试数据看板超时原因 → §5。</p>
+<h2>一、逐需求验收详情</h2>
+<h3>1. 递交列表-程序开发人员筛选 — ✅ 满足</h3>
+<ul>
+<li>入口：「递交 → 递交列表」<code>/OPStestList/OPStestList_list</code> 筛选区新增「程序开发」下拉；表格新增「程序开发」列</li>
+<li>结论：递交列表筛选区已新增&quot;程序开发&quot;人员筛选下拉（真实开发人员选项），可按程序开发人员精准筛出其负责递交，供程序侧拉取数据，功能达成开发意图。</li>
+<li>验证证据：
+<ul>
+<li>UI ✅ 筛选区含「程序开发」下拉（选项：龙顺波/傅闽翌/陈杰/高翔/刘奕铭…），表头新增「程序开发」列，与选择场景组/PM/行业线等筛选并列</li>
+<li>边界 ✅ 需先设日期范围再筛（列表默认只筛当天）；设 2026 全年 + 程序开发=龙顺波 筛出 119 条</li>
+<li>接口 ✅ <code>project_publish/get_list</code> 新增参数 <code>chengxu_people=&lt;uid&gt;</code>（龙顺波=79），与既有 project_pm/project_scene 等参数并列</li>
+<li>数据 ✅ 筛选后列表 119 条，逐行「程序开发」列均为龙顺波，真过滤非忽略</li>
+</ul>
+</li>
+<li>定妆图 <a href="01-%E9%80%92%E4%BA%A4%E5%88%97%E8%A1%A8-%E7%A8%8B%E5%BA%8F%E5%BC%80%E5%8F%91%E7%AD%9B%E9%80%89.jpg">01-递交列表-程序开发筛选.jpg</a> ｜ 关注：程序开发、PM、QA</li>
+</ul>
+<h3>2. 模型外包-外包筛选条件 — ✅ 满足</h3>
+<ul>
+<li>入口：「项目 → 项目详情 → 模型外包」<code>/project/outsource_project?projectId=N</code> 列表筛选</li>
+<li>结论：模型外包列表筛选由原「全部 / 内部自制」扩展为「全部 / 外包 / 内部自制」，新增的&quot;外包&quot;筛选与&quot;自制&quot;完全对称，可单独筛出外包发包，达成&quot;与自制一样&quot;的意图。</li>
+<li>验证证据：
+<ul>
+<li>UI ✅ 筛选 radio 由 全部/内部自制 增为 全部/外包/内部自制，与自制并列对称</li>
+<li>边界 ✅ 三档互斥切换，切换即重新请求；某项目仅外包发包时&quot;内部自制&quot;档正确显示 0 条</li>
+<li>接口 ✅ 外包档 → <code>outsource/get_package_list?...&amp;is_self_made=0</code>；内部自制档 → <code>is_self_made=1</code>（对称参数）</li>
+<li>数据 ✅ 项目「亿滋工厂及仓储孪生项目二期」(SJ202506050003)：外包档筛出 27 条全外包发包，自制档 0 条</li>
+</ul>
+</li>
+<li>定妆图 <a href="02-%E6%A8%A1%E5%9E%8B%E5%A4%96%E5%8C%85-%E5%A4%96%E5%8C%85%E7%AD%9B%E9%80%89.jpg">02-模型外包-外包筛选.jpg</a> ｜ 关注：DTA、PM</li>
+</ul>
+<h3>3. 项目概览时间轴-预计营收时间 — ✅ 满足</h3>
+<ul>
+<li>入口：「项目 → 项目概况」<code>/project/project_detail?projectId=N</code> 顶部时间轴</li>
+<li>结论：项目概况顶部时间轴新增&quot;预估营收&quot;节点（精确到月），与开工令/实际开工/初版递交/终版递交/实际营收同轴展示，让项目营收计划在概览一眼可见，达成&quot;时间轴新增预计营收时间字段&quot;意图（系统字段名为&quot;预估营收时间&quot;，dev_notes 措辞&quot;预计营收时间&quot;）。</li>
+<li>验证证据：
+<ul>
+<li>UI ✅ 时间轴节点：开工令 → 实际开工 → 初版递交 → 终版递交 → <strong>预估营收 2026-09</strong> → 实际营收；&quot;基本信息&quot;面板亦含&quot;预估营收时间 2026-09&quot;</li>
+<li>边界 ✅ 月精度（2026-09）；未设时显示 —</li>
+<li>接口 ✅ <code>project/get_project_info?id=N</code> 返回 <code>data.info.plan_income_date</code>；不存在 id 不 5xx（回归 api 已覆盖）</li>
+<li>数据 ✅ 时间轴显示值 2026-09 = 接口 plan_income_date 2026-09 一致</li>
+</ul>
+</li>
+<li>定妆图 <a href="03-%E9%A1%B9%E7%9B%AE%E6%A6%82%E8%A7%88%E6%97%B6%E9%97%B4%E8%BD%B4-%E9%A2%84%E4%BC%B0%E8%90%A5%E6%94%B6%E6%97%B6%E9%97%B4.jpg">03-项目概览时间轴-预估营收时间.jpg</a> ｜ 关注：PM、销售运营</li>
+</ul>
+<h3>4. 项目动态-我的动态（结果记录 + 集中管理） — ✅ 满足</h3>
+<ul>
+<li>入口：「我的地盘 → 我的仪表盘」相关项目动态结果卡 → 点击跳转「我的地盘 → 我的动态」<code>/my_board/main/moments</code></li>
+<li>结论：我的仪表盘原&quot;未解决项目问题&quot;卡改为&quot;相关项目动态&quot;结果记录卡（14 条），点击跳转左侧栏新增的【我的动态】页；我的动态支持按会议/风险/问题筛选、&quot;全部动态（站点）/与我相关（个人）&quot;切换、按项目搜索、快速添加动态，完整达成流程规范意图。</li>
+<li>验证证据：
+<ul>
+<li>UI ✅ 仪表盘&quot;相关项目动态 14 条&quot;结果卡；左栏「与我有关」组新增「我的动态」；我的动态含筛选 全部14/会议7/风险3/问题4 + 「全部动态 / 与我相关」切换 + 「添加动态」+ 「按项目搜索」</li>
+<li>边界 ✅ 点仪表盘结果卡真实路由到 <code>/my_board/main/moments</code>；动态按月分组（2026年8月/7月）展示会议/风险/问题卡片</li>
+<li>接口 ✅ 动态数据 <code>project_moment/get_list</code>（module=meet/risk/problem）；添加走 <code>project_moment/add</code></li>
+<li>数据 ✅ &quot;添加动态&quot;弹窗含会议/风险/问题三 tab + 顶部&quot;所属项目&quot;选择（快速添加项目动态）；问题动态表单字段：所属项目/问题类型/问题描述/问题截图/影响程度/问题关注人员/解决方案</li>
+</ul>
+</li>
+<li>定妆图 <a href="04-%E9%A1%B9%E7%9B%AE%E5%8A%A8%E6%80%81-%E6%88%91%E7%9A%84%E5%8A%A8%E6%80%81.jpg">04-项目动态-我的动态.jpg</a> ｜ 关注：PM、全员</li>
+</ul>
+<h3>5. 测试数据看板-查看超时原因 — ✅ 满足</h3>
+<ul>
+<li>入口：「统计 → 测试数据看板」<code>/statistic/bug</code> → 点递交相关卡片（如&quot;超时递交&quot;）打开递交明细 → 明细行「查看超时原因」按钮</li>
+<li>结论：测试数据看板中与递交相关的可点击卡片/柱状打开递交明细后，明细每行&quot;超时递交&quot;列新增&quot;查看超时原因&quot;按钮，点击弹出该项目的超时原因（原因文字 + 截图），达成体验升级意图。</li>
+<li>验证证据：
+<ul>
+<li>UI ✅ 递交明细弹窗「明细 — 超时递交」每行含「查看超时原因」按钮；点击弹「超时原因」弹窗（项目名 + 原因说明 + 图片）</li>
+<li>边界 ✅ 需切到含超时数据的统计周期（如季度 2026 Q3 有 4 条超时）；卡片/明细为空周期不展示</li>
+<li>接口 ✅ 递交明细走 <code>data_export/get_qa_stat_detail_list</code>（超时递交明细），超时原因随记录返回</li>
+<li>数据 ✅ 4 条超时记录实际递交时间均晚于计划递交时间；点&quot;厦门-同安区…（信息服务）(SJ202601130003)&quot;查看超时原因，弹窗正确呈现该项目原因文本（关联风险 R1）</li>
+</ul>
+</li>
+<li>定妆图 <a href="05-%E6%B5%8B%E8%AF%95%E6%95%B0%E6%8D%AE%E7%9C%8B%E6%9D%BF-%E6%9F%A5%E7%9C%8B%E8%B6%85%E6%97%B6%E5%8E%9F%E5%9B%A0.jpg">05-测试数据看板-查看超时原因.jpg</a> ｜ 关注：PM、QA、全员 ｜ 关联风险 R1</li>
+</ul>
+<h2>二、缺陷清单（已确认的问题，需修）</h2>
+<p>本轮无功能性缺陷。5 项需求全部真实 UI 走通，无报错弹窗、无控制台阻断红错、无点击无响应。</p>
+<h2>三、风险与待确认</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>事项</th>
+<th>等级</th>
+<th>建议</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R1</td>
+<td>测试数据看板&quot;超时递交&quot;按<strong>实际递交时间</strong>归入统计周期：某项目计划递交时间在上一周期（如厦门-同安区项目计划 2026-06-30 属 Q2）、实际递交落在本周期（2026-07-01 属 Q3），则计入本周期超时明细（4 条）；而按计划时间筛选的递交列表在该周期仅 3 条。两者判据不同属看板既有口径（非本轮 item5 引入，item5 仅新增&quot;查看超时原因&quot;展示），需产品确认归期口径是否为预期。</td>
+<td>低</td>
+<td>产品确认看板超时归期口径；如需与递交列表对齐可注明按实际/计划时间的取数说明</td>
+</tr>
+</tbody>
+</table>
+<p><strong>未覆盖盲区声明</strong>：程序开发筛选仅验了单人（龙顺波）筛选真过滤，未穷举全部程序开发人员与多条件组合；超时原因弹窗的图片仅确认渲染出图，未逐条核对每个项目原因文本与后端一致；看板超时数跨模块对账因明细接口参数口径差异仅做到定位解释（R1），未做全量逐条 diff。</p>
+<h2>四、发版内容（初稿）</h2>
+<h3>V2.3.1 发布于 2026-08-03</h3>
+<h4>影响强度</h4>
+<p>强度中等，新增&quot;我的动态&quot;集中管理入口，并补充递交程序开发筛选、模型外包外包筛选、项目预估营收时间与测试数据看板超时原因展示能力。</p>
+<h4>新增功能</h4>
+<p>需关注人员：DTA、PM</p>
+<p>1.「模型外包-外包筛选」：（发包按承接方式快速归类，提升管理效率）<br>
+在模型外包列表原有&quot;全部 / 内部自制&quot;筛选基础上，新增与&quot;自制&quot;对称的&quot;外包&quot;筛选条件，<br>
+支持一键筛出全部外包发包，<br>
+方便 DTA、PM 分别查看外包与自制发包的进度与明细。</p>
+<p>需关注人员：PM、销售运营</p>
+<p>2.「项目概览-预估营收时间」：（项目营收计划一眼可见）<br>
+项目概况顶部时间轴新增&quot;预估营收&quot;节点（精确到月），<br>
+与开工令、实际开工、初版/终版递交、实际营收同轴展示，<br>
+方便 PM 与销售运营在项目概览快速掌握营收计划节奏。</p>
+<h4>体验优化</h4>
+<p>需关注人员：程序开发、PM、QA</p>
+<p>1.「递交-递交列表」：（按程序开发人员精准拉取递交数据）<br>
+递交列表筛选区新增&quot;程序开发&quot;人员筛选条件，并在列表中展示&quot;程序开发&quot;列，<br>
+支持按指定程序开发人员筛出其负责的递交记录，<br>
+方便程序侧按人拉取所需的递交数据。</p>
+<p>需关注人员：PM、QA、全员</p>
+<p>2.「统计-测试数据看板」：（超时递交原因就地可查，快速定位延期症结）<br>
+在测试数据看板中，点击递交相关的卡片或柱状查看递交明细时，明细每行新增&quot;查看超时原因&quot;按钮，<br>
+点击即可查看该项目本次超时递交的原因说明与截图，<br>
+方便 PM、QA 在盘点递交数据时快速了解超时缘由。</p>
+<h4>流程规范</h4>
+<p>需关注人员：PM、全员</p>
+<p>1.「我的地盘-我的动态」：（个人相关动态集中管理，动态盘点更高效）<br>
+我的仪表盘中相关项目动态改为结果记录，点击可跳转左侧栏新增的【我的动态】页；<br>
+在&quot;我的动态&quot;中支持按会议、风险、问题筛选，可在&quot;与我相关&quot;（个人相关）与&quot;全部动态&quot;（站点全部）之间切换查看，并支持按项目搜索、快速添加项目动态，<br>
+方便全员集中查看、跟进与自己相关及站点范围内的会议、风险、问题动态。</p>
+<h2>附录 A：回归与测试证据（追溯用，非验收结论）</h2>
+<h3>A.1 老功能回归（精准选集 + api 冒烟）</h3>
+<p>精准选集 <code>@project_publish|@outsource|@project_detail|@project_moment|@data_export</code>：<strong>51 通过 / 5 失败</strong>（含 api 冒烟哨兵按预期失败=绿）。5 条失败经本轮 UI 实锤逐条判定，<strong>无一真回归 BUG</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>失败用例</th>
+<th>簇</th>
+<th>判定</th>
+<th>处置（阶段 4）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>v2.3.0 ⑦ 未解决项目问题入口</td>
+<td>@project_moment</td>
+<td>预期规格变更：item4 将仪表盘&quot;未解决项目问题&quot;卡改为&quot;相关项目动态&quot;结果卡 + 我的动态页</td>
+<td>重写 v2.3.0.spec ⑦（指向 /my_board/main/moments）</td>
+</tr>
+<tr>
+<td>v2.3.0 ⑥ 问题动态表单需关注人员</td>
+<td>@project_moment</td>
+<td>预期规格变更：字段标签&quot;需关注人员&quot;→&quot;问题关注人员&quot;</td>
+<td>改 v2.3.0.spec ⑥ 断言&quot;问题关注人员&quot;</td>
+</tr>
+<tr>
+<td>v2.2.6 ③ 项目概况文档位</td>
+<td>@project_detail</td>
+<td>预期规格变更：项目信息由手风琴改为 tab/collapse 结构，旧展开逻辑失效（文档位实际齐全）</td>
+<td>改 v2.2.6.spec ③ 适配新 tab 展开</td>
+</tr>
+<tr>
+<td>v2.2.9 ⑧ 发包挂起/取消</td>
+<td>@outsource</td>
+<td>测试选样问题：挂起按钮仅&quot;制作中&quot;发包显示，实测制作中发包编辑弹窗底部含挂起+取消发包</td>
+<td>改 v2.2.9.spec ⑧ 先筛&quot;制作中&quot;再取样</td>
+</tr>
+<tr>
+<td>v2.3.0 ⑩ Bug类型项目技术</td>
+<td>@data_export</td>
+<td>测试查找问题：item5 重构测试数据看板组件后旧 vm 路径失效（接口 bug_type_list 仍含&quot;项目技术&quot;）</td>
+<td>改 v2.3.0.spec ⑩ 走接口断言</td>
+</tr>
+</tbody>
+</table>
+<p>排查顺序已确认：登录态有效（阶段 0 <code>npm run check</code> code=0）、8888 转发正常、后端 10.67.8.189 可达。</p>
+<p><strong>阶段 4 已就地修复上述 5 条旧 spec（P-07 原则）</strong>，复跑精准选集 <strong>65 passed / 0 failed</strong>（含 api 冲烟哨兵按预期）全绿；新功能用例已沉淀进 <code>v2.3.1.spec.js</code> + <code>api-v2.3.1.spec.js</code>。</p>
+<h3>A.2 接口用例沉淀</h3>
+<p>本轮实锤接口（沉淀进 <code>api-v2.3.1.spec.js</code> / 回填 entry_map）：</p>
+<ul>
+<li><code>project_publish/get_list?...&amp;chengxu_people=&lt;uid&gt;</code>：递交列表新增程序开发人员筛选参数</li>
+<li><code>outsource/get_package_list?...&amp;is_self_made=0|1</code>：模型外包 外包/自制 对称筛选</li>
+<li><code>project/get_project_info?id=N</code> → <code>data.info.plan_income_date</code>：项目预估营收时间（月）</li>
+<li><code>data_export/get_qa_stat_detail_list</code>（chart_key=over_tb）：递交超时明细 + 超时原因</li>
+<li><code>bug/get_bug_const</code> → <code>bug_type_list</code> 含 <code>9:项目技术</code>（回归 ⑩ 佐证）</li>
+</ul>
+<p>跨功能发现按确定性归入 §三 R1（看板超时归期口径）。</p>
+<h3>A.3 验收产生的测试数据</h3>
+<p>本轮验收<strong>全程只读</strong>，未产生新的写入数据（筛选/查看类功能，未做写操作）。引用的既有数据：</p>
+<ul>
+<li>项目「亿滋工厂及仓储孪生项目二期」(SJ202506050003, project_id=6342)：外包发包 27 条、plan_income_date=2026-09</li>
+<li>我的动态既有样本：贵州茅台本部园区综合安防IOC项目 问题动态、现代前瞻UX智能座舱项目二期 风险动态等</li>
+<li>测试数据看板 2026 Q3 超时递交 4 条（厦门-同安区/玉禾田/亿滋 等）</li>
+</ul>
+
+</body></html>

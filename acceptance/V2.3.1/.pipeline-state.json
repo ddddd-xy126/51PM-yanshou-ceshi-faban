@@ -1,34 +1,41 @@
 {
   "version": "V2.3.1",
-  "devNotes": "用户体验:递交模块添加「程序开发」人员筛选条件(供程序侧拉数据);新增功能:①模型外包新增外包筛选条件(与自制一样)②项目概览时间轴新增预计营收时间字段;流程规范:项目动态-我的仪表盘相关项目动态改为结果记录+点击跳转左侧栏【我的动态】(筛选查看所有个人相关动态含会议/风险/问题+可查站点所有动态+支持快速添加项目动态);体验升级重构优化:统计-测试数据看板递交相关列表(卡片/柱状查看递交明细)点「查看超时原因」按钮呈现该项目超时原因",
-  "updatedAt": "2026-08-03",
+  "devNotes": "AI功能:统计-测试数据看板上线AI分析(用户自选补充提示词→AI分析自动填充测试数据看板总结与建议,用户可修改后保存,后续作为QA各统计周期总结依据);新增功能:①模型外包新增外包筛选条件(与自制一样)②项目概览时间轴新增预计营收时间字段;流程规范:项目动态-我的仪表盘相关项目动态改结果记录+点击跳转左侧栏【我的动态】(筛选查看所有个人相关动态含会议/风险/问题+可查站点所有动态+支持快速添加项目动态);体验升级重构优化:①统计-测试数据看板递交相关列表(卡片/柱状查看递交明细)点「查看超时原因」呈现项目超时原因②移动端重构优化(解决历史体验问题+完善移动端交互适配+提升稳定性易用性);用户体验:递交模块添加「程序开发」人员筛选条件(供程序侧拉数据)",
+  "note": "本轮为 V2.3.1 第二次全流程重跑(用户要求):上轮5项已过,本轮dev_notes新增 AI分析功能 + 移动端重构 两项,用户要求7项全部完整重测不遗漏",
+  "updatedAt": "2026-08-07",
   "checklist": [
-    { "name": "递交列表-程序开发人员筛选", "entry": "递交→递交列表 /OPStestList/OPStestList_list 筛选区新增「程序开发」人员筛选", "tables": ["project_publish"] },
-    { "name": "模型外包-外包筛选条件", "entry": "项目→项目详情→模型外包 /project/outsource_project?projectId=N 列表 tab(原全部/内部自制)新增外包筛选", "tables": ["outsource"] },
-    { "name": "项目概览时间轴-预计营收时间", "entry": "项目→项目概况 /project/project_detail?projectId=N 时间轴模块新增预计营收时间字段", "tables": ["project_detail"] },
-    { "name": "项目动态-我的动态(结果记录+跳转)", "entry": "我的地盘→我的仪表盘 相关项目动态卡片(结果记录)→点击跳转左侧栏「我的动态」(筛选会议/风险/问题+站点全部+快速添加)", "tables": ["project_moment"] },
-    { "name": "测试数据看板-查看超时原因", "entry": "统计→测试数据看板 /statistic/bug 递交相关列表(卡片/柱状递交明细)点「查看超时原因」按钮呈现项目超时原因", "tables": ["data_export"] }
+    { "name": "测试数据看板-AI分析(自选提示词→AI填充总结建议→可改保存)", "entry": "统计→测试数据看板 /statistic/bug QA总结与建议区新增AI分析(补充提示词入口+AI生成填充+编辑保存)", "tables": ["data_export"], "isNew": true },
+    { "name": "移动端重构优化", "entry": "移动端 /mobile 各页(重构交互适配/稳定性易用性)", "tables": ["global-mobile"], "isNew": true },
+    { "name": "模型外包-外包筛选条件", "entry": "项目→项目详情→模型外包 /project/outsource_project?projectId=N 列表筛选(全部/外包/内部自制)", "tables": ["outsource"] },
+    { "name": "项目概览时间轴-预计营收时间", "entry": "项目→项目概况 /project/project_detail?projectId=N 时间轴新增预估营收节点", "tables": ["project_detail"] },
+    { "name": "项目动态-我的动态(结果记录+跳转)", "entry": "我的地盘→我的仪表盘 相关项目动态卡片(结果记录)→点击跳转左侧栏「我的动态」/my_board/main/moments(筛选会议/风险/问题+站点全部+快速添加)", "tables": ["project_moment"] },
+    { "name": "测试数据看板-查看超时原因", "entry": "统计→测试数据看板 /statistic/bug 递交相关列表(卡片/柱状递交明细)点「查看超时原因」按钮呈现项目超时原因", "tables": ["data_export"] },
+    { "name": "递交列表-程序开发人员筛选", "entry": "递交→递交列表 /OPStestList/OPStestList_list 筛选区「程序开发」人员筛选", "tables": ["project_publish"] }
   ],
   "pendingSpecUpdates": [],
+  "pendingSpecUpdatesLog": "v2.3.0⑦ 我的动态 hasFilters 断言→已就地加 waitForFunction 等会议/风险/问题计数出现再断言,复跑通过,已清零",
   "stages": {
-    "0": { "status": "passed", "at": "2026-08-03", "note": "npm run check code=0 token有效 后端10.67.8.189" },
-    "1": { "status": "passed", "at": "2026-08-03", "result": "精准回归 @project_publish|@outsource|@project_detail|@project_moment|@data_export 各61过/5败(51passed+哨兵);5败均落本轮验收簇内,性质随阶段2判定;api冲烟哨兵符合预期" },
-    "2": { "status": "passed", "at": "2026-08-03", "result": "5项均✅满足;无功能缺陷;风险R1(看板超时按实际递交时间归期口径,低)", "features": [
-      { "name": "递交列表-程序开发人员筛选", "verdict": "✅满足", "layers": "UI筛选下拉+程序开发列;接口新增chengxu_people参数(龙顺波=79);数据全年119条行值全=龙顺波真过滤", "screenshots": true },
-      { "name": "项目动态-我的动态", "verdict": "✅满足", "layers": "仪表盘相关项目动态改结果卡(14条)点击跳/my_board/main/moments;我的动态筛选全部/会议/风险/问题计数+全部动态(站点)/与我相关(个人)切换+添加动态(会议/风险/问题三tab+所属项目快速添加)+按项目搜索;回归⑦=预期规格变更(未解决项目问题卡→相关项目动态);回归⑥=字段改名需关注人员→问题关注人员", "screenshots": false },
-      { "name": "模型外包-外包筛选条件", "verdict": "✅满足", "layers": "筛选由全部/内部自制增为全部/外包/内部自制;外包=is_self_made=0(27条全外包)与自制=is_self_made=1对称真过滤;回归⑧非BUG=挂起按钮仅制作中发包显示(已验制作中包footer=挂起+取消发包),测试需先筛制作中", "screenshots": false },
-      { "name": "项目概览时间轴-预估营收时间", "verdict": "✅满足", "layers": "时间轴新增预估营收节点2026-09(月精度);接口get_project_info.plan_income_date=2026-09;时间轴值=接口值一致;回归③非BUG=项目信息手风琴改tab/collapse结构旧spec展开失效", "screenshots": false }
+    "0": { "status": "passed", "at": "2026-08-07", "note": "扫码续登(集成浏览器CAS)刷新oauthToken写回state.json;npm run check code=0 token有效;后端10.67.8.189:8888" },
+    "1": { "status": "passed", "at": "2026-08-07", "result": "精准回归 @project_publish|@outsource|@project_detail|@project_moment|@data_export:63过/2跳/1真失败(另6条哨兵test.fail预期失败=绿).2跳=v2.2.6③文档上传硬骨头+v2.2.9⑧发包挂起需制作中样本.1真失败=v2.3.0⑦我的动态(hasFilters会议/风险/问题计数=false),落本轮验收项『项目动态-我的动态』内,性质待阶段2 UI实锤;移动端为全局重构,PC回归簇不覆盖/api冒烟兜底后端契约" },
+    "2": { "status": "passed", "at": "2026-08-07", "result": "7项均✅满足;无功能缺陷;风险R1(看板超时按实际递交时间归期口径,低)", "features": [
+      { "name": "测试数据看板-AI分析", "verdict": "✅满足", "layers": "总结与关注事项区AI分析按钮+补充提示词输入框(可选);点击→AI分析中(读看板数据/抽样致命严重BUG/归纳问题模式/生成草稿~30s)→生成草稿(各角色PM/QA/程序问题+建议/BUG总结分析/BUG改进建议美术程序QA/关注事项2条/推进项2条)全字段可编辑;放弃不写/全部保存→11次POST data_export/add_qa_stat_summary_item按块独立保存;编辑标记【V2.3.1验收-AI测试】硬刷新后仍在=真落库;各块显AI生成徽章+编辑按钮;按统计周期独立(2026-08)", "screenshots": true },
+      { "name": "移动端重构优化", "verdict": "✅满足", "layers": "/mobile重构:首页卡片式(工时确认环形进度/今日已确认0h·8h目标/今日已创建/本月休假/确认今日工时CTA/快捷功能填工时创任务申请递交项目日报帮TA补工时)+底部导航首页/填工时/日报/申请;各页(填工时项目/非项目任务tab+今日开始/已完成筛选+分页;日报真实项目列表;申请递交我的申请/项目排期tab卡片式)渲染正常、tab切换/筛选/分页可交互、适配390px移动视口;返回/清除缓存header统一;广泛重构无法穷举每屏(覆盖4核心页+交互)", "screenshots": true },
+      { "name": "模型外包-外包筛选条件", "verdict": "✅满足", "layers": "筛选全部/外包/内部自制对称;外包→is_self_made=0(9条全外包)/内部自制→is_self_made=1(0条,该项目仅外包)真过滤", "screenshots": true },
+      { "name": "项目概览时间轴-预估营收时间", "verdict": "✅满足", "layers": "时间轴节点预估营收2026-09(工令→实际开工→初版→终版→实际营收→预估营收);基本信息预估营收时间字段;接口plan_income_date=2026-09=显示值一致(月精度)", "screenshots": true },
+      { "name": "项目动态-我的动态", "verdict": "✅满足", "layers": "仪表盘相关项目动态结果卡+左栏我的动态菜单;进页真实点击=全部16/会议7/风险3/问题6筛选计数+全部动态(站点)/与我相关(个人)切换+添加动态(会议/风险/问题三tab+所属项目快速添加+从组群导入)+按项目搜索;回归v2.3.0⑦hasFilters偶发红=计数异步<3s(非真回归,登记pendingSpecUpdates加固等待)", "screenshots": true },
+      { "name": "测试数据看板-查看超时原因", "verdict": "✅满足", "layers": "递交概览超时递交卡可点(2026Q2超时2)→明细—超时递交弹窗(13条,列含计划/实际递交时间/PM/查看超时原因)→点查看超时原因→超时原因弹窗(项目名『中科大苏州校区数字孪生试点SJ202503310002』+原因『1.打包机异常无法上传Nas』)", "screenshots": true },
+      { "name": "递交列表-程序开发人员筛选", "verdict": "✅满足", "layers": "筛选区程序开发下拉(龙顺波/傅闽翌/陈杰/高翔/刘奕铭)+程序开发列;选龙顺波→chengxu_people=79参数;全年范围124条,程序开发列逐行含龙顺波真过滤(默认只筛当天需先设范围)", "screenshots": true }
     ] },
-    "3": { "status": "passed", "at": "2026-08-03", "note": "发版初稿写进报告§四;md2html转html完成" },
-    "4": { "status": "passed", "at": "2026-08-03", "checklist": {
-      "ui-spec": "tests/v2.3.1.spec.js(4用例)+修复v2.2.6③/v2.2.9⑧/v2.3.0⑥⑦⑩;复跑精准选集65 passed/0 failed全绿",
-      "api-spec": "tests/api-v2.3.1.spec.js(6用例:chengxu_people真子集/非法不5xx,is_self_made对称,plan_income_date月精度,bug_type_list含项目技术)",
-      "entry_map": "新5入口行(递交程序开发筛选/模型外包外包筛选/项目概览预估营收/我的动态/测试看板超时原因)+项目信息tab结构纠正",
-      "impact_map": "§A追5行;§B project_publish/outsource/project_detail/project_moment/data_export 5簇各追V2.3.1功能",
-      "playbooks": "新5:递交列表-程序开发筛选/模型外包-外包自制筛选/项目概览-预估营收时间/我的动态/测试数据看板-查看超时原因;README回填",
-      "pendingSpecUpdates": "5处均就地改旧spec并清零(v2.3.0⑥⑦⑩/v2.2.6③/v2.2.9⑧),复跑全绿",
-      "pitfalls": "无新坑(本轮命中P-07重构旧spec/P-09截图headless/P-12固定列取id均既有)"
+    "3": { "status": "passed", "at": "2026-08-07", "note": "发版初稿写进报告§四(按用户dev_notes分类:AI功能/新增功能/流程规范/体验升级重构优化/用户体验,含移动端+AI分析);md2html转html完成" },
+    "4": { "status": "passed", "at": "2026-08-07", "checklist": {
+      "ui-spec": "tests/v2.3.1.spec.js 增2用例(⑤AI分析入口+补充提示词+编辑保存要素静态哨兵@data_export;⑥移动端重构首页/填工时/日报/申请渲染+底部导航@mobile),原4用例仍在;单跑6 passed全绿",
+      "api-spec": "tests/api-v2.3.1.spec.js 增2用例(AI分析总结get_qa_stat_summary契约存在不5xx+非法周期不5xx@data_export),原6在;单跑8 passed全绿",
+      "entry_map": "增2入口行:测试数据看板-AI分析总结(add_qa_stat_summary_item/get_qa_stat_summary,补充提示词+生成+编辑保存+按周期独立)、移动端(重构版/mobile首页填工时日报申请+底部导航);原5行(round1)保留",
+      "impact_map": "§A增2行(测试数据看板-AI分析总结→data_export;移动端重构→全局-mobile复用PC后端);§B data_export簇追AI分析总结",
+      "playbooks": "新2:测试数据看板-AI分析总结.md【写】、移动端-重构版导航.md【只读/写】;README现有条目表回填2行",
+      "pendingSpecUpdates": "v2.3.0⑦我的动态 就地加 waitForFunction 等异步计数(P-07同族=偶发时序非改版),复跑通过已清零",
+      "pitfalls": "无新坑(命中既有:P-07就地改旧spec/P-09 headless截图+移动端截图用mobile视口=headless模式延伸/P-08异步加载时序;AI分析写链路真写透=既有写透规则)"
     } }
   },
-  "history": [ { "at": "2026-08-03", "event": "pipeline-init", "stage": 0 }, { "at": "2026-08-03", "event": "pipeline-complete", "stage": 4, "note": "5项均✅;无缺陷;回归修复后65 passed/0 failed;新spec+回填已沉淀" } ]
+  "history": [ { "at": "2026-08-03", "event": "pipeline-init", "stage": 0 }, { "at": "2026-08-03", "event": "pipeline-complete", "stage": 4, "note": "5项均✅;无缺陷;回归修复后65 passed/0 failed;新spec+回填已沉淀" }, { "at": "2026-08-07", "event": "pipeline-rerun-init", "stage": 0, "note": "第二轮:新增AI分析+移动端重构,7项全部重测;扫码续登完成" }, { "at": "2026-08-07", "event": "pipeline-complete-round2", "stage": 4, "note": "7项均✅满足;无缺陷;风险R1(看板超时归期口径,低);回归67过/2跳/0真失败(v2.3.0⑦修复);新spec(v2.3.1+2/api+2)全绿;entry_map/impact_map/2playbook回填" } ]
 }

@@ -88,4 +88,61 @@ test.describe('V2.3.1 回归', () => {
     expect(dlg, '应弹出「超时原因」弹窗').toBeTruthy();
     expect(dlg.length > 10, '超时原因弹窗应呈现项目与原因内容').toBe(true);
   });
+
+  // AI功能 测试数据看板：AI分析入口 + 补充提示词输入框 + 各总结块可编辑保存（V2.3.1 二轮新增）
+  test('⑤ 测试数据看板：AI分析入口 + 补充提示词 + 总结块编辑保存要素 @data_export', async ({ page }) => {
+    await page.goto('/statistic/bug');
+    await page.waitForTimeout(6000);
+    await h.dismissAnnouncement(page);
+    const ui = await page.evaluate(() => {
+      const t = document.body.innerText;
+      return {
+        hasAIBtn: [...document.querySelectorAll('button')].some((b) => b.innerText.trim() === 'AI分析'),
+        hasSection: t.includes('总结与关注事项'),
+        hasEditBtn: [...document.querySelectorAll('button')].some((b) => b.innerText.trim() === '编辑'),
+        // AI 生成过内容则显「AI生成」徽章（本环境 2026-08 已保存过）
+        hasAIBadge: t.includes('AI生成'),
+      };
+    });
+    expect(ui.hasSection, '应有「总结与关注事项」区').toBe(true);
+    expect(ui.hasAIBtn, '应有「AI分析」按钮').toBe(true);
+    expect(ui.hasEditBtn, '各总结块应有「编辑」按钮（可修改保存）').toBe(true);
+    // 补充自定义提示词输入框 + 生成→编辑→保存→落库 完整流程已在 UI 验收实锤（报告 §1）；
+    // 提示词框仅在点 AI分析 后的面板短暂可见、分析很快接管，headless 时序不稳，故哨兵只守静态入口。
+  });
+
+  // 体验升级 移动端重构：核心页渲染 + 底部导航路由（V2.3.1 二轮新增）
+  test('⑥ 移动端重构：首页/填工时/日报/申请渲染 + 底部导航 @mobile', async ({ browser }) => {
+    const ctx = await browser.newContext({
+      storageState: 'auth/state.json',
+      viewport: { width: 390, height: 844 },
+      isMobile: true,
+      hasTouch: true,
+    });
+    const page = await ctx.newPage();
+    await page.goto('/mobile');
+    await page.waitForTimeout(5500);
+    const home = await page.evaluate(() => {
+      const t = document.body.innerText;
+      return {
+        landedHome: location.pathname.includes('/mobile'),
+        hasGreeting: /早上好|下午好|晚上好|你好/.test(t),
+        hasQuick: t.includes('快捷功能'),
+        navLinks: [...document.querySelectorAll('nav a, nav [href], .van-tabbar-item')].map((e) => e.textContent.trim()).filter(Boolean),
+      };
+    });
+    expect(home.landedHome, '应落在移动端页面').toBe(true);
+    expect(home.hasQuick, '移动端首页应有「快捷功能」').toBe(true);
+    // 逐页渲染（填工时/日报/申请）
+    const pages = {};
+    for (const [name, url] of [['填工时', '/mobile/createEstimate'], ['日报', '/mobile/projectDaily'], ['申请', '/mobile/tb_publish']]) {
+      await page.goto('http://10.67.8.183:7777' + url);
+      await page.waitForTimeout(4000);
+      pages[name] = await page.evaluate(() => ({ path: location.pathname, len: document.body.innerText.replace(/\s/g, '').length }));
+    }
+    expect(pages['填工时'].path.includes('createEstimate') && pages['填工时'].len > 20, '填工时页应渲染').toBe(true);
+    expect(pages['日报'].path.includes('projectDaily') && pages['日报'].len > 20, '日报页应渲染').toBe(true);
+    expect(pages['申请'].path.includes('tb_publish') && pages['申请'].len > 20, '申请页应渲染').toBe(true);
+    await ctx.close();
+  });
 });

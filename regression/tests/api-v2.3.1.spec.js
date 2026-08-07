@@ -71,4 +71,19 @@ test.describe('V2.3.1 接口回归', () => {
     const types = j.data && j.data.bug_type_list ? Object.values(j.data.bug_type_list) : [];
     expect(types.includes('项目技术')).toBe(true);
   });
+
+  // AI功能 测试数据看板 AI分析总结：get_qa_stat_summary 只读契约（AI生成/编辑结果按周期存取，二轮新增）
+  test('AI分析总结：get_qa_stat_summary 契约存在且不 5xx @data_export', async ({ request }) => {
+    // 参数口径未逐一固定（读接口按周期取存/AI 结果），此处验契约可达、后端优雅返码而非 5xx
+    const r = await request.get('/manage_api/data_export/get_qa_stat_summary?type=month&date=2026-08', { headers });
+    expect(r.status()).toBeLessThan(500);
+    const j = await r.json();
+    expect(typeof j.code).toBe('number');
+    // 保存写接口 add_qa_stat_summary_item 由 UI 验收实锤（生成→编辑→保存→硬刷新落库），不每轮真写
+  });
+
+  test('AI分析总结：非法周期参数不 5xx @data_export', async ({ request }) => {
+    const r = await request.get('/manage_api/data_export/get_qa_stat_summary?type=abc&date=xxxx', { headers });
+    expect(r.status()).toBeLessThan(500);
+  });
 });

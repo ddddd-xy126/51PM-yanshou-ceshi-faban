@@ -82,6 +82,8 @@
 | 项目概览时间轴-预估营收（V2.3.1）| `project_detail`（时间轴新增预估营收节点，get_project_info.info.plan_income_date） |
 | 我的动态-个人动态集中管理（V2.3.1）| `project_moment`（我的仪表盘相关项目动态结果卡→/my_board/main/moments，get_list module=meet/risk/problem 全站/与我相关） |
 | 测试数据看板-查看超时原因（V2.3.1）| `data_export`（递交超时明细 get_qa_stat_detail_list + 超时原因展示）             |
+| 测试数据看板-AI分析总结（V2.3.1）| `data_export`（add_qa_stat_summary_item 保存 + get_qa_stat_summary 回读，AI 生成总结与建议按周期独立）|
+| 移动端重构（V2.3.1）      | 全局-移动端 `/mobile`（首页/填工时/日报/申请递交等重构，**复用既有 PC 后端接口**，无新共享后端表/接口）|
 
 ---
 
@@ -133,7 +135,7 @@
 
 ### `data_export`（统计看板取数）
 
-产能数据看板 · 项目人员看板 · 测试数据看板（V2.3.0-pre）· BUG类型枚举（V2.3.0：bug/get_bug_const）· 测试数据看板-查看超时原因（V2.3.1）
+产能数据看板 · 项目人员看板 · 测试数据看板（V2.3.0-pre）· BUG类型枚举（V2.3.0：bug/get_bug_const）· 测试数据看板-查看超时原因（V2.3.1）· 测试数据看板-AI分析总结（V2.3.1：add_qa_stat_summary_item/get_qa_stat_summary）
 
 > 共用 data_export 取数层，维度/日期/部门参数的边界兼底逻辑共享。⚠️测试数据看板（/statistic/bug）走 get_qa_stat_{kpi,bug,publish,summary,detail_list}；BUG明细的添加/类型枚举走 bug/get_bug_const（bug_type_list 含 V2.3.0 新增「项目技术」）+ bug/get_list；添加Bug 门禁 isCanAddBug。
 

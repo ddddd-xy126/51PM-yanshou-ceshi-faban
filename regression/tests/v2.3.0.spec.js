@@ -166,6 +166,11 @@ test.describe('V2.3.0 回归', () => {
     await page.waitForTimeout(3000);
     if (!page.url().includes('moments')) { await page.goto('/my_board/main/moments'); await page.waitForTimeout(3000); }
     await h.dismissAnnouncement(page);
+    // 会议/风险/问题计数为异步加载，等其出现再断言（V2.3.1 二轮：仅 waitForTimeout 3s 偶发未就绪误红）
+    await page.waitForFunction(() => {
+      const t = document.body.innerText;
+      return /会议\s*\d/.test(t) && /风险\s*\d/.test(t) && /问题\s*\d/.test(t);
+    }, { timeout: 15000 }).catch(() => {});
     const moments = await page.evaluate(() => {
       const t = document.body.innerText;
       return {

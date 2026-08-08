@@ -145,4 +145,40 @@ test.describe('V2.3.1 回归', () => {
     expect(pages['申请'].path.includes('tb_publish') && pages['申请'].len > 20, '申请页应渲染').toBe(true);
     await ctx.close();
   });
+
+  // 补充验收（2026-08-08）统计-项目动态看板：入口+双tab+筛选+图表 静态要素 + 动态类型切换携 module 参数
+  test('⑦ 项目动态看板：全景要素 + 动态类型切换携 module @project_moment', async ({ page }) => {
+    await page.goto('/statistic/project_risk_panel');
+    await page.waitForTimeout(5000);
+    await h.dismissAnnouncement(page);
+    const ui = await page.evaluate(() => {
+      const t = document.body.innerText;
+      const radioTexts = [...document.querySelectorAll('.el-radio-button__inner')].map((e) => e.innerText.trim());
+      return {
+        hasTitle: t.includes('项目动态看板'),
+        hasDetailTab: [...document.querySelectorAll('button,[role=tab]')].some((b) => b.innerText.trim() === '动态明细'),
+        periods: ['天', '周', '月', '季度', '半年', '年'].every((p) => radioTexts.includes(p)),
+        dynTypes: ['全部', '会议', '风险', '问题'].every((p) => radioTexts.includes(p)),
+        hasLatest: t.includes('最新动态') && t.includes('本期新增风险') && t.includes('本期新增问题') && t.includes('本期新增会议'),
+        hasMore: [...document.querySelectorAll('button')].some((b) => b.innerText.includes('更多筛选')),
+        charts: document.querySelectorAll('[_echarts_instance_]').length,
+      };
+    });
+    expect(ui.hasTitle, '应有「项目动态看板」标题').toBe(true);
+    expect(ui.hasDetailTab, '应有「动态明细」tab').toBe(true);
+    expect(ui.periods, '统计周期应含 天/周/月/季度/半年/年').toBe(true);
+    expect(ui.dynTypes, '动态类型应含 全部/会议/风险/问题').toBe(true);
+    expect(ui.hasLatest, '应有最新动态三卡（风险/问题/会议）').toBe(true);
+    expect(ui.hasMore, '应有「更多筛选」').toBe(true);
+    expect(ui.charts, '应渲染多个 ECharts 维度图表').toBeGreaterThan(4);
+    // 交互：切动态类型=问题 → 聚合请求携 module=problem
+    const reqs = [];
+    page.on('request', (q) => { if (/get_project_moment_stat/.test(q.url())) reqs.push(q.url()); });
+    await page.evaluate(() => {
+      const gs = [...document.querySelectorAll('.el-radio-group')];
+      for (const g of gs) { const txt = g.innerText.replace(/\s/g, ''); if (txt.includes('会议') && txt.includes('问题')) { for (const b of g.querySelectorAll('.el-radio-button')) { if (b.innerText.trim() === '问题') { b.querySelector('.el-radio-button__inner').click(); return; } } } }
+    });
+    await page.waitForTimeout(2500);
+    expect(reqs.some((u) => /module=problem/.test(u)), '切动态类型=问题应携 module=problem 请求').toBe(true);
+  });
 });

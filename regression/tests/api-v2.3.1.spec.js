@@ -86,4 +86,44 @@ test.describe('V2.3.1 接口回归', () => {
     const r = await request.get('/manage_api/data_export/get_qa_stat_summary?type=abc&date=xxxx', { headers });
     expect(r.status()).toBeLessThan(500);
   });
+
+  // 补充验收（2026-08-08）项目动态看板：get_project_moment_stat 聚合 + 跨模块与 project_moment 源头对账
+  test('项目动态看板：get_project_moment_stat 年聚合内部自洽 + 与 project_moment 源头逐项一致 @project_moment', async ({ request }) => {
+    const stat = await (await request.get('/manage_api/data_export/get_project_moment_stat?period_type=year&period_key=2026&module=all', { headers })).json();
+    expect(stat.code).toBe(0);
+    const d = stat.data;
+    expect(d.period.period_key).toBe('2026');
+    // 源头 project_moment/get_list 按创建时间落在 2026 分组自算，与看板逐模块对账
+    for (const mod of ['risk', 'problem', 'meet']) {
+      const src = await (await request.get(`/manage_api/project_moment/get_list?page=1&limit=9999&module=${mod}`, { headers })).json();
+      const rows = listOf(src.data).filter((x) => x.create_time >= '2026-01-01' && x.create_time <= '2026-12-31 23:59:59');
+      expect(d.summary[mod].value, `看板 ${mod} 年计数应=源头 project_moment 年内计数`).toBe(rows.length);
+      // 卡片 breakdown 分组加总 = 总值（内部自洽）
+      const bkSum = (d.summary[mod].breakdown || []).reduce((s, b) => s + b.count, 0);
+      expect(bkSum).toBe(d.summary[mod].value);
+    }
+    // 风险类型×等级图 每类 high+medium+low 之和 = 该类源头数量
+    const typeLevelSum = (d.risk.type_level_list || []).reduce((s, t) => s + t.high_num + t.medium_num + t.low_num, 0);
+    expect(typeLevelSum).toBe(d.summary.risk.value);
+  });
+
+  test('项目动态看板：动态明细 get_project_moment_stat_list 各 module 加总 = 全部 @project_moment', async ({ request }) => {
+    const q = 'period_type=year&period_key=2026&page=1&limit=20';
+    const totalOf = async (mod) => {
+      const j = await (await request.get(`/manage_api/data_export/get_project_moment_stat_list?${q}&module=${mod}`, { headers })).json();
+      return j.data?.total ?? 0;
+    };
+    const all = await totalOf('all');
+    const risk = await totalOf('risk');
+    const problem = await totalOf('problem');
+    const meet = await totalOf('meet');
+    expect(all).toBe(risk + problem + meet);
+  });
+
+  test('项目动态看板：非法 period_type / module 不 5xx @project_moment', async ({ request }) => {
+    const r1 = await request.get('/manage_api/data_export/get_project_moment_stat?period_type=abc&period_key=xxxx&module=zzz', { headers });
+    expect(r1.status()).toBeLessThan(500);
+    const r2 = await request.get('/manage_api/data_export/get_project_moment_stat_list?period_type=year&period_key=2026&module=zzz&page=1&limit=20', { headers });
+    expect(r2.status()).toBeLessThan(500);
+  });
 });

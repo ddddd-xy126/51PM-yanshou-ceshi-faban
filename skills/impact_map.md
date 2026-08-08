@@ -84,6 +84,7 @@
 | 测试数据看板-查看超时原因（V2.3.1）| `data_export`（递交超时明细 get_qa_stat_detail_list + 超时原因展示）             |
 | 测试数据看板-AI分析总结（V2.3.1）| `data_export`（add_qa_stat_summary_item 保存 + get_qa_stat_summary 回读，AI 生成总结与建议按周期独立）|
 | 移动端重构（V2.3.1）      | 全局-移动端 `/mobile`（首页/填工时/日报/申请递交等重构，**复用既有 PC 后端接口**，无新共享后端表/接口）|
+| 项目动态看板（V2.3.1 补充）| `project_moment`（统计-项目动态看板 /statistic/project_risk_panel，会议/风险/问题全景聚合 get_project_moment_stat + 明细 get_project_moment_stat_list，module=all/meet/risk/problem，按创建时间落期分组）|
 
 ---
 
@@ -99,9 +100,9 @@
 
 ### `project_moment`（项目动态）
 
-会议动态待办负责人 · 项目动态 · 问题动态 · 我的动态-个人动态集中管理（V2.3.1）
+会议动态待办负责人 · 项目动态 · 问题动态 · 我的动态-个人动态集中管理（V2.3.1）· 项目动态看板（V2.3.1 补充）
 
-> module 字段区分 meet/risk/problem；risk_level 被复用为「影响程度」，status 复用为「解决状态」。新增一种 module 要回归其它 module 的列表/筛选不串。⚠️V2.3.0：项目问题（module=problem）完成闭环重构——创建/筛选/编辑/删除/快捷处理＋需关注人员在「我的地盘-未解决项目问题」集中展示（我的仓盘卡片→「与我相关的项目问题」弹窗）；V2.2.9 遗留的问题卡片按钮禁用/无法闭环缺陷已修复。造数助手 `ensureProblemMoment`。
+> module 字段区分 meet/risk/problem；risk_level 被复用为「影响程度」（风险存「高/中/低风险」全词、问题存「高/中/低」），status 复用为「解决状态」。新增一种 module 要回归其它 module 的列表/筛选不串。⚠️V2.3.0：项目问题（module=problem）完成闭环重构——创建/筛选/编辑/删除/快捷处理＋需关注人员在「我的地盘-未解决项目问题」集中展示（我的仓盘卡片→「与我相关的项目问题」弹窗）；V2.2.9 遗留的问题卡片按钮禁用/无法闭环缺陷已修复。造数助手 `ensureProblemMoment`。⚠️V2.3.1 补充：新增**项目动态看板**（统计-纯读聚合看板，不写 project_moment）——看板数字取 project_moment 按创建时间落入统计周期分组统计，改 project_moment 的 module/risk_level/type 枚举会直接波及看板卡片/图表分组（已验证跨模块对账逐项一致）。
 
 ### `demand`（需求）
 

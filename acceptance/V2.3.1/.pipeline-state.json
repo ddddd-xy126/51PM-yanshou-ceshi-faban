@@ -10,7 +10,8 @@
     { "name": "项目概览时间轴-预计营收时间", "entry": "项目→项目概况 /project/project_detail?projectId=N 时间轴新增预估营收节点", "tables": ["project_detail"] },
     { "name": "项目动态-我的动态(结果记录+跳转)", "entry": "我的地盘→我的仪表盘 相关项目动态卡片(结果记录)→点击跳转左侧栏「我的动态」/my_board/main/moments(筛选会议/风险/问题+站点全部+快速添加)", "tables": ["project_moment"] },
     { "name": "测试数据看板-查看超时原因", "entry": "统计→测试数据看板 /statistic/bug 递交相关列表(卡片/柱状递交明细)点「查看超时原因」按钮呈现项目超时原因", "tables": ["data_export"] },
-    { "name": "递交列表-程序开发人员筛选", "entry": "递交→递交列表 /OPStestList/OPStestList_list 筛选区「程序开发」人员筛选", "tables": ["project_publish"] }
+    { "name": "递交列表-程序开发人员筛选", "entry": "递交→递交列表 /OPStestList/OPStestList_list 筛选区「程序开发」人员筛选", "tables": ["project_publish"] },
+    { "name": "统计-项目动态看板(补充验收)", "entry": "统计→项目动态看板 /statistic/project_risk_panel 双tab(看板/动态明细);卡片图表下钻+统计周期/动态类型/更多筛选", "tables": ["project_moment"], "isNew": true, "supplement": "2026-08-08" }
   ],
   "pendingSpecUpdates": [],
   "pendingSpecUpdatesLog": "v2.3.0⑦ 我的动态 hasFilters 断言→已就地加 waitForFunction 等会议/风险/问题计数出现再断言,复跑通过,已清零",
@@ -37,5 +38,5 @@
       "pitfalls": "无新坑(命中既有:P-07就地改旧spec/P-09 headless截图+移动端截图用mobile视口=headless模式延伸/P-08异步加载时序;AI分析写链路真写透=既有写透规则)"
     } }
   },
-  "history": [ { "at": "2026-08-03", "event": "pipeline-init", "stage": 0 }, { "at": "2026-08-03", "event": "pipeline-complete", "stage": 4, "note": "5项均✅;无缺陷;回归修复后65 passed/0 failed;新spec+回填已沉淀" }, { "at": "2026-08-07", "event": "pipeline-rerun-init", "stage": 0, "note": "第二轮:新增AI分析+移动端重构,7项全部重测;扫码续登完成" }, { "at": "2026-08-07", "event": "pipeline-complete-round2", "stage": 4, "note": "7项均✅满足;无缺陷;风险R1(看板超时归期口径,低);回归67过/2跳/0真失败(v2.3.0⑦修复);新spec(v2.3.1+2/api+2)全绿;entry_map/impact_map/2playbook回填" } ]
+  "history": [ { "at": "2026-08-03", "event": "pipeline-init", "stage": 0 }, { "at": "2026-08-03", "event": "pipeline-complete", "stage": 4, "note": "5项均✅;无缺陷;回归修复后65 passed/0 failed;新spec+回填已沉淀" }, { "at": "2026-08-07", "event": "pipeline-rerun-init", "stage": 0, "note": "第二轮:新增AI分析+移动端重构,7项全部重测;扫码续登完成" }, { "at": "2026-08-07", "event": "pipeline-complete-round2", "stage": 4, "note": "7项均✅满足;无缺陷;风险R1(看板超时归期口径,低);回归67过/2跳/0真失败(v2.3.0⑧修复);新spec(v2.3.1+2/api+2)全绿;entry_map/impact_map/2playbook回填" }, { "at": "2026-08-08", "event": "supplement-project-moment-panel", "stage": 4, "note": "补充验收统计-项目动态看板(用户要求全流程免回归):✅满足/无缺陷/无新风险。交互(周期6档/动态类型/更多筛选PM pm_id/卡片下钻/图表柱段下钻/动态明细tab)全通;跨模块对账 project_moment/get_list 源头逐项一致(周W32+年2026×风险/问题/会议×类型/等级/创建人/部门);接口 get_project_moment_stat + get_project_moment_stat_list;新spec v2.3.1⑧+api项目动态看板3例全绿;entry_map/impact_map/playbook回填;3定妆图headless+storageState" }, { "at": "2026-08-08", "event": "supplement-drilldown-exhaustive-click", "stage": 4, "note": "应用户要求补充:全部8个可点击图表(风险类型×等级/PM创建风险×等级/PM创建风险×风险类型/问题类型×影响程度/发起人创建问题×影响程度/部门创建问题×类型/会议类型分布/PM创建会议×类型)+3张动态卡片(本期新增风险/问题/会议)逐一点击验证下钻,弹窗条数与图表段值/卡片摘要/源头project_moment分组三方比对零差异(如:场景美术高风险4/李赵波高风险4/曾豪场景美术3/资源不足高1/万兴碧高1/Web端开发资料问题2/项目融通会201/张小杰项目融通会45);技术难点:echarts实例不可从window访问,改用canvas getImageData像素扫描定位柱段边界后点击,已写入playbook;报告§8下钻证据+未覆盖盲区声明已更新,html已重新生成" } ]
 }

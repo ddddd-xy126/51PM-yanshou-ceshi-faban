@@ -2,4 +2,6 @@ node_modules/
 regression/auth/state.json
 regression/playwright-report/
 regression/test-results/
+skills/feedback-analyzer/scripts/.env
+skills/feedback-analyzer/scripts/.pending-feedback.json
 .DS_Store

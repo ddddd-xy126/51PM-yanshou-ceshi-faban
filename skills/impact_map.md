@@ -85,6 +85,8 @@
 | 测试数据看板-AI分析总结（V2.3.1）| `data_export`（add_qa_stat_summary_item 保存 + get_qa_stat_summary 回读，AI 生成总结与建议按周期独立）|
 | 移动端重构（V2.3.1）      | 全局-移动端 `/mobile`（首页/填工时/日报/申请递交等重构，**复用既有 PC 后端接口**，无新共享后端表/接口）|
 | 项目动态看板（V2.3.1 补充）| `project_moment`（统计-项目动态看板 /statistic/project_risk_panel，会议/风险/问题全景聚合 get_project_moment_stat + 明细 get_project_moment_stat_list，module=all/meet/risk/problem，按创建时间落期分组）|
+| 我的工作台-51PM Agent配置（V2.3.1 补充）| `ai_api_key`（get_ai_api_key_list 个人配置 AI 大模型 API Key + 默认模型，供全站 AI 能力调用）|
+| 产能数据看板-AI产能诊断（V2.3.1 补充）| `data_export`（复用构能面板 get_dept_capacity_panel/get_employee_project_list 生成分析）、`ai_history`（get_ai_history_list?intent=dept_capacity_ai_analysis 历史问答）、`ai_api_key`（依赖已配置生效的 AI Key）|
 
 ---
 
@@ -136,9 +138,9 @@
 
 ### `data_export`（统计看板取数）
 
-产能数据看板 · 项目人员看板 · 测试数据看板（V2.3.0-pre）· BUG类型枚举（V2.3.0：bug/get_bug_const）· 测试数据看板-查看超时原因（V2.3.1）· 测试数据看板-AI分析总结（V2.3.1：add_qa_stat_summary_item/get_qa_stat_summary）
+产能数据看板 · 项目人员看板 · 测试数据看板（V2.3.0-pre）· BUG类型枚举（V2.3.0：bug/get_bug_const）· 测试数据看板-查看超时原因（V2.3.1）· 测试数据看板-AI分析总结（V2.3.1：add_qa_stat_summary_item/get_qa_stat_summary）· 产能数据看板-AI产能诊断（V2.3.1 补充：复用 get_dept_capacity_panel/get_employee_project_list）
 
-> 共用 data_export 取数层，维度/日期/部门参数的边界兼底逻辑共享。⚠️测试数据看板（/statistic/bug）走 get_qa_stat_{kpi,bug,publish,summary,detail_list}；BUG明细的添加/类型枚举走 bug/get_bug_const（bug_type_list 含 V2.3.0 新增「项目技术」）+ bug/get_list；添加Bug 门禁 isCanAddBug。
+> 共用 data_export 取数层，维度/日期/部门参数的边界兼底逻辑共享。⚠️测试数据看板（/statistic/bug）走 get_qa_stat_{kpi,bug,publish,summary,detail_list}；BUG明细的添加/类型枚举走 bug/get_bug_const（bug_type_list 含 V2.3.0 新增「项目技术」）+ bug/get_list；添加Bug 门禁 isCanAddBug。⚠️V2.3.1 补充：产能数据看板新增 AI 产能诊断不引入新取数接口，直接复用已加载的部门产能面板/人员明细数据做 AI 归因，改这两个接口的字段结构会同时波及 AI 诊断的输入数据准确性；另新引入 `ai_api_key`（个人 AI Key 配置，/ai_api_key_config）+ `ai_history`（intent 区分的通用 AI 问答历史命名空间，后续其他 AI 功能若复用同套 ai_history 可换不同 intent 接入）。
 
 ### `estimate`（工时/导出）
 

@@ -1,0 +1,40 @@
+{
+  "version": "V2.3.2-pre-项目概览新",
+  "devNotes": "深度验收【项目概览（新）】/project/project_overview_new：7个子页签(项目概况/价值与成果/需求与成本/质量/递交/人员/风险与执行问题)的聚合展示、数值计算准确性、跨模块数据照应、接口边界。测试项目：#6651 玉禾田集团深圳光明&兰州城关智慧城市环保项目(进行中)、#6653 重庆医科大学附属第二医院安消一体化数字孪生大屏应用项目(已结项)。",
+  "updatedAt": "2026-08-14",
+  "checklist": [
+    { "name": "① 项目概况子页(信息/基本信息/团队/工时成本明细/动态/公告聚合)", "entry": "项目→项目概览(新)→项目概况 /project/project_overview_new", "tables": ["project_detail:get_project_info", "project:count_project_price", "project_moment"] },
+    { "name": "② 价值与成果(项目价值清单示例/项目展厅/功能展厅)", "entry": "项目概览(新)→价值与成果", "tables": ["project_display", "function:get_list_by_project_id"] },
+    { "name": "③ 需求与成本(标准成本总览/需求性质分布/蔓延分析/模块分布/工时成本分析)", "entry": "项目概览(新)→需求与成本", "tables": ["project_overview:get_req_cost", "demand", "estimate", "project:count_project_price"] },
+    { "name": "④ 质量(质量总览/反馈验收状态分布/反馈分布/BUG总览)", "entry": "项目概览(新)→质量", "tables": ["project_overview:get_quality", "bug/data_export", "produce_demand/outsource_feedback"] },
+    { "name": "⑤ 递交(递交总览与图表)", "entry": "项目概览(新)→递交", "tables": ["project_overview:get_deliver", "project_publish"] },
+    { "name": "⑥ 人员(团队工时/产出分布)", "entry": "项目概览(新)→人员", "tables": ["project_overview:get_member?", "estimate", "user_group"] },
+    { "name": "⑦ 风险与执行问题(风险/问题动态)", "entry": "项目概览(新)→风险与执行问题", "tables": ["project_overview:get_risk?", "project_moment"] }
+  ],
+  "pendingSpecUpdates": [],
+  "stages": {
+    "0": { "status": "passed", "at": "2026-08-14", "note": "npm run check 通过(后端 .189)；已通读 pitfalls-ledger；token 已续登改写 state.json" },
+    "1": { "status": "skipped-by-user", "note": "用户明确指示本轮跳过回归，直接进阶段2深度验收；清单已落盘" },
+    "2": { "status": "passed", "result": "7子页全验+双项目跨模块对账+接口边界；缺陷2(B1严重成本预警工时口径错/B2一般质量反馈不自洽)+风险7", "features": [
+      { "name": "项目概况", "verdict": "🟡", "layers": "ui+边界+接口+数据", "screenshots": true, "note": "KPI/时间轴/聚合全对；成本预警卡工时错=B1" },
+      { "name": "价值与成果", "verdict": "🟡", "layers": "ui+接口+数据", "screenshots": true, "note": "项目价值清单硬编码示例无落库=R3；展厅真实" },
+      { "name": "需求与成本", "verdict": "✅", "layers": "ui+边界+接口+数据", "screenshots": true, "note": "需求人天/蔓延/超支率全部复算正确" },
+      { "name": "质量", "verdict": "🟡", "layers": "ui+边界+接口+数据", "screenshots": true, "note": "BUG对上；6651反馈总数1vs状态0=B2；反馈源口径=R1" },
+      { "name": "递交", "verdict": "✅", "layers": "ui+边界+接口+数据", "screenshots": true, "note": "递交次数/各率内部自洽且对源头；时间轴口径差异=R6" },
+      { "name": "人员", "verdict": "🟡", "layers": "ui+边界+接口+数据", "screenshots": true, "note": "明细表完整；产出工时占比列全—=R5" },
+      { "name": "风险与执行问题", "verdict": "✅", "layers": "ui+边界+接口+数据", "screenshots": false, "note": "风险/问题与project_moment一致" }
+    ] },
+    "3": { "status": "skipped", "note": "功能未达发版标准(严重缺陷B1+多项示例/待定)，pre-验收不产出发版初稿" },
+    "4": { "status": "not-started", "checklist": { "ui-spec": null, "api-spec": null, "entry_map": null, "impact_map": null, "playbooks": null, "pendingSpecUpdates": null, "pitfalls": null } }
+  },
+  "defects": [
+    { "id": "B1", "sev": "严重", "desc": "概况成本预警卡实际花费/产出工时严重偏小(6653 84.5h vs 真值1387h/6651 201.5h vs 1151h)，超支项目误判结余，与需求与成本子页矛盾" },
+    { "id": "B2", "sev": "一般", "desc": "质量页6651项目反馈总数1但反馈验收状态分布合计0，同页不自洽" }
+  ],
+  "history": [
+    { "at": "2026-08-14", "event": "stage-passed", "stage": 0 },
+    { "at": "2026-08-14", "event": "checklist-persisted", "stage": 1 },
+    { "at": "2026-08-14", "event": "stage1-skipped-by-user", "stage": 1 },
+    { "at": "2026-08-14", "event": "stage-passed", "stage": 2, "note": "报告+fix-handoff+html+10定妆图" }
+  ]
+}

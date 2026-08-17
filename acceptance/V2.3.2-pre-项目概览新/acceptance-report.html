@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>51PM V2.3.2-pre 项目概览（新）验收报告</title>
+<style>
+:root{color-scheme:light}
+body{margin:0 auto;max-width:920px;padding:40px 48px;font-family:-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;color:#1a1a1a;line-height:1.7;background:#fdfdfd}
+h1{font-size:1.9em;border-bottom:3px solid #4a7;padding-bottom:.3em}
+h2{font-size:1.45em;border-bottom:1px solid #ddd;padding-bottom:.25em;margin-top:1.8em}
+h3{font-size:1.2em;margin-top:1.5em;color:#2a6}
+h4{font-size:1.05em;color:#444}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:.94em}
+th,td{border:1px solid #d0d7de;padding:7px 10px;text-align:left;vertical-align:top}
+th{background:#f0f6f2}
+tr:nth-child(even){background:#fafbfa}
+code{background:#f2f4f2;padding:1px 5px;border-radius:4px;font-size:.9em;font-family:Consolas,Monaco,monospace}
+pre{background:#f6f8fa;padding:12px 14px;border-radius:6px;overflow:auto}
+pre code{background:none;padding:0}
+blockquote{border-left:4px solid #9c9;background:#f6faf7;margin:1em 0;padding:.6em 1em;color:#444}
+hr{border:none;border-top:1px solid #e0e0e0;margin:1.5em 0}
+a{color:#268}
+ul,ol{padding-left:1.6em}
+li{margin:.2em 0}
+img{max-width:100%}
+</style></head>
+<body>
+<h1>51PM V2.3.2-pre-项目概览新 验收报告</h1>
+<ul>
+<li>验收时间：2026-08-14</li>
+<li>环境：测试 10.67.8.183:7777（后端 10.67.8.189:8888）</li>
+<li>验收账号角色：邓欣羽（超管视角）</li>
+<li>被验功能：<strong>【项目概览（新）】</strong> <code>/project/project_overview_new</code>（项目详情二级菜单第 3 项），含 7 个子页签：项目概况 / 价值与成果 / 需求与成本 / 质量 / 递交 / 人员 / 风险与执行问题</li>
+<li>测试项目：<strong>#6651 玉禾田集团深圳光明&amp;兰州城关智慧城市环保项目</strong>（SJ202603180001，进行中，PM 张小杰）、<strong>#6653 重庆医科大学附属第二医院安消一体化数字孪生大屏应用项目</strong>（SJ202601200002，已结项/已营收，PM 李赵波）</li>
+<li><strong>下文简称：「玉禾田（#6651）」= 深圳光明&amp;兰州城关环保项目（进行中）；「医科大（#6653）」= 重庆医科大附二院项目（已结项）</strong></li>
+<li><strong>验收结论：核心聚合与数值大面积正确，但发现 1 个严重缺陷（成本预警工时口径错误、结论方向反了）+ 1 个一般缺陷（质量反馈总数与状态分布不自洽）；另有 7 项风险/待确认（多为「示例数据/口径待定/未实现」，且页面已自行标注）。</strong></li>
+<li>老功能回归：本轮经用户明确指示<strong>跳过回归</strong>，直接深度验收本功能。</li>
+</ul>
+<blockquote>
+<p>阅读顺序：先看「一、逐子页验收详情」判断达标与否 → 「二、缺陷」「三、风险」是待处理项 → 附录为跨模块对账证据（追溯用）。</p>
+</blockquote>
+<h2>0. 原始验收需求</h2>
+<blockquote>
+<p>现在需要你对【项目概览（新）】进行深度！！！的测试验收，注意需要与其他模块进行数据的对应，需要模块与模块之间数据照应，数值计算的准确性、接口等等都需要覆盖到，使用玉禾田集团深圳光明&amp;兰州城关智慧城市环保项目和重庆医科大进行测试。</p>
+</blockquote>
+<p>对应关系：需求是对单一功能【项目概览（新）】的深度验收 → 拆为 7 个子页签逐一验收（§1~§7）+ 跨模块数据对账（附录 A）+ 接口边界（附录 B）。</p>
+<h2>一、逐子页验收详情</h2>
+<h3>1. 项目概况（顶部 KPI + 里程碑时间轴 + 成本预警 + 信息/工时/动态/公告聚合）— 🟡 部分满足</h3>
+<ul>
+<li>入口：项目概览（新）默认子页。</li>
+<li>结论：顶部 6 张 KPI（项目总成本 / 工程总成本 / 需求总数 / 项目 BUG 数量 / 递交次数 / 项目动态）、里程碑时间轴、项目信息/基本信息/团队/工时明细/成本明细/项目动态/项目公告聚合<strong>全部与源头一致</strong>（见附录 A）；<strong>唯「成本预警」双口径卡片工时数值严重错误 → B1</strong>。</li>
+<li>验证证据：
+<ul>
+<li>UI ✅ KPI、时间轴（开工令→实际开工→初/终版递交→预估营收→实际营收）、手风琴（项目信息 17/20、基本信息 9/9、团队）、工时/成本明细、动态列表均正常渲染。</li>
+<li>边界 ✅ 已结项项目（医科大#6653）与进行中项目（玉禾田#6651）均正常聚合；空值字段显示「—」。</li>
+<li>接口 ✅ <code>project_overview/get_header</code>（identity/kpis/cost_compare）+ 复用 <code>project/get_project_info</code>、<code>count_project_price</code>、<code>project_moment/get_list</code>；非法/越界 project_id 无 5xx（附录 B）。</li>
+<li>数据 ✅ 成本/需求/BUG/递交/动态 KPI 全部对上源头；❌ <strong>成本预警卡「实际花费人天/产出类型人天」数值错误</strong>（已确认该卡 tooltip 声明口径为“已过滤非产出人员 PM/管理层”；但按同口径校验，医科大#6653 卡显示 84.5h，而人员页（同样去掉非产出人员）实际工时合计=894h、产出型需求实际工时=1,181h，均 &gt; 标准 986h，实为<strong>超支</strong>却判“结余 91%”。→ B1。</li>
+</ul>
+</li>
+<li>定妆图 final-概况-6653.jpg（B1 现场：成本预警&quot;实际花费 10.56 天&quot;与正下方工时明细&quot;实际花费工时 1,387h&quot;矛盾）、final-概况-6651.jpg ｜ 关联缺陷 B1</li>
+</ul>
+<h3>2. 价值与成果（项目价值清单 + 场景/功能展厅）— 🟡 部分满足</h3>
+<ul>
+<li>入口：项目概览（新）→ 价值与成果。</li>
+<li>结论：展厅区（场景效果·项目展厅 / 功能效果·功能展厅）复用真实组件、空数据友好提示正确；但**「项目价值清单」是前端硬编码示例内容**（页面顶部已自述&quot;缺乏数据来源，需要人工添加&quot;），两项目文本完全相同、编辑无落库接口 → R3。</li>
+<li>验证证据：
+<ul>
+<li>UI ✅ 价值清单表格（商机/业务/团队价值）可行内编辑（编辑/保存/取消）；展厅卡片可展开收起。</li>
+<li>边界 ✅ 两项目展厅均&quot;暂未创建/复用内容&quot;友好提示。</li>
+<li>接口 ✅ 展厅走 <code>project_display/get_list</code> + <code>function/get_list_by_project_id</code>（真实数据）；⚠️项目价值清单编辑未观察到任何写接口（POST），刷新后不持久化。</li>
+<li>数据 ⚠️ 项目价值清单 玉禾田#6651（环保项目）与 医科大#6653（医院项目）「商机价值」文本完全相同（均为&quot;精密医疗器械行业数字孪生的首个落地项目…&quot;）→ 硬编码示例，与实际项目无关。</li>
+</ul>
+</li>
+<li>定妆图 final-质量-*.jpg 系列中含该页 ｜ 关联风险 R3</li>
+</ul>
+<h3>3. 需求与成本（标准成本总览 + 需求性质/蔓延 + 模块分布 + 工时成本分析）— ✅ 满足</h3>
+<ul>
+<li>入口：项目概览（新）→ 需求与成本。</li>
+<li>结论：需求人天拆分、蔓延/变更成本占比、工时超支/结余全部<strong>数值精确正确</strong>（见附录 A）；页面已自述&quot;部分新增/变更需求未在 51PM 绑定，明细展示待定&quot;（R4）。</li>
+<li>验证证据：
+<ul>
+<li>UI ✅ 总览卡、需求性质饼、蔓延分析、模块柱图（个数/人天切换）、工时成本分析（剩余/超支视角切换）均渲染。</li>
+<li>边界 ✅ 医科大#6653（超支项目）正确显示&quot;工时超出量 +401H / +40.67%&quot;；玉禾田#6651（结余项目）显示&quot;-293H / -20.29%&quot;。</li>
+<li>接口 ✅ <code>project_overview/get_req_cost</code>（req_stats/req_spread/work_hour_kpis/over_cost_bar 等）。</li>
+<li>数据 ✅ 需求蔓延 39.92%=(48.5+3)/129、变更成本占比 4.86%=(3.91+0.3)/86.59、工时超出率 -20.29%=-293/1444、成本结余率 81.87%=772686/943786 全部复算一致；实际总工时=consumed_hour（玉禾田#6651:1151、医科大#6653:1387）✅。</li>
+</ul>
+</li>
+<li>定妆图 final-需求与成本-6651.jpg、final-需求与成本-6653.jpg ｜ 关联风险 R4</li>
+</ul>
+<h3>4. 质量（质量总览 + 反馈验收状态分布 + 反馈分布 + BUG 总览）— 🟡 部分满足</h3>
+<ul>
+<li>入口：项目概览（新）→ 质量。</li>
+<li>结论：BUG 侧（总数/等级/状态/占比/下钻）与 BUG 系统一致；反馈验收状态下钻明细正常；但<strong>玉禾田#6651「项目反馈总数 1」与「反馈验收状态分布合计 0」自相矛盾 → B2</strong>；「项目反馈」跨模块口径待确认 → R1；医科大#6653「BUG 总数 07→08=0」与总量卡「Bug 3 个」并存易误读 → R2。</li>
+<li>验证证据：
+<ul>
+<li>UI ✅ 状态卡可点击下钻（&quot;已验收·反馈明细(3 条)&quot;弹窗正常，含预计/实际递交列）。</li>
+<li>边界 ✅ 玉禾田#6651（0 BUG）、医科大#6653（3 BUG 全&quot;一般&quot;）均正确。</li>
+<li>接口 ✅ <code>project_overview/get_quality</code>（quality_insights/feedback_status_dist/bug_summary/bug_status_dist 等）。</li>
+<li>数据 🟡 医科大#6653 反馈内部自洽（总数 6=模块饼 1+5=状态 3+3）✅；玉禾田#6651 反馈总数 1、模块饼 1，但状态分布合计 0 ❌（B2）；BUG 医科大#6653=3、玉禾田#6651=0 对上 BUG 系统 ✅。</li>
+</ul>
+</li>
+<li>定妆图 final-质量-6653.jpg、final-质量-6651.jpg ｜ 关联缺陷 B2、风险 R1/R2</li>
+</ul>
+<h3>5. 递交（递交总览 + 趋势 + 状态统计 + 明细 + 临时/延期分析）— ✅ 满足</h3>
+<ul>
+<li>入口：项目概览（新）→ 递交。</li>
+<li>结论：递交次数、准时/正常/提前/延期/超时/临时各率<strong>内部自洽且与源头一致</strong>（见附录 A）；顶部里程碑时间轴节点数与&quot;递交次数&quot;口径不同（时间轴取排期、次数取实际递交）→ R6。</li>
+<li>验证证据：
+<ul>
+<li>UI ✅ 递交总览、趋势、状态统计、明细行、临时递交责任人饼、延期责任人柱均渲染。</li>
+<li>边界 ✅ 医科大#6653 无超时/延期（超时 0·延期 0）；玉禾田#6651 超时 4·延期 2。</li>
+<li>接口 ✅ <code>project_overview/get_deliver</code>。</li>
+<li>数据 ✅ 玉禾田#6651：正常 13+提前 1+延期 2=16=递交次数；准时 14/16=87.5%、正常率 81.25%、临时 8/16=50% 复算一致；源头 <code>project_publish</code> 本项目条数 玉禾田#6651=16、医科大#6653=8 ✅。</li>
+</ul>
+</li>
+<li>定妆图 final-递交-6651.jpg、final-递交-6653.jpg ｜ 关联风险 R6</li>
+</ul>
+<h3>6. 人员（人员成本与质量总览 + 人员工时/BUG/超支图 + 人员明细表）— 🟡 部分满足</h3>
+<ul>
+<li>入口：项目概览（新）→ 人员。</li>
+<li>结论：人员明细表（标准/实际工时、差异、差异率、产出效率、BUG、关联动态）渲染完整且数值合理；但**「产出工时占比」列全为「—」（未实现）→ R5**。</li>
+<li>验证证据：
+<ul>
+<li>UI ✅ 明细表 23 行（玉禾田#6651）可搜索、可点「详情」；图表区渲染。</li>
+<li>边界 ✅ 0 工时成员显示 N/A 差异率、超支/结余用正负值区分。</li>
+<li>接口 ✅ 人员数据随首屏一次性加载（切页签不重新请求）。</li>
+<li>数据 ⚠️「产出工时占比」全表「—」；人员逐人工时未在已抓接口响应中定位到独立字段（附录 A.4 说明）。</li>
+</ul>
+</li>
+<li>定妆图 final-人员-6651.jpg、final-人员-6653.jpg ｜ 关联风险 R5</li>
+</ul>
+<h3>7. 风险与执行问题（风险/问题总览 + 明细表 + 类型/部门分布）— ✅ 满足</h3>
+<ul>
+<li>入口：项目概览（新）→ 风险与执行问题。</li>
+<li>结论：风险/问题计数、明细表、分布图与 <code>project_moment</code> 源头一致。</li>
+<li>验证证据：
+<ul>
+<li>UI ✅ 风险动态明细表（商机号/项目/类型/等级/内容/PM/创建人/部门/时间）+ 分页 + 类型/部门分布图。</li>
+<li>边界 ✅ 玉禾田#6651 风险 1（高 1）、问题 0；医科大#6653 风险 1、问题 1（&quot;暂无数据&quot;友好占位）。</li>
+<li>接口 ✅ 复用 <code>project_moment/get_list</code>（module=risk/problem）。</li>
+<li>数据 ✅ 玉禾田#6651 风险 1=moment risk 1；医科大#6653 问题 1=moment problem 1 ✅。</li>
+</ul>
+</li>
+<li>定妆图（含于概况系列） ｜ 无关联缺陷</li>
+</ul>
+<h2>二、缺陷清单（已确认的问题，需修）</h2>
+<blockquote>
+<p>复现/接口/定位等技术细节见 <a href="fix-handoff.md">fix-handoff.md</a>。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>缺陷</th>
+<th>严重度</th>
+<th>建议</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>B1</td>
+<td>项目概况「成本预警」双口径卡片的&quot;实际花费人天/产出类型人天&quot;数值严重偏小（卡片 tooltip 声明口径为“已过滤非产出人员 PM/管理层”）：医科大#6653 显示实际花费 84.5h(10.56天)、判&quot;结余 91%&quot;，但按同口径（去掉非产出人员）人员页实际工时合计=894h、产出型需求实际工时=1,181h，均 &gt; 标准 986h，<strong>实为超支</strong>；玉禾田#6651 显示 201.5h，同口径应≈人员页 1,002.5h/产出型 1,006.5h。数值偏小约 5~14 倍，且 医科大#6653 结论方向反了（超支误判为结余），直接误导成本/工时管理判断。同时与同功能人员页（同样声明去掉非产出人员）相差约 10 倍，同功能内自相矛盾。</td>
+<td>严重</td>
+<td>成本预警卡的实际花费/产出工时应与人员页同源（去掉非产出人员后的产出工时，玉禾田#6651≈1006.5h、医科大#6653≈894~1181h），修正后重新校对&quot;超支/结余&quot;结论方向</td>
+</tr>
+<tr>
+<td>B2</td>
+<td>质量页 玉禾田#6651「项目反馈总数 1」「反馈模块饼 场景 1」，但「反馈验收状态分布」待交付/待验收/已验收合计=0，同一实体同页两处数字对不上；用户点击查看那 1 条反馈的验收状态时无任何数据。</td>
+<td>一般</td>
+<td>统一「项目反馈总数」与「反馈验收状态分布」的数据源，确保总量=各状态之和</td>
+</tr>
+</tbody>
+</table>
+<h2>三、风险与待确认</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>事项</th>
+<th>等级</th>
+<th>建议</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R1</td>
+<td>质量页「项目反馈」跨模块源头口径不明：医科大#6653 反馈总数=6，但需求模块反馈(demand one_type=6)=1、反馈申请(produce_demand)=13，三者对不上；应明确「项目反馈」以哪个模块为权威口径</td>
+<td>中高</td>
+<td>产品/后端确认「项目反馈」定义与唯一数据源</td>
+</tr>
+<tr>
+<td>R2</td>
+<td>医科大#6653「项目 BUG 总览·Bug 总数 07→08=0」与「质量总量 Bug 3/header BUG 3/已解决 3」并存（月度窗口 vs 全量），卡片标题&quot;Bug 总数&quot;却显示 0，易被误读为无 BUG</td>
+<td>中</td>
+<td>卡片标题标明统计口径（如&quot;近月新增 BUG&quot;），或与全量口径统一</td>
+</tr>
+<tr>
+<td>R3</td>
+<td>价值与成果「项目价值清单」为前端硬编码示例（两项目文本完全相同、页面自述&quot;缺乏数据来源&quot;、编辑无落库接口）；展厅区为真实数据</td>
+<td>中</td>
+<td>上线前明确项目价值的数据来源/录入落库，或先隐藏/标注&quot;示例&quot;</td>
+</tr>
+<tr>
+<td>R4</td>
+<td>需求与成本「所属模块分析」新增仅 3、变更 1，实际新增 12、变更 1（页面自述&quot;部分需求未在 51PM 发起绑定，明细展示待定&quot;），模块分布不完整</td>
+<td>中</td>
+<td>明确未绑定需求的展示策略（占位/人工补录/不展示）</td>
+</tr>
+<tr>
+<td>R5</td>
+<td>人员明细表「产出工时占比」列全为「—」（未实现）</td>
+<td>低</td>
+<td>补齐该列计算或移除该列</td>
+</tr>
+<tr>
+<td>R6</td>
+<td>顶部里程碑时间轴节点数与&quot;递交次数&quot;口径不同（玉禾田#6651 时间轴 17 节点 vs 递交次数 16；时间轴临时 4 vs 状态统计临时 8），数据源不同（排期 vs 实际递交）易误读</td>
+<td>低</td>
+<td>统一或标注两处口径差异</td>
+</tr>
+<tr>
+<td>R7</td>
+<td>概览 4 接口对「不存在项目」返回原始 DB 错误串 <code>sql: no rows in result set</code>（轻微信息泄露），非法/越界参数虽无 5xx 但错误文案不友好</td>
+<td>低</td>
+<td>项目不存在时返回友好文案（如&quot;项目不存在&quot;），勿透传 ORM/DB 错误</td>
+</tr>
+</tbody>
+</table>
+<p><strong>未覆盖盲区声明</strong>：① 图表扇区/柱段的逐一像素级点击下钻未穷举（已抽样验证卡片下钻弹窗正常）；② 项目价值/项目公告编辑的完整写链路未强制提交（价值清单无落库接口、公告编辑为真实项目数据未深写）；③ 人员逐人工时的后端源头字段未定位到（随首屏一次性加载，非独立接口）；④ 极限数据量（超大团队/超多需求）未专门构造。</p>
+<h2>四、发版内容（初稿）</h2>
+<blockquote>
+<p>待阶段 3 产出后回填。</p>
+</blockquote>
+<h2>附录 A：跨模块数据对账（追溯用）</h2>
+<h3>A.1 成本（<code>count_project_price</code> 源头）— ✅ 全对</h3>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>玉禾田#6651 概览</th>
+<th>玉禾田#6651 源头</th>
+<th>医科大#6653 概览</th>
+<th>医科大#6653 源头</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>项目总成本</td>
+<td>86.59 万</td>
+<td>工程17.11+采购66+研发3.48=86.59 ✅</td>
+<td>73.36 万</td>
+<td>工程12.33+采购60.75+研发0.29=73.36 ✅</td>
+</tr>
+<tr>
+<td>工程总成本</td>
+<td>17.11 万</td>
+<td>cost 171100 ✅</td>
+<td>12.33 万</td>
+<td>cost 123250 ✅</td>
+</tr>
+<tr>
+<td>签约价/标准价</td>
+<td>198.72/94.38 万</td>
+<td>1987200/943786 ✅</td>
+<td>78.5/67.3 万</td>
+<td>785000/672980 ✅</td>
+</tr>
+</tbody>
+</table>
+<h3>A.2 需求（<code>demand/get_project_demand_list</code>，one_type 映射 初始=4/新增=1/变更=2/其他=5/反馈=6）— ✅ 全对</h3>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>玉禾田#6651 概览</th>
+<th>玉禾田#6651 源头</th>
+<th>医科大#6653 概览</th>
+<th>医科大#6653 源头</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>需求总数</td>
+<td>20（初始7·新增12·变更1）</td>
+<td>one_type 4=7 / 1=12 / 2=1 ✅</td>
+<td>17（初始14·新增3·变更0）</td>
+<td>one_type 4=14 / 1=3 / 2=0 ✅</td>
+</tr>
+<tr>
+<td>初始标准人天</td>
+<td>129</td>
+<td>Σstd(one_type=4)=1032÷8 ✅</td>
+<td>—</td>
+<td>Σstd=706÷8=88.25 ✅</td>
+</tr>
+<tr>
+<td>新增/变更标准人天</td>
+<td>48.5 / 3</td>
+<td>388÷8 / 24÷8 ✅</td>
+<td>35 / 0</td>
+<td>280÷8 / 0 ✅</td>
+</tr>
+</tbody>
+</table>
+<h3>A.3 工时（<code>project/get_project_list</code> consumed_hour/done_hour；demand 合计交叉验证）</h3>
+<blockquote>
+<p>⚠️ 成本预警卡 tooltip 口径：“已过滤非产出人员（PM/管理层）”。故下表另列“去掉非产出后”的基准（产出型需求 one_type=1/2/4 的实际工时 + 人员页实际合计）与卡片值对比——即使按该口径，卡片值仍错。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>玉禾田#6651</th>
+<th>医科大#6653</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>实际总工时（需求与成本子页）</td>
+<td>1,151h = consumed_hour ✅</td>
+<td>1,387h = consumed_hour ✅</td>
+</tr>
+<tr>
+<td>产出工时</td>
+<td>1,013.5h = done_hour ✅</td>
+<td>957.5h = done_hour ✅</td>
+</tr>
+<tr>
+<td>demand 逐条 Σconsumed / Σdone</td>
+<td>1151 / 1013.5 ✅</td>
+<td>1387 / 957.5 ✅</td>
+</tr>
+<tr>
+<td><strong>去掉非产出后</strong>：产出型需求(one_type 1/2/4) Σconsumed / Σdone</td>
+<td>1,006.5 / 1,013.5</td>
+<td>1,181 / 957.5</td>
+</tr>
+<tr>
+<td><strong>去掉非产出后</strong>：人员页实际工时合计</td>
+<td>≈ 1,002.5h</td>
+<td>894h</td>
+</tr>
+<tr>
+<td><strong>概况「成本预警」实际花费/产出</strong></td>
+<td><strong>201.5h / 199.5h ❌</strong></td>
+<td><strong>84.5h / 83h ❌</strong></td>
+</tr>
+<tr>
+<td>标准工时 vs 产出型实际 → 真实结论</td>
+<td>1444 vs 1006.5 = 结余（卡方向对但数值偏小5倍）</td>
+<td>986 vs 1181 = <strong>超支</strong>（卡误判“结余91%&quot;）</td>
+</tr>
+</tbody>
+</table>
+<h3>A.4 BUG / 动态 / 递交 / 反馈</h3>
+<table>
+<thead>
+<tr>
+<th>模块</th>
+<th>玉禾田#6651 概览</th>
+<th>玉禾田#6651 源头</th>
+<th>医科大#6653 概览</th>
+<th>医科大#6653 源头</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BUG（<code>bug/get_list</code> 过滤 project_id）</td>
+<td>0</td>
+<td>0 ✅</td>
+<td>3（一般 3）</td>
+<td>3 全 level=2 ✅</td>
+</tr>
+<tr>
+<td>项目动态（<code>project_moment/get_list</code>）</td>
+<td>11（会议 10·风险 1·问题 0）</td>
+<td>meet10/risk1 ✅</td>
+<td>9（会议 7·风险 1·问题 1）</td>
+<td>meet7/risk1/problem1 ✅</td>
+</tr>
+<tr>
+<td>递交（<code>project_publish/get_list</code> 属本项目）</td>
+<td>16</td>
+<td>16 ✅</td>
+<td>8</td>
+<td>8 ✅</td>
+</tr>
+<tr>
+<td>项目反馈（源头待确认）</td>
+<td>1</td>
+<td>demand one_type=6=1（≈匹配）</td>
+<td>6</td>
+<td>≠ demand(1) ≠ produce_demand(13) ⚠️R1</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>人员逐人工时明细：随首屏一次性加载，未在 <code>project_overview/*</code> 四个接口响应中定位到独立的逐人工时字段（node 侧抓取的响应不含 23 人明细），推测为前端加工或未在本次抓包范围；人员表总体数值合理但源头字段待开发确认。</p>
+</blockquote>
+<h2>附录 B：接口层边界验证（<code>project_overview/get_header|get_req_cost|get_quality|get_deliver</code>）</h2>
+<table>
+<thead>
+<tr>
+<th>用例</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>正常 project_id</td>
+<td>http 200 / code 0 ✅</td>
+</tr>
+<tr>
+<td>不存在(999999) / 0 / 负数 / 非数字 / SQL注入串</td>
+<td>http 200 / code 50 <code>sql: no rows in result set</code>（无 5xx、无注入生效，但透传 DB 错误 ⚠️R7）</td>
+</tr>
+<tr>
+<td>缺 project_id</td>
+<td>http 200 / code 51「请选择项目」✅</td>
+</tr>
+<tr>
+<td>无鉴权（去 Bearer）</td>
+<td>http 401 ✅</td>
+</tr>
+</tbody>
+</table>
+<h2>附录 C：验收产生的测试数据</h2>
+<ul>
+<li>本轮以只读核对为主；仅在价值与成果「项目价值清单」尝试一次编辑保存（内容为&quot;【V232验收测试标记】…&quot;），因该清单无落库接口、刷新后不持久化，未产生真实数据变更。</li>
+</ul>
+
+</body></html>

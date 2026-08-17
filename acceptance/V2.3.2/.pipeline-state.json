@@ -1,0 +1,24 @@
+{
+  "version": "V2.3.2",
+  "devNotes": "体验升级重构优化：1.项目-模型外包 查看日报从弹窗改抽屉，抽屉内快捷添加新反馈并进行反馈走查（点反馈走查可留言），留言在该包下反馈管理-验收工作台批量验收时提供查看反馈走查留言功能；2.项目概览完全重构（见 V2.3.2-pre 版本，已单独验收）。AI赋能：1.AI自动填充项目动态——飞书会议智能总结原文复制到51PM动态会议添加中，选择项目后点AI自动填充，AI分析飞书(仅支持飞书)会议总结自动填写会议表单，agent自动进行任务进程（右下角按钮）。",
+  "updatedAt": "2026-08-17",
+  "checklist": [
+    { "name": "① 模型外包-查看日报重构(弹窗→抽屉)", "entry": "项目→模型外包→发包列表→查看日报(抽屉)", "tables": ["outsource", "outsource_feedback"] },
+    { "name": "② 抽屉内快捷添加新反馈 + 反馈走查留言", "entry": "查看日报抽屉内→添加反馈/反馈走查", "tables": ["outsource_feedback", "反馈走查留言"] },
+    { "name": "③ 反馈验收工作台批量验收时查看反馈走查留言", "entry": "模型外包→反馈管理→验收工作台→批量验收", "tables": ["outsource_feedback"] },
+    { "name": "④ 项目概览完全重构(引用 V2.3.2-pre 验收结论)", "entry": "项目→项目概览(新) /project/project_overview_new", "tables": ["project_overview"] },
+    { "name": "⑤ AI自动填充项目动态(飞书会议总结→AI分析填会议表单)", "entry": "项目→动态→添加会议动态→AI自动填充", "tables": ["project_moment", "ai_history?", "ai分析接口"] }
+  ],
+  "pendingSpecUpdates": [],
+  "stages": {
+    "0": { "status": "passed", "at": "2026-08-17", "note": "npm run check 通过(后端 .189，token 有效)；已通读 pitfalls-ledger" },
+    "1": { "status": "in-progress" },
+    "2": { "status": "not-started", "features": [] },
+    "3": { "status": "not-started" },
+    "4": { "status": "not-started", "checklist": { "ui-spec": null, "api-spec": null, "entry_map": null, "impact_map": null, "playbooks": null, "pendingSpecUpdates": null, "pitfalls": null } }
+  },
+  "history": [
+    { "at": "2026-08-17", "event": "stage-passed", "stage": 0 },
+    { "at": "2026-08-17", "event": "checklist-persisted", "stage": 1 }
+  ]
+}

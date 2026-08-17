@@ -12,13 +12,31 @@
   "pendingSpecUpdates": [],
   "stages": {
     "0": { "status": "passed", "at": "2026-08-17", "note": "npm run check 通过(后端 .189，token 有效)；已通读 pitfalls-ledger" },
-    "1": { "status": "in-progress" },
-    "2": { "status": "not-started", "features": [] },
-    "3": { "status": "not-started" },
-    "4": { "status": "not-started", "checklist": { "ui-spec": null, "api-spec": null, "entry_map": null, "impact_map": null, "playbooks": null, "pendingSpecUpdates": null, "pitfalls": null } }
+    "1": { "status": "passed", "result": "@outsource|@project_moment 精准回归 35过/1跳(v2.2.9⑨发包挂起需制作中样本授权skip)/0败，老功能未被改坏" },
+    "2": { "status": "passed", "features": [
+      { "name": "① 查看日报重构(弹窗→抽屉)", "verdict": "✅", "layers": "ui+接口+数据", "screenshots": false, "note": "PackageDailyReportDrawer.vue 右侧抽屉【模型制作日报】，每模型折叠卡片(代码/名称/状态/N条日报/N条反馈/添加新反馈)+搜索+状态筛选，展开见紧凑日报行(日期/制作方/进度/内容)；样本包#31半导体46日报" },
+      { "name": "② 抽屉快捷添加反馈 + 反馈走查留言", "verdict": "🟡", "layers": "ui+接口+数据", "screenshots": false, "note": "添加新反馈=批量创建反馈向导(录入/确认两步,模块*+内容*+截图)→create_feedback 写透落库(task195#830);反馈走查单 TaskFeedbackDialog.vue 点N条反馈打开,右侧反馈走查留言→create_feedback_suggestion 写透;⚠快捷添反馈后抑屉卡片「N条反馈」计数不实时刷新(重开抽屉才变对)=轻微 B" },
+      { "name": "③ 验收工作台批量验收查看反馈走查留言", "verdict": "✅", "layers": "ui+接口+数据", "screenshots": true, "note": "包#45广交会展L4外包 6条待验收(task247)→验收工作台每条反馈「查看反馈走查留言 N」按钮悬浮展示该任务全部走查留言(2条华中豪+1条本人 V2.3.2验收)=与反馈走查单同源打通" },
+      { "name": "④ 项目概览完全重构", "verdict": "🟡", "layers": "引用pre+API复核", "screenshots": false, "note": "dev_notes明确见pre版;引用 V2.3.2-pre 深度验收(7子页+双项目跨模块对账);本轮API复核严重缺B1(成本预警工时口径)仍未修" },
+      { "name": "⑤ AI自动填充项目动态(飞书会议总结)", "verdict": "🟡", "layers": "ui+接口+agent任务", "screenshots": true, "note": "机制/UI/接口(ai_skill/execute intent=moment_meeting_ai_fill)/agent异步任务追踪均到位;AI实际回填结果因模型服务持续429限流本轮未实测=环境盲区R1" }
+    ] },
+    "3": { "status": "passed", "note": "发版初稿已写报告§四(模型外包查看日报重构/项目概览见pre/AI自动填充);md→html 已转(md2html.js)" },
+    "4": { "status": "passed", "checklist": {
+      "ui-spec": "tests/v2.3.2.spec.js 4过(真绿:查看日报抽屉/反馈走查单+走查留言输入/验收工作台查看走查留言/AI自动填充入口与粘贴流程)",
+      "api-spec": "tests/api-v2.3.2.spec.js 7过(真绿:日报抽屉task+daily_report结构/非法参数不5xx/反馈走查留言动作型自造读回/验收工作台quality_status=2契约/ai_api_key状态/ai_skill执行契约不5xx)",
+      "entry_map": "新增3行(模型外包-查看日报抽屉/模型外包-快捷添加反馈·反馈走查留言/AI自动填充项目动态)+反馈验收工作台行补V2.3.2查看走查留言",
+      "impact_map": "§A新增3行(查看日报抽屉/反馈走查留言/AI自动填充)+§B outsource簇追加查看日报抽屉·反馈走查留言、project_moment簇追加AI自动填充",
+      "playbooks": "新增 模型外包-查看日报抽屉与反馈走查.md、AI自动填充项目动态.md + README回填2行",
+      "pendingSpecUpdates": "本轮无规格变更(精准回归@outsource|@project_moment 35过0败,老功能未被改坏,无旧spec需就地改)",
+      "pitfalls": "P-15 新增(AI接口HTTP200+code0但data.status=llm_error/429误判成功;哨兵只守契约别死等LLM);helpers新增 ensureFeedbackSuggestion 幂等造走查留言"
+    } }
   },
   "history": [
     { "at": "2026-08-17", "event": "stage-passed", "stage": 0 },
-    { "at": "2026-08-17", "event": "checklist-persisted", "stage": 1 }
+    { "at": "2026-08-17", "event": "checklist-persisted", "stage": 1 },
+    { "at": "2026-08-17", "event": "stage-passed", "stage": 1, "note": "回归35过/1跳/0败" },
+    { "at": "2026-08-17", "event": "stage-passed", "stage": 2, "note": "报告+fix-handoff+6定妆图;缺陷B1严重(pre沿用)/B2一般(pre沿用)/B3轻微(本轮);风险R1(AI 429盲区)/R2(pre 7风险)" },
+    { "at": "2026-08-17", "event": "stage-passed", "stage": 3, "note": "发版初稿+html" },
+    { "at": "2026-08-17", "event": "stage-passed", "stage": 4, "note": "ui-spec+api-spec(11过真绿)+entry_map+impact_map+2playbook+P-15+helpers ensureFeedbackSuggestion" }
   ]
 }

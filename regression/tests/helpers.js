@@ -508,6 +508,71 @@ async function openMultiPersonTaskDialog(page, demandId) {
   await waitVisibleDialog(page);
 }
 
+/**
+ * 幂等造数（V2.3.2）：确保某发包任务下存在一条带 marker 的「反馈走查留言」（验收建议）。
+ * 动作型自造真验，验证的是模型外包-查看日报抽屉的「反馈走查留言」写链路 + 验收工作台可查看能力。
+ * 端点：POST /manage_api/outsource_task/create_feedback_suggestion{outsource_task_id,content}（写）；
+ *      GET  /manage_api/outsource_task/get_feedback_suggestion_list?outsource_task_id=N（读）。
+ * 幂等策略：动态挑一个「有任务的发包」→取第一个任务→按 marker 查走查留言列表，命中复用、未命中才 POST。
+ * @param {import('@playwright/test').APIRequestContext} request
+ * @param {{marker:string, packageId?:number}} opts
+ * @returns {Promise<{seeded:boolean, taskId:number, item:object}>}
+ */
+async function ensureFeedbackSuggestion(request, opts) {
+  const { marker } = opts;
+  const headers = authHeaders();
+
+  // 动态挑一个有任务的发包（不写死，测试库刷新也能跑）
+  let packageId = opts.packageId;
+  if (!packageId) {
+    const pkgRes = await request.get(
+      `${API_BASE}/manage_api/outsource/get_package_list?page=1&limit=50&sj_num=`,
+      { headers }
+    );
+    const pkgJson = await pkgRes.json();
+    expect(pkgJson.code, 'get_package_list code 应为 0（否则登录态失效）').toBe(0);
+    const pkgs = Array.isArray(pkgJson.data) ? pkgJson.data : pkgJson.data?.data || [];
+    // 优先带日报的发包（有任务概率高）
+    const cand = pkgs.filter((p) => Number(p.report_count) > 0).sort((a, b) => b.report_count - a.report_count);
+    packageId = (cand[0] || pkgs[0]).id;
+  }
+
+  const tkRes = await request.get(
+    `${API_BASE}/manage_api/outsource_task/get_task_list?outsource_package_id=${packageId}`,
+    { headers }
+  );
+  const tkJson = await tkRes.json();
+  const tasks = Array.isArray(tkJson.data) ? tkJson.data : tkJson.data?.data || [];
+  expect(tasks.length, `发包#${packageId} 应有可关联任务`).toBeGreaterThan(0);
+  const taskId = tasks[0].id;
+
+  const listUrl = `${API_BASE}/manage_api/outsource_task/get_feedback_suggestion_list?outsource_task_id=${taskId}`;
+  const findByMarker = async () => {
+    const res = await request.get(listUrl, { headers });
+    expect(res.status(), 'get_feedback_suggestion_list 应 200').toBe(200);
+    const j = await res.json();
+    expect(j.code, 'get_feedback_suggestion_list code 应为 0').toBe(0);
+    const d = j.data;
+    const list = Array.isArray(d) ? d : d?.data || d?.list || [];
+    return list.find((x) => String(x.content || '').includes(marker)) || null;
+  };
+
+  const existing = await findByMarker();
+  if (existing) return { seeded: false, taskId, item: existing };
+
+  const add = await request.post(`${API_BASE}/manage_api/outsource_task/create_feedback_suggestion`, {
+    headers,
+    data: { outsource_task_id: taskId, content: marker },
+  });
+  expect(add.status(), 'create_feedback_suggestion 应 200').toBe(200);
+  const addJson = await add.json();
+  expect(addJson.code, `创建反馈走查留言失败：${addJson.msg || ''}`).toBe(0);
+
+  const created = await findByMarker();
+  expect(created, '造数后应能在走查留言列表查到').toBeTruthy();
+  return { seeded: true, taskId, item: created };
+}
+
 module.exports = {
   TEST_PROJECT_ID,
   PUBLISH_DATA_PROJECT_ID,
@@ -519,6 +584,7 @@ module.exports = {
   ensureMeetingMoment,
   ensureProblemMoment,
   ensureOutsourceFeedback,
+  ensureFeedbackSuggestion,
   ensureApplyDemand,
   ensureMyCalendarTask,
   ensureDismantleableDemand,

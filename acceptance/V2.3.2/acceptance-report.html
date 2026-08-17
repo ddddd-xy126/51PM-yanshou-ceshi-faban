@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>51PM V2.3.2 验收报告</title>
+<style>
+:root{color-scheme:light}
+body{margin:0 auto;max-width:920px;padding:40px 48px;font-family:-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;color:#1a1a1a;line-height:1.7;background:#fdfdfd}
+h1{font-size:1.9em;border-bottom:3px solid #4a7;padding-bottom:.3em}
+h2{font-size:1.45em;border-bottom:1px solid #ddd;padding-bottom:.25em;margin-top:1.8em}
+h3{font-size:1.2em;margin-top:1.5em;color:#2a6}
+h4{font-size:1.05em;color:#444}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:.94em}
+th,td{border:1px solid #d0d7de;padding:7px 10px;text-align:left;vertical-align:top}
+th{background:#f0f6f2}
+tr:nth-child(even){background:#fafbfa}
+code{background:#f2f4f2;padding:1px 5px;border-radius:4px;font-size:.9em;font-family:Consolas,Monaco,monospace}
+pre{background:#f6f8fa;padding:12px 14px;border-radius:6px;overflow:auto}
+pre code{background:none;padding:0}
+blockquote{border-left:4px solid #9c9;background:#f6faf7;margin:1em 0;padding:.6em 1em;color:#444}
+hr{border:none;border-top:1px solid #e0e0e0;margin:1.5em 0}
+a{color:#268}
+ul,ol{padding-left:1.6em}
+li{margin:.2em 0}
+img{max-width:100%}
+</style></head>
+<body>
+<h1>51PM V2.3.2 验收报告</h1>
+<ul>
+<li>验收时间：2026-08-17</li>
+<li>环境：测试 10.67.8.183:7777（后端 10.67.8.189:8888）</li>
+<li>验收账号角色：邓欣羽（超管视角）</li>
+<li><strong>验收结论：3 项需求，满足 0 / 部分满足 3 / 不满足 0</strong>；发现缺陷 3（严重 1[项目概览沿用]、一般 1[项目概览沿用]、轻微 1[本轮新增]）、风险/待确认 2</li>
+<li>老功能回归：✅ 无回归（精准选集 <code>@outsource|@project_moment</code> 35 通过 / 1 跳过 / 0 失败，明细见附录 A.1）</li>
+</ul>
+<blockquote>
+<p>阅读顺序：先看「一、逐需求验收详情」判断本次交付达标与否 → 「二、缺陷」「三、风险」是待处理项 → 「四、发版内容（初稿）」→ 回归与接口等测试证据在附录，供追溯。</p>
+</blockquote>
+<h2>0. 原始验收需求</h2>
+<blockquote>
+<p>V2.3.2 正式版本，开发内容如下：<br>
+<strong>体验升级、重构优化</strong></p>
+<ol>
+<li>项目-模型外包：场景组某用户反映 发包列表中的查看日报弹窗中，日报条数多，展示空间过大，造成可视域不够，难以一眼获取到重点日报。重构查看日报，从弹窗改成抽屉，快捷添加新反馈，并进行反馈走查，点击反馈走查可进行反馈走查留言，留言在该包下的反馈管理-验收工作台进行批量验收时，提供查看反馈走查留言的功能，便于场景、DTA 的交互等等。</li>
+<li>项目概览：完全重构（见 v2.3.2 的 pre 版本）。<br>
+<strong>AI 赋能</strong></li>
+<li>AI 自动填充项目动态：实现飞书会议智能总结原文复制到 51PM 动态会议添加中，AI 分析并自动填充会议表单，选择项目后，点击 AI 自动填充将飞书（只支持飞书）的会议总结一键复制粘贴进行 AI 自动分析填写表单，可不需等待，agent 自动进行任务进程（右下角的按钮）。</li>
+</ol>
+</blockquote>
+<p>对应关系：需求 1（模型外包-查看日报重构）→ §1（含 ①查看日报抽屉、②抽屉快捷添加反馈与反馈走查留言、③验收工作台查看反馈走查留言）；需求 2（项目概览完全重构）→ §2（沿用 V2.3.2-pre 深度验收结论）；需求 3（AI 自动填充项目动态）→ §3。</p>
+<h2>一、逐需求验收详情</h2>
+<h3>1. 模型外包-查看日报重构（弹窗→抽屉 + 快捷添加反馈 + 反馈走查留言 + 验收工作台查看留言）— 🟡 部分满足</h3>
+<ul>
+<li>入口：项目 → 项目详情 → 模型外包 → 发包列表行内「查看日报(N)」→ 右侧抽屉「模型制作日报」；抽屉内每模型卡「添加新反馈」/点「N 条反馈」开「模型反馈走查单」；反馈走查留言在「发包详情 → 反馈管理 → 验收工作台」批量验收时可查看。</li>
+<li>结论：查看日报已由弹窗重构为<strong>右侧抽屉 + 摘要态卡片</strong>（可搜索、可按状态筛选、逐卡折叠），可视密度大幅提升，切中场景组&quot;日报多、难一眼获取重点&quot;的原始反馈；抽屉内「快捷添加反馈」（批量创建向导）与「反馈走查留言」写链路均真实写透并落库；验收工作台批量验收时「查看反馈走查留言」正确展示同源留言。<strong>唯一缺口：抽屉内快捷添加反馈后，任务卡「N 条反馈」计数不实时刷新（重开抽屉才更新，数据本身正确）→ B3（轻微）</strong>。</li>
+<li>验证证据：
+<ul>
+<li>UI ✅ 「查看日报(46)」（发包#31『半导体』）打开 <code>PackageDailyReportDrawer.vue</code> 抽屉（宽 740px），标题「模型制作日报-半导体」，含搜索框「搜索模型/建筑名称」+ 状态筛选 + 17 张模型卡（代码/建筑名/状态点/制作方/N 条日报/N 条反馈/添加新反馈）；展开卡显示紧凑日报行（日期/制作方/进度条%/内容）。</li>
+<li>边界 ✅ 已完成/制作中状态点区分；0 反馈/多反馈卡均正常；抽屉复用 <code>outsource_task/get_task_list</code> + 逐任务 <code>outsource_daily_report/get_daily_report_list</code>。</li>
+<li>接口 ✅ 反馈走查留言 <code>POST outsource_task/create_feedback_suggestion</code>{outsource_task_id,content} → 落库（任务 195 发布留言后回读 <code>get_feedback_suggestion_list</code> 命中「邓欣羽 2026-08-17」）；快捷添加反馈 <code>POST outsource_feedback/create_feedback</code>{outsource_package_id,outsource_task_id,feedback_module,feedback_content} → 落库（任务 195 新增反馈 #830，get_feedback_list 由 6→7）。</li>
+<li>数据 ✅ 验收工作台（发包#45『广交会展L4外包』6 条待验收，task 247）每条反馈「查看反馈走查留言 3」悬浮展示该任务全部走查留言（2 条华中豪 + 1 条本人 V2.3.2 验收），与反馈走查单同源一致；❌ 快捷添加反馈后抽屉卡「N 条反馈」计数不实时刷新（仍显 6、实际 7，重开抽屉变 7）→ B3。</li>
+</ul>
+</li>
+<li>定妆图 final-01-查看日报抽屉.jpg、final-02-反馈走查单与走查留言.jpg、final-03-快捷添加反馈向导.jpg、final-04-验收工作台查看走查留言.jpg ｜ 关联缺陷 B3</li>
+</ul>
+<h3>2. 项目概览完全重构 — 🟡 部分满足（沿用 V2.3.2-pre 深度验收结论）</h3>
+<ul>
+<li>入口：项目 → 项目概览（新）<code>/project/project_overview_new</code>（7 子页签：项目概况/价值与成果/需求与成本/质量/递交/人员/风险与执行问题）。</li>
+<li>结论：dev_notes 明确「见 v2.3.2 的 pre 版本」，本功能已在 <strong><a href="../V2.3.2-pre-%E9%A1%B9%E7%9B%AE%E6%A6%82%E8%A7%88%E6%96%B0/acceptance-report.md">V2.3.2-pre 验收报告</a></strong> 做过双项目（玉禾田#6651 进行中 / 医科大#6653 已结项）跨模块深度对账验收：核心聚合与数值大面积正确，7 子页签渲染/边界/接口均通过；但存在 <strong>1 严重缺陷（成本预警工时口径错误、超支误判结余）+ 1 一般缺陷（质量反馈总数与状态分布不自洽）+ 7 项风险/待确认</strong>。</li>
+<li>验证证据：
+<ul>
+<li>UI ✅ 详见 V2.3.2-pre 报告 §1~§7（本轮不重复深度验收）。</li>
+<li>边界 ✅ 进行中/已结项双项目均正常聚合（pre 已覆盖）。</li>
+<li>接口 ✅ <code>project_overview/get_header|get_req_cost|get_quality|get_deliver</code> 等（pre 已覆盖）。</li>
+<li>数据 ❌ 本轮 API 复核确认 pre 版<strong>严重缺陷 B1 仍未修复</strong>：<code>project_overview/get_header?project_id=6653</code> 的 cost_compare 仍返 algoA 实际花费 84.5h（10.56 天）、algoB 产出工时 83h（10.38 天）、<code>over:false</code>（判结余），与需求与成本子页 / 人员页同源工时（应超支）矛盾 → 见 B1。</li>
+</ul>
+</li>
+<li>定妆图 ../V2.3.2-pre-项目概览新/final-*.jpg（pre 轮定妆图，含 B1 现场）｜ 关联缺陷 B1、B2（沿用 pre）、风险见 V2.3.2-pre 报告 §三 R1~R7</li>
+</ul>
+<h3>3. AI 自动填充项目动态（飞书会议智能总结 → AI 分析自动填写会议表单）— 🟡 部分满足</h3>
+<ul>
+<li>入口：项目 → 项目动态 → 「添加动态」→「会议动态」tab →「AI 自动填充」→ 粘贴飞书会议纪要原文 →「开始 AI 识别」；识别以 agent 异步任务进行，右下角「Agent 任务进程」按钮（51PM Agent 面板）实时展示任务状态。</li>
+<li>结论：AI 自动填充的<strong>完整机制、交互、接口与 agent 异步任务追踪均已到位并正确</strong>——粘贴区明确标注「仅飞书智能纪要」、支持自动存草稿、点「开始 AI 识别」后转入右下角 51PM Agent 面板异步执行（含状态/耗时/重试/跳转来源/完成），与 dev_notes「agent 自动进行任务进程（右下角按钮）」一致；<strong>但 AI 实际解析并回填会议表单的结果本轮无法实测</strong>——模型服务在多次尝试、跨数分钟内持续返回 429「模型服务请求过于频繁」（<code>ai_skill/execute</code> 返 <code>status:llm_error</code>），属<strong>环境类模型配额限流盲区、非本功能代码缺陷</strong> → R1。</li>
+<li>验证证据：
+<ul>
+<li>UI ✅ 「添加动态」弹窗三 tab（会议/风险/问题动态）；会议动态 tab 顶部「AI 自动填充」入口 + 提示「粘贴会议纪要，AI 自动识别并填充下方字段」；AI 子弹窗含粘贴 textarea「在此粘贴会议纪要原文……」+「开始 AI 识别」+ 草稿自动保存。</li>
+<li>边界 ✅ 触发后右下角「Agent 任务进程」出现计数徽章；51PM Agent 面板列出任务「会议纪要填充」含状态（失败）/耗时/错误文案，提供重试/完成/跳转来源。</li>
+<li>接口 ⚠️ <code>GET ai_api_key/get_ai_api_key_status</code>（本账号 configured=true、default_model=deepseek-v3）+ <code>POST ai_skill/execute</code>{intent:&quot;moment_meeting_ai_fill&quot;, slots:{raw_text}}；本轮该接口恒返 <code>code:0</code> 但 <code>data.status:&quot;llm_error&quot;</code>、reply=「模型服务请求过于频繁（429），请稍后再试或更换模型」→ 无法取得回填结果。</li>
+<li>数据 ⚠️ 因模型服务 429 限流，AI 解析后的会议类型/会议内容/参会人员/待办事项<strong>实际回填结果未能观察</strong>（R1 覆盖盲区）。</li>
+</ul>
+</li>
+<li>定妆图 final-05-AI自动填充粘贴纪要.jpg、final-06-AI-Agent任务进程.jpg ｜ 关联风险 R1</li>
+</ul>
+<h2>二、缺陷清单（已确认的问题，需修）</h2>
+<blockquote>
+<p>复现/接口/定位等技术细节见 <a href="fix-handoff.md">fix-handoff.md</a>。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>缺陷</th>
+<th>严重度</th>
+<th>建议</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>B1</td>
+<td>项目概览-概况「成本预警」双口径卡片的&quot;实际花费/产出类型人天&quot;口径严重偏小、结论方向反了（医科大#6653 显示实际花费 84.5h/结余 91%，同口径实际应为超支）。<strong>沿用 V2.3.2-pre 缺陷，本轮 API 复核仍未修复</strong>。</td>
+<td>严重</td>
+<td>成本预警卡实际花费/产出工时应与人员页、需求与成本页同源（去掉非产出人员后的产出工时），修正后重校&quot;超支/结余&quot;结论方向</td>
+</tr>
+<tr>
+<td>B2</td>
+<td>项目概览-质量 玉禾田#6651「项目反馈总数 1」与「反馈验收状态分布合计 0」同页两处对不上，点查那 1 条反馈的验收状态无数据。<strong>沿用 V2.3.2-pre 缺陷</strong>。</td>
+<td>一般</td>
+<td>统一「项目反馈总数」与「反馈验收状态分布」的数据源，确保总量=各状态之和</td>
+</tr>
+<tr>
+<td>B3</td>
+<td>模型外包-查看日报抽屉：在抽屉内「快捷添加新反馈」成功后，对应模型任务卡的「N 条反馈」计数不实时刷新（仍显旧值，关闭并重开抽屉才更新为正确值）；反馈本身已正确落库。</td>
+<td>轻微</td>
+<td>快捷添加反馈成功后就地刷新当前任务卡的反馈计数（或整卡数据），无需用户重开抽屉</td>
+</tr>
+</tbody>
+</table>
+<h2>三、风险与待确认</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>事项</th>
+<th>等级</th>
+<th>建议</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R1</td>
+<td>AI 自动填充项目动态：AI 实际解析并回填会议表单的结果本轮未能实测——模型服务（deepseek-v3）在跨数分钟多次尝试中持续返回 429「请求过于频繁」，<code>ai_skill/execute</code> 恒返 <code>status:llm_error</code>。功能的 UI/流程/接口/agent 异步任务机制均已验证到位，仅 LLM 回填结果因模型配额限流未观察到（环境类盲区，非代码缺陷）。</td>
+<td>中</td>
+<td>确认模型服务配额/限流策略；建议在模型持续 429 时给出「切换模型/稍后重试」的更明确引导，并在配额充足时段复验一次真实回填质量（会议类型/内容/参会人/待办的识别准确度、人员按系统昵称匹配率）</td>
+</tr>
+<tr>
+<td>R2</td>
+<td>项目概览-完全重构：V2.3.2-pre 报告另记录 7 项风险/待确认（R1 反馈跨模块口径、R2 BUG 月度 vs 全量口径、R3 项目价值清单为硬编码示例、R4 未绑定需求展示策略、R5 产出工时占比列未实现、R6 时间轴 vs 递交次数口径、R7 不存在项目返 ORM 原始错误串）。本轮沿用，详见 <a href="../V2.3.2-pre-%E9%A1%B9%E7%9B%AE%E6%A6%82%E8%A7%88%E6%96%B0/acceptance-report.md">V2.3.2-pre 报告 §三</a>。</td>
+<td>中</td>
+<td>参见 V2.3.2-pre 报告逐项建议</td>
+</tr>
+</tbody>
+</table>
+<p><strong>未覆盖盲区声明</strong>：① AI 自动填充的真实 LLM 回填结果因模型服务持续 429 未能实测（R1）；② 项目概览深度验收沿用 V2.3.2-pre，本轮仅对严重缺陷 B1 做 API 复核确认仍存，未重跑全部 7 子页跨模块对账；③ 快捷添加反馈的截图上传（Ctrl+V 贴图）分支未强制走文件上传；④ 反馈走查留言的 500 字上限、并发多人留言时序未专门构造。</p>
+<h2>四、发版内容（初稿，待人工定稿）</h2>
+<p><strong>影响强度</strong></p>
+<blockquote>
+<p>强度中等，重构「模型外包-查看日报」（弹窗改抽屉，新增快捷添加反馈与反馈走查留言）与「项目概览」，并新增「AI 自动填充项目动态」能力。</p>
+</blockquote>
+<p><strong>体验升级、重构优化</strong></p>
+<p>需关注人员：PM、组长、场景组、DTA、Builder/供应商</p>
+<p>1.「模型外包-查看日报」：（减少日报多时的翻找成本，提升场景、DTA 走查与反馈协作效率）<br>
+将发包列表的&quot;查看日报&quot;由弹窗重构为右侧抽屉，按模型分组以摘要态卡片呈现（模型名称、制作状态、日报数、反馈数、制作进度），支持按模型/建筑名称搜索、按制作状态筛选，并逐卡展开查看日报明细；<br>
+支持在抽屉内对某模型「快捷添加新反馈」（批量录入反馈模块与内容后统一提交），并对反馈发起「反馈走查」、留下「反馈走查留言」供团队与供应商查看；<br>
+该发包的反馈走查留言在&quot;反馈管理-验收工作台&quot;批量验收时一键查看，方便场景、DTA 与供应商在验收环节直接对齐意见。</p>
+<p>需关注人员：PM、全员</p>
+<p>1.「项目概览」：（一屏掌握项目全貌，减少 PM 跨模块汇总项目进展的成本）<br>
+完全重构项目概览页（详见 V2.3.2-pre 版本），整合项目概况、价值与成果、需求与成本、质量、递交、人员、风险与执行问题等多维视图，支持按项目聚合展示核心指标与图表，方便 PM 一屏掌握项目进展、成本、质量与风险全貌。</p>
+<p><strong>AI 赋能</strong></p>
+<p>需关注人员：PM</p>
+<p>1.「项目动态-AI 自动填充」：（免去 PM 会议纪要手工誊抄，提升会议动态录入效率）<br>
+在项目动态&quot;添加会议动态&quot;中新增&quot;AI 自动填充&quot;：支持将飞书智能会议纪要原文整段粘贴，一键由 AI 自动识别会议类型、会议内容、参会人员与待办事项并回填表单，用户核对后提交；<br>
+识别过程以 agent 异步任务进行、无需等待，支持在右下角&quot;Agent 任务进程&quot;面板实时查看任务状态并重试。</p>
+<hr>
+<h2>附录 A：测试证据（追溯用）</h2>
+<h3>A.1 老功能回归</h3>
+<ul>
+<li>精准选集 <code>--grep &quot;@outsource|@project_moment&quot;</code>（本轮碰 outsource 模型外包全链 + project_moment 项目动态两簇）：<strong>35 通过 / 1 跳过 / 0 失败</strong>。</li>
+<li>跳过 1 = <code>v2.2.9.spec.js</code> ⑨ 发包挂起/取消（需&quot;制作中&quot;状态发包样本，授权 skip）。</li>
+<li>全绿（含哨兵 test.fail 预期失败）说明本轮模型外包抽屉/反馈走查、AI 会议动态填充未改坏两簇既有功能。</li>
+</ul>
+<h3>A.2 本轮验收产生的测试数据（测试环境，无需清理）</h3>
+<ul>
+<li>反馈走查留言（<code>create_feedback_suggestion</code>）：发包#31『半导体』任务 195『有机通风柜』下 1 条「V2.3.2验收-反馈走查留言测试…」；发包#45『广交会展L4外包』任务 247 下 1 条「V2.3.2验收-验收工作台走查留言可见性测试…」（suggestion id=4）。</li>
+<li>快捷添加反馈（<code>create_feedback</code>）：发包#31 任务 195 下 1 条模型反馈 #830「V2.3.2验收-抽屉快捷添加反馈测试…」。</li>
+<li>AI 自动填充：发起若干次 <code>ai_skill/execute</code>（intent=moment_meeting_ai_fill）均因模型 429 失败，未产生会议动态落库数据。</li>
+</ul>
+<h3>A.3 关键接口（供 impact_map / 下轮造数）</h3>
+<ul>
+<li>抽屉日报：<code>GET outsource_task/get_task_list?outsource_package_id=N</code> + <code>GET outsource_daily_report/get_daily_report_list?outsource_task_id=N</code></li>
+<li>反馈走查留言：<code>GET outsource_task/get_feedback_suggestion_list?outsource_task_id=N</code>（读）；<code>POST outsource_task/create_feedback_suggestion</code>{outsource_task_id,content}（写）</li>
+<li>快捷添加反馈：<code>POST outsource_feedback/create_feedback</code>{outsource_package_id,outsource_task_id,feedback_module,feedback_content}</li>
+<li>验收工作台：<code>GET outsource_feedback/get_feedback_list?outsource_package_id=N&amp;quality_status=2</code>（仅拉待验收）+ 复用 <code>get_feedback_suggestion_list</code></li>
+<li>AI 自动填充：<code>GET ai_api_key/get_ai_api_key_status</code>（configured/default_model）+ <code>POST ai_skill/execute</code>{intent:&quot;moment_meeting_ai_fill&quot;,slots:{raw_text}}</li>
+</ul>
+
+</body></html>

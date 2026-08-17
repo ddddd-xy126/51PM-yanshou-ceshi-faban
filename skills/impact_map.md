@@ -87,6 +87,9 @@
 | 项目动态看板（V2.3.1 补充）| `project_moment`（统计-项目动态看板 /statistic/project_risk_panel，会议/风险/问题全景聚合 get_project_moment_stat + 明细 get_project_moment_stat_list，module=all/meet/risk/problem，按创建时间落期分组）|
 | 我的工作台-51PM Agent配置（V2.3.1 补充）| `ai_api_key`（get_ai_api_key_list 个人配置 AI 大模型 API Key + 默认模型，供全站 AI 能力调用）|
 | 产能数据看板-AI产能诊断（V2.3.1 补充）| `data_export`（复用构能面板 get_dept_capacity_panel/get_employee_project_list 生成分析）、`ai_history`（get_ai_history_list?intent=dept_capacity_ai_analysis 历史问答）、`ai_api_key`（依赖已配置生效的 AI Key）|
+| 模型外包-查看日报抽屉（V2.3.2）| `outsource`（发包列表查看日报重构为抽屉；outsource_task/get_task_list + outsource_daily_report/get_daily_report_list）|
+| 模型外包-反馈走查留言（V2.3.2）| `outsource_feedback`、`outsource_task`（抽屉快捷添反馈 create_feedback；反馈走查留言 create_feedback_suggestion/get_feedback_suggestion_list；验收工作台批量验收时查看走查留言）|
+| AI自动填充项目动态（V2.3.2）| `project_moment`（会议动态）、`ai_skill`（execute intent=moment_meeting_ai_fill，飞书会议纪要→AI解析回填）、`ai_api_key`（get_ai_api_key_status 依赖已配置生效的 AI Key）|
 
 ---
 
@@ -102,7 +105,7 @@
 
 ### `project_moment`（项目动态）
 
-会议动态待办负责人 · 项目动态 · 问题动态 · 我的动态-个人动态集中管理（V2.3.1）· 项目动态看板（V2.3.1 补充）
+会议动态待办负责人 · 项目动态 · 问题动态 · 我的动态-个人动态集中管理（V2.3.1）· 项目动态看板（V2.3.1 补充）· AI自动填充项目动态（V2.3.2）
 
 > module 字段区分 meet/risk/problem；risk_level 被复用为「影响程度」（风险存「高/中/低风险」全词、问题存「高/中/低」），status 复用为「解决状态」。新增一种 module 要回归其它 module 的列表/筛选不串。⚠️V2.3.0：项目问题（module=problem）完成闭环重构——创建/筛选/编辑/删除/快捷处理＋需关注人员在「我的地盘-未解决项目问题」集中展示（我的仓盘卡片→「与我相关的项目问题」弹窗）；V2.2.9 遗留的问题卡片按钮禁用/无法闭环缺陷已修复。造数助手 `ensureProblemMoment`。⚠️V2.3.1 补充：新增**项目动态看板**（统计-纯读聚合看板，不写 project_moment）——看板数字取 project_moment 按创建时间落入统计周期分组统计，改 project_moment 的 module/risk_level/type 枚举会直接波及看板卡片/图表分组（已验证跨模块对账逐项一致）。
 
@@ -120,7 +123,7 @@
 
 ### `outsource` + `outsource_feedback` + `supplier_api`（模型外包全链）
 
-申请发包 · 发包审核/立项 · 外包反馈管理 · 反馈验收工作台 · 模型数据看板 · 供应商企业管理 · 供应商端入口 · 发包挂起/取消（V2.2.9）· 结项评价打分（V2.3.0）· 外包筛选（V2.3.1）
+申请发包 · 发包审核/立项 · 外包反馈管理 · 反馈验收工作台 · 模型数据看板 · 供应商企业管理 · 供应商端入口 · 发包挂起/取消（V2.2.9）· 结项评价打分（V2.3.0）· 外包筛选（V2.3.1）· 查看日报抽屉（V2.3.2）· 反馈走查留言（V2.3.2）
 
 > 管理端建的项目/发包/任务实时同步供应商门户；反馈 quality_status 0/1/2/3 与验收工作台强耦合；自制 vs 供应商分支（isSelfMade）影响反馈 tab 显隐。⚠️V2.2.9：发包状态新增「挂起」「已取消」——取消不计入外包成本统计、挂起可恢复只做/取消，改动发包状态枚举会波及模型数据看板成本汇总（get_data_overview）与发包列表筛选。⚠️V2.3.0：结项评价（CloseProjectDialog）质量评分≤3 分必填备注（placeholder 变必填 + 提交拦截）；有未完工任务时弹窗底部提示「还有 N 个任务未完工，无法结项」、点结项被拦（修复原「无反应」）。
 

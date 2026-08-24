@@ -88,4 +88,21 @@ test.describe('V2.3.2 接口回归', () => {
     expect(j).toHaveProperty('code');
     expect(j.data).toHaveProperty('status'); // ready/llm_error 等
   });
+
+  // B1 复验沉淀（2026-08-24）：项目概览-成本预警 cost_compare 双口径应同源、algoB 应贴近 algoA（仅扣管理工时的小额差），
+  // 且不应回归成「量级偏小10倍」的旧 bug。project_id 用真实项目 6653/6651（沿用 V2.3.2-pre 验收样本）。
+  for (const pid of [6653, 6651]) {
+    test(`项目概览-成本预警：cost_compare algoA/algoB 同源、量级合理 @project_overview（project_id=${pid}）`, async ({ request }) => {
+      const j = await (await request.get(`/manage_api/project_overview/get_header?project_id=${pid}`, { headers })).json();
+      expect(j.code).toBe(0);
+      const { algoA, algoB } = j.data.cost_compare;
+      expect(algoA.actualDays).toBeGreaterThan(0);
+      expect(algoB.outputDays).toBeGreaterThan(0);
+      // 旧 bug 是 algoA 量级仅为真值的 1/10~1/14；用"应达标准工时三分之一以上"防止回归到那种量级
+      expect(algoA.actualDays).toBeGreaterThan(algoA.stdDays / 3);
+      // algoB（扣管理工时后）应 <= algoA，且不应偏离过多（同一批人、只扣小额非产出工时类型）
+      expect(algoB.outputDays).toBeLessThanOrEqual(algoA.actualDays + 0.01);
+      expect(algoB.outputDays).toBeGreaterThan(algoA.actualDays * 0.7);
+    });
+  }
 });

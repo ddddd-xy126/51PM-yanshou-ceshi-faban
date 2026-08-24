@@ -1,0 +1,24 @@
+{
+  "version": "V2.3.3-pre-项目成本看板",
+  "devNotes": "1.项目动态成本看板-项目成本动态（需要严格验证数据统一性，正确性，跨模块对比）\n2.（已排除）AI项目动态：飞书端 -> 51PM Agent -> 51PM数据入库技术验证——用户明确本轮不验收，由用户自行验证，故本轮不覆盖",
+  "note": "预发版本测试：本轮为阶段性先行验收（下周完成全部开发后再正式发版），比照 V2.3.0-pre/V2.3.2-pre 惯例，仅做阶段0-2（环境自检+回归+验收出报告），不生成阶段3发版初稿，不做阶段4沉淀；范围仅含「项目成本动态」看板，「AI项目动态-飞书Agent集成」经用户确认由其自行验收，不在本轮范围",
+  "updatedAt": "2026-08-24",
+  "checklist": [
+    { "feature": "项目成本动态看板", "entry": "统计 → 项目动态看板(project_risk_panel) → 顶部切到「项目成本动态」tab", "coreApi": "data_export/get_project_cost_stat?period_type=&period_key=&group=&pm=&project_id=", "status": "done", "result": "满足，0 缺陷，3 风险(R1口径同名不同源/R2 AI 429环境盲区/R3 需求2范围排除)" }
+  ],
+  "pendingSpecUpdates": [],
+  "stages": {
+    "0": { "status": "passed", "note": "npm run check 通过，token 有效，后端 10.67.8.189:8888" },
+    "1": { "status": "skipped", "note": "预发版本仅覆盖新功能验收，暂未跑既有回归用例（新功能无既有 spec 可跑）" },
+    "2": { "status": "passed", "features": [
+      { "name": "项目成本动态看板", "status": "done", "result": "✅满足" }
+    ] },
+    "3": { "status": "skipped", "note": "预发版本测试，本轮不出发版初稿" },
+    "4": { "status": "skipped", "note": "预发版本测试，先行验收无沉淀（惯例见 V2.3.0-pre）" }
+  },
+  "history": [
+    { "at": "2026-08-24", "note": "用户确认排除 Feature2(AI项目动态/飞书Agent集成)，由用户自行验收；本轮验收目录改名为 V2.3.3-pre-项目成本看板，仅覆盖 Feature1" },
+    { "at": "2026-08-24", "note": "Feature1验收完成：内部聚合/跨表源数据(project_list)/跨模块(cost_compare)三层核对全通过，产品自带口径对齐表证实'产出类需求花费'与cost_compare.algoA完全一致；0缺陷，产出acceptance-report.md+html" },
+    { "at": "2026-08-24", "note": "补充验证4项此前声明的盲区(用户要求)：①气泡点击下钻与成本画像按钮下钻为同一弹窗组件(等价，以北交大铁路孪生项目验证)；②4处图表配色/图例与数据核对一致，切2026全年后气泡图出现蓝色(进度领先)证明颜色按健康度分级；③两个可展开明细区块逐条核对，管理/反馈成本明细9行加总353.5h与总览精确相等；④大数据量：年周期下64个在统计项目(59告警)渲染无异常。report md+html已同步更新，四条盲区声明已从§三移除" }
+  ]
+}

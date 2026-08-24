@@ -37,6 +37,8 @@
     { "at": "2026-08-17", "event": "stage-passed", "stage": 1, "note": "回归35过/1跳/0败" },
     { "at": "2026-08-17", "event": "stage-passed", "stage": 2, "note": "报告+fix-handoff+6定妆图;缺陷B1严重(pre沿用)/B2一般(pre沿用)/B3轻微(本轮);风险R1(AI 429盲区)/R2(pre 7风险)" },
     { "at": "2026-08-17", "event": "stage-passed", "stage": 3, "note": "发版初稿+html" },
-    { "at": "2026-08-17", "event": "stage-passed", "stage": 4, "note": "ui-spec+api-spec(11过真绿)+entry_map+impact_map+2playbook+P-15+helpers ensureFeedbackSuggestion" }
+    { "at": "2026-08-17", "event": "stage-passed", "stage": 4, "note": "ui-spec+api-spec(11过真绿)+entry_map+impact_map+2playbook+P-15+helpers ensureFeedbackSuggestion" },
+    { "at": "2026-08-24", "event": "stage5-recheck", "stage": 5, "note": "B1部分修复(algoA已修/algoB仍错，6653产出型需求真值1181h接口仍返894h)；B2未修复(反馈总数1/状态分布合计0原样复现)；B3未修复(PECVD任务后端feedback_count 0→1但抽屉chip未刷新)；api冒烟59过/3败(数据漂移非回归)/1跳；报告已追加复验记录+重转html" },
+    { "at": "2026-08-24", "event": "stage5-correction", "stage": 5, "note": "用户澄清「产出类型人天」口径=人员维度(algoA基础上再扣管理人员非产出工时类型)，非需求维度Σconsumed；更正B1结论为✅已修复(algoA/algoB均同源、量级合理、结余方向正确)。B2/B3结论不变仍未修复。已更新fix-handoff.md+acceptance-report.md复验记录+重转html；新沉淀2条回归断言进 tests/api-v2.3.2.spec.js（project_overview cost_compare同源+量级校验，6653/6651均真绿）" }
   ]
 }

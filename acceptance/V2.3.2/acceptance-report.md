@@ -125,3 +125,15 @@
 - 快捷添加反馈：`POST outsource_feedback/create_feedback`{outsource_package_id,outsource_task_id,feedback_module,feedback_content}
 - 验收工作台：`GET outsource_feedback/get_feedback_list?outsource_package_id=N&quality_status=2`（仅拉待验收）+ 复用 `get_feedback_suggestion_list`
 - AI 自动填充：`GET ai_api_key/get_ai_api_key_status`（configured/default_model）+ `POST ai_skill/execute`{intent:"moment_meeting_ai_fill",slots:{raw_text}}
+
+## 复验记录
+
+> 技术细节见 [fix-handoff.md](fix-handoff.md) 各 B# 节内「🔁 复验结果」小节。
+
+| 日期 | 缺陷 | 结果 |
+| --- | --- | --- |
+| 2026-08-24 | B1（成本预警口径） | ✅ 已修复（初次核对用错基准，已更正）：algoA（实际花费人天）与 algoB（产出类型人天）现均从人员页同源取数——医科大#6653 由 84.5h/83h 修正为 895.5h/894h，`over:false` 结余方向正确；玉禾田#6651 同理（1038.5h/1036.5h）。初次复验误拿「产出型需求(one_type∈{1,2,4})需求成本页Σconsumed_hour=1181h」（需求维度）去对标「产出类型人天」（人员维度：algoA 基础上再扣管理人员非产出工时类型），两者口径不同不应直接对比，已更正判定。 |
+| 2026-08-24 | B2（质量反馈总数与状态分布不自洽） | ❌ 未修复：`get_quality?project_id=6651` 返回与修复前完全一致，`quality_insights[0].value="1"` 但 `feedback_status_dist` 三态合计仍为 0。 |
+| 2026-08-24 | B3（抽屉快捷添加反馈计数不实时刷新） | ❌ 未修复：发包#31『半导体』ZK_BDT_PECVD 任务卡快捷提交 1 条反馈后，后端已正确落库（`feedback_count` 0→1，新反馈 #834），但未重开抽屉时任务卡「N 条反馈」chip 仍显 0，未实时更新。 |
+
+影响面核对：跑 `tests/api-*.spec.js` 接口冒烟兜底 59 过/3 败/1 跳——3 败均为测试库数据漂移导致的既有用例数据缺失（#6690 无 pause 样本需求、发包日报/任务样本被刷新为空），与本次 B1/B2/B3 复验无关，未见新增回归。

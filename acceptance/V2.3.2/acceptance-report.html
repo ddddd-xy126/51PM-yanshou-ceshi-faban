@@ -191,5 +191,36 @@ img{max-width:100%}
 <li>验收工作台：<code>GET outsource_feedback/get_feedback_list?outsource_package_id=N&amp;quality_status=2</code>（仅拉待验收）+ 复用 <code>get_feedback_suggestion_list</code></li>
 <li>AI 自动填充：<code>GET ai_api_key/get_ai_api_key_status</code>（configured/default_model）+ <code>POST ai_skill/execute</code>{intent:&quot;moment_meeting_ai_fill&quot;,slots:{raw_text}}</li>
 </ul>
+<h2>复验记录</h2>
+<blockquote>
+<p>技术细节见 <a href="fix-handoff.md">fix-handoff.md</a> 各 B# 节内「🔁 复验结果」小节。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>日期</th>
+<th>缺陷</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2026-08-24</td>
+<td>B1（成本预警口径）</td>
+<td>✅ 已修复（初次核对用错基准，已更正）：algoA（实际花费人天）与 algoB（产出类型人天）现均从人员页同源取数——医科大#6653 由 84.5h/83h 修正为 895.5h/894h，<code>over:false</code> 结余方向正确；玉禾田#6651 同理（1038.5h/1036.5h）。初次复验误拿「产出型需求(one_type∈{1,2,4})需求成本页Σconsumed_hour=1181h」（需求维度）去对标「产出类型人天」（人员维度：algoA 基础上再扣管理人员非产出工时类型），两者口径不同不应直接对比，已更正判定。</td>
+</tr>
+<tr>
+<td>2026-08-24</td>
+<td>B2（质量反馈总数与状态分布不自洽）</td>
+<td>❌ 未修复：<code>get_quality?project_id=6651</code> 返回与修复前完全一致，<code>quality_insights[0].value=&quot;1&quot;</code> 但 <code>feedback_status_dist</code> 三态合计仍为 0。</td>
+</tr>
+<tr>
+<td>2026-08-24</td>
+<td>B3（抽屉快捷添加反馈计数不实时刷新）</td>
+<td>❌ 未修复：发包#31『半导体』ZK_BDT_PECVD 任务卡快捷提交 1 条反馈后，后端已正确落库（<code>feedback_count</code> 0→1，新反馈 #834），但未重开抽屉时任务卡「N 条反馈」chip 仍显 0，未实时更新。</td>
+</tr>
+</tbody>
+</table>
+<p>影响面核对：跑 <code>tests/api-*.spec.js</code> 接口冒烟兜底 59 过/3 败/1 跳——3 败均为测试库数据漂移导致的既有用例数据缺失（#6690 无 pause 样本需求、发包日报/任务样本被刷新为空），与本次 B1/B2/B3 复验无关，未见新增回归。</p>
 
 </body></html>

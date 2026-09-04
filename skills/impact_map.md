@@ -90,6 +90,7 @@
 | 模型外包-查看日报抽屉（V2.3.2）| `outsource`（发包列表查看日报重构为抽屉；outsource_task/get_task_list + outsource_daily_report/get_daily_report_list）|
 | 模型外包-反馈走查留言（V2.3.2）| `outsource_feedback`、`outsource_task`（抽屉快捷添反馈 create_feedback；反馈走查留言 create_feedback_suggestion/get_feedback_suggestion_list；验收工作台批量验收时查看走查留言）|
 | AI自动填充项目动态（V2.3.2）| `project_moment`（会议动态）、`ai_skill`（execute intent=moment_meeting_ai_fill，飞书会议纪要→AI解析回填）、`ai_api_key`（get_ai_api_key_status 依赖已配置生效的 AI Key）|
+| 项目成本动态看板（V2.3.3）| `data_export`（get_project_cost_stat，标准/花费/产出/非产出/范围扩张五维成本）、`project_overview`（get_header.cost_compare 跨模块口径对照，仅只读比对非共享写路径）|
 
 ---
 
@@ -141,9 +142,9 @@
 
 ### `data_export`（统计看板取数）
 
-产能数据看板 · 项目人员看板 · 测试数据看板（V2.3.0-pre）· BUG类型枚举（V2.3.0：bug/get_bug_const）· 测试数据看板-查看超时原因（V2.3.1）· 测试数据看板-AI分析总结（V2.3.1：add_qa_stat_summary_item/get_qa_stat_summary）· 产能数据看板-AI产能诊断（V2.3.1 补充：复用 get_dept_capacity_panel/get_employee_project_list）
+产能数据看板 · 项目人员看板 · 测试数据看板（V2.3.0-pre）· BUG类型枚举（V2.3.0：bug/get_bug_const）· 测试数据看板-查看超时原因（V2.3.1）· 测试数据看板-AI分析总结（V2.3.1：add_qa_stat_summary_item/get_qa_stat_summary）· 产能数据看板-AI产能诊断（V2.3.1 补充：复用 get_dept_capacity_panel/get_employee_project_list）· 项目成本动态看板（V2.3.3：get_project_cost_stat）
 
-> 共用 data_export 取数层，维度/日期/部门参数的边界兼底逻辑共享。⚠️测试数据看板（/statistic/bug）走 get_qa_stat_{kpi,bug,publish,summary,detail_list}；BUG明细的添加/类型枚举走 bug/get_bug_const（bug_type_list 含 V2.3.0 新增「项目技术」）+ bug/get_list；添加Bug 门禁 isCanAddBug。⚠️V2.3.1 补充：产能数据看板新增 AI 产能诊断不引入新取数接口，直接复用已加载的部门产能面板/人员明细数据做 AI 归因，改这两个接口的字段结构会同时波及 AI 诊断的输入数据准确性；另新引入 `ai_api_key`（个人 AI Key 配置，/ai_api_key_config）+ `ai_history`（intent 区分的通用 AI 问答历史命名空间，后续其他 AI 功能若复用同套 ai_history 可换不同 intent 接入）。
+> 共用 data_export 取数层，维度/日期/部门参数的边界兼底逻辑共享。⚠️测试数据看板（/statistic/bug）走 get_qa_stat_{kpi,bug,publish,summary,detail_list}；BUG明细的添加/类型枚举走 bug/get_bug_const（bug_type_list 含 V2.3.0 新增「项目技术」）+ bug/get_list；添加Bug 门禁 isCanAddBug。⚠️V2.3.1 补充：产能数据看板新增 AI 产能诊断不引入新取数接口，直接复用已加载的部门产能面板/人员明细数据做 AI 归因，改这两个接口的字段结构会同时波及 AI 诊断的输入数据准确性；另新引入 `ai_api_key`（个人 AI Key 配置，/ai_api_key_config）+ `ai_history`（intent 区分的通用 AI 问答历史命名空间，后续其他 AI 功能若复用同套 ai_history 可换不同 intent 接入）。⚠️V2.3.3 补充：项目成本动态看板（`get_project_cost_stat`）与「项目动态看板」（`get_project_moment_stat`）同挂 `/statistic/project_risk_panel` 页面不同 tab，改其一的筛选/路由结构要连带回归另一 tab；该看板「产出工时(EV)」与 `project_overview/get_header.cost_compare.algoB`（项目概况-成本预警）同名不同源、各自独立演进（非缺陷，见 V2.3.3 报告 R1），跨模块改动两处任一「产出」判定逻辑都应同步核对另一侧不产生新的口径分歧。
 
 ### `estimate`（工时/导出）
 
@@ -165,7 +166,7 @@
 
 ### 独立维度（暂无同簇老功能，改动一般不外溢）
 
-批量添加反馈（`produce_demand`）· 拆解项目反馈/逃逸Bug（`produce_demand`，V2.2.2 反馈递交流程源头）· 主题面板（`pm_theme`）· 工作台UGA入口（外部系统）
+批量添加反馈（`produce_demand`）· 拆解项目反馈/逃逸Bug（`produce_demand`，V2.2.2 反馈递交流程源头）· 主题面板（`pm_theme`）· 工作台UGA入口（外部系统）· 项目概况-成本预警（`project_overview`，get_header.cost_compare.{algoA,algoB}，V2.3.2 起被项目成本动态看板跨模块引用比对，本身无同簇写操作老功能）
 
 ---
 

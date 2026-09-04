@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN"><head><meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>51PM V2.3.3-pre（项目成本看板）验收报告</title>
+<title>51PM V2.3.3 验收报告</title>
 <style>
 :root{color-scheme:light}
 body{margin:0 auto;max-width:920px;padding:40px 48px;font-family:-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;color:#1a1a1a;line-height:1.7;background:#fdfdfd}
@@ -24,17 +24,25 @@ li{margin:.2em 0}
 img{max-width:100%}
 </style></head>
 <body>
-<h1>51PM V2.3.3-pre（项目成本看板）验收报告</h1>
+<h1>51PM V2.3.3 验收报告</h1>
 <ul>
-<li>验收时间：2026-08-24</li>
+<li>验收时间：2026-08-24（预发布阶段验收）；2026-09-04 按用户指示正式落实为 V2.3.3 官方发版材料</li>
 <li>环境：测试 10.67.8.183:7777</li>
 <li>验收账号角色：邓欣羽（非 PM 角色）</li>
 <li><strong>验收结论：1 项需求，满足 1 / 部分满足 0 / 不满足 0</strong>；发现缺陷 0、风险/待确认 3</li>
-<li>老功能回归：本轮未跑（纯新增看板，无既有 spec 覆盖该入口；范围收窄说明见下）</li>
+<li>老功能回归：<strong>本轮按用户指示跳过</strong>（&quot;对应的测试预发布版可落实为正式版本，无需走回归等步骤&quot;），详见下方「本次晋升说明」与附录 A.1</li>
 </ul>
 <blockquote>
 <p>阅读顺序：先看「一、逐需求验收详情」判断本次交付达标与否 → 「二、缺陷」「三、风险」是待处理项 → 「四、发版内容（初稿）」→ 附录为测试证据，供追溯。</p>
 </blockquote>
+<h2>本次晋升说明（V2.3.3-pre → V2.3.3 正式版本）</h2>
+<p>本报告承接自 <code>acceptance/V2.3.3-pre-项目成本看板/acceptance-report.md</code>（2026-08-24 完成的预发布阶段验收，含 4 处盲区补充验证）。2026-09-04 用户明确指示：<strong>该预发布版本可直接落实为正式版本 V2.3.3，无需再走回归等步骤</strong>。据此本轮only做以下事：</p>
+<ol>
+<li>验收结论<strong>原样承接</strong>，未变化、不重复验收（内容见 §一~§三，与 pre 版一致）；</li>
+<li>老功能回归<strong>按用户指示跳过</strong>（不视为遗漏，是明确决策）；</li>
+<li>补充完成<strong>阶段 3（发版内容初稿定稿）</strong> 与<strong>阶段 4（沉淀：新增回归用例 + 回填 entry_map/impact_map/playbook）</strong>，见 §四 与附录 A。</li>
+</ol>
+<p>需求范围仍与 pre 版一致：本轮只覆盖「项目成本动态看板」；「AI 项目动态：飞书端 → 51PM Agent 集成」用户已明确由其自行验证，不在本报告范围内（该功能若同版发布，其发版内容需用户自行补充/确认）。</p>
 <h2>0. 原始验收需求</h2>
 <blockquote>
 <p>现在先进行一个 v2.3.3 的预发版本测试，待下周完成全部开发再进行发版，发版内容如下：</p>
@@ -43,8 +51,8 @@ img{max-width:100%}
 <li>AI 项目动态：打通验证飞书端 -&gt; 51PM Agent -&gt; 51PM 数据入库的技术验证。以飞书端生成智能会议纪要并让飞书中的 51PM Agent 应用添加会议动态到 51PM 系统中</li>
 </ol>
 </blockquote>
-<p><strong>范围调整（用户确认）</strong>：需求 2（飞书 51PM Agent 集成）用户明确本轮<strong>不纳入验收范围，由用户自行验证</strong>（我方无飞书账号/该应用访问权限，且该项本质是跨系统技术联调，非纯 51PM 内 UI 验收）。故本轮验收目录改名为 <code>V2.3.3-pre-项目成本看板</code>，只覆盖需求 1。</p>
-<p>对应关系：需求 1 → §一.1；需求 2 → 不在本轮范围（见 §三 未覆盖盲区声明）</p>
+<p><strong>范围调整（用户确认）</strong>：需求 2（飞书 51PM Agent 集成）用户明确不纳入本报告验收范围，由用户自行验证（我方无飞书账号/该应用访问权限，且该项本质是跨系统技术联调，非纯 51PM 内 UI 验收）。</p>
+<p>对应关系：需求 1 → §一.1；需求 2 → 不在本报告范围（见 §三 未覆盖盲区声明）</p>
 <h2>一、逐需求验收详情</h2>
 <h3>1. 项目成本动态看板 — ✅ 满足</h3>
 <ul>
@@ -56,7 +64,7 @@ img{max-width:100%}
 <li>边界 ✅ 切到无项目开工的统计周（2026 第 35 周）正确显示&quot;共 0 个项目&quot;及空状态提示，未报错；重置按钮可清空全部筛选恢复默认</li>
 <li>接口 ✅ 核心接口 <code>data_export/get_project_cost_stat?period_type=&amp;period_key=&amp;group=&amp;pm=&amp;project_id=</code>，四个筛选参数（period_type/period_key/pm/project_id）逐一实测均正确生效且无 5xx</li>
 <li>数据 ✅ <strong>三层交叉核对全部通过</strong>：① 看板自身内部聚合——9 个在统计项目的标准/花费/产出/非产出/范围扩张 headline 加总 = 各项目明细逐条求和，CPI/告警计数公式逆向验证一致；② 跨表源数据——抽样 2 个项目（北交大铁路孪生项目 #6710、水源公司-南水北调项目 #6713），面板 标准/花费/初始/新增/变更/产出 六项与 <code>project/get_project_list</code> 同项目行的 standard_hour/consumed_hour/origin_hour/new_hour/change_hour/done_hour <strong>逐项精确相等</strong>；③ 跨模块对比——结合面板自带「口径对齐表」公式核实：面板&quot;产出类需求花费&quot;（CPI 分母，#6713=274.5h）与「项目概况-成本预警」<code>cost_compare.algoA.actualHours</code>（#6713=274.5h）<strong>完全一致</strong>，证明两处功能对&quot;实际花费&quot;的核心计算路径相同；仅 <code>cost_compare.algoB</code>&quot;产出类型工时&quot;（#6713=237h）与本看板&quot;产出工时 EV&quot;（#6713=272.5h）不直接相等——判定为两个历史上独立演进的功能对&quot;产出&quot;一词的过滤范围不完全同源（非计算错误，见 §三 R1）</li>
-<li>补充验证（可视化/交互盲区，本轮追加覆盖）✅ ① <strong>气泡下钻等价性</strong>：点击「成本健康矩阵」中&quot;北交大铁路孪生项目&quot;气泡，弹出的下钻弹窗与表格「成本画像」按钮打开的<strong>是同一个弹窗组件</strong>（标准工时 4524h / 花费工时 1336.5h / 产出工时 1170h，与该项目在其他视图的数据完全一致），证明气泡点击与按钮点击两条下钻路径等价、非重复实现两套逻辑；②<strong>四处图表可视化细节</strong>：「已花费工时构成」「非产出构成」两个环形图图例配色与数值对应正确（绿=产出类需求投入 3719.5、橙=非产出类需求投入 353.5；紫=其他(会议、产研) 353.5、黄=反馈 0，图例文字与色块一一对应）；「各项目非产出工时拆分」横向堆叠条形图配色与图例一致（本期样本&quot;反馈&quot;均为 0，故条形全部为紫色单段，符合数据实际情况，非渲染缺陷）；「成本健康矩阵」气泡颜色随健康度变化——切至 2026 全年（64 个在统计项目）后观察到红/粉（风险/已超支）之外还出现<strong>蓝色气泡</strong>（对应&quot;进度领先&quot;状态），证明颜色编码确实按健康度分级而非固定单色；③<strong>两个可展开明细区块逐条核对</strong>：「范围扩张明细」展开后 6 行项目级数据（初始需求/新增/变更/现标准工时/扩张率）与已知项目数据吻合；「管理/反馈成本明细」展开后 9 行项目级非产出工时明细<strong>加总 59+12+33+17.5+48.5+60+10.5+102.5+10.5=353.5h，与总览「非产出工时 353.5h」精确相等</strong>，工时去向 TOP3 文案完整可读；④<strong>大数据量渲染</strong>：统计周期切至「年」「2026」后在统计项目数由 9 增至 <strong>64 个</strong>（告警项目 59 个），气泡图/环形图/堆叠条形图/告警明细表均正常渲染无报错、无卡死，DOM 查询响应 &lt;10ms，未观察到明显卡顿（受限于当前唯一账号+单一网络环境，未做多用户并发/网络限速下的专项性能压测）</li>
+<li>补充验证（可视化/交互盲区，pre 轮追加覆盖）✅ ① <strong>气泡下钻等价性</strong>：点击「成本健康矩阵」中&quot;北交大铁路孪生项目&quot;气泡，弹出的下钻弹窗与表格「成本画像」按钮打开的<strong>是同一个弹窗组件</strong>（标准工时 4524h / 花费工时 1336.5h / 产出工时 1170h，与该项目在其他视图的数据完全一致），证明气泡点击与按钮点击两条下钻路径等价、非重复实现两套逻辑；②<strong>四处图表可视化细节</strong>：「已花费工时构成」「非产出构成」两个环形图图例配色与数值对应正确（绿=产出类需求投入 3719.5、橙=非产出类需求投入 353.5；紫=其他(会议、产研) 353.5、黄=反馈 0，图例文字与色块一一对应）；「各项目非产出工时拆分」横向堆叠条形图配色与图例一致（本期样本&quot;反馈&quot;均为 0，故条形全部为紫色单段，符合数据实际情况，非渲染缺陷）；「成本健康矩阵」气泡颜色随健康度变化——切至 2026 全年（64 个在统计项目）后观察到红/粉（风险/已超支）之外还出现<strong>蓝色气泡</strong>（对应&quot;进度领先&quot;状态），证明颜色编码确实按健康度分级而非固定单色；③<strong>两个可展开明细区块逐条核对</strong>：「范围扩张明细」展开后 6 行项目级数据（初始需求/新增/变更/现标准工时/扩张率）与已知项目数据吻合；「管理/反馈成本明细」展开后 9 行项目级非产出工时明细<strong>加总 59+12+33+17.5+48.5+60+10.5+102.5+10.5=353.5h，与总览「非产出工时 353.5h」精确相等</strong>，工时去向 TOP3 文案完整可读；④<strong>大数据量渲染</strong>：统计周期切至「年」「2026」后在统计项目数由 9 增至 <strong>64 个</strong>（告警项目 59 个），气泡图/环形图/堆叠条形图/告警明细表均正常渲染无报错、无卡死，DOM 查询响应 &lt;10ms，未观察到明显卡顿（受限于当前唯一账号+单一网络环境，未做多用户并发/网络限速下的专项性能压测）</li>
 </ul>
 </li>
 <li>定妆图：未生成（本轮以接口/DOM 数据核对为主，UI 结构已通过 accessibility 快照逐屏核对，详见探索记录）｜ 关注：PM、产品 ｜ 关联风险 R1</li>
@@ -97,7 +105,8 @@ img{max-width:100%}
 <p><strong>未覆盖盲区声明</strong>：</p>
 <ul>
 <li>需求 2（飞书 51PM Agent 集成）整体未覆盖，按用户要求由其自行验证。</li>
-<li>「成本健康矩阵」气泡下钻等价性、四处图表可视化细节、两个可展开明细区块、大数据量（64 项目）渲染，均已于本轮追加覆盖并通过（详见 §一.1 补充验证）；未做的仅剩多用户并发/弱网限速等专项性能压测（非本轮验收范畴）。</li>
+<li>「成本健康矩阵」气泡下钻等价性、四处图表可视化细节、两个可展开明细区块、大数据量（64 项目）渲染，均已于 pre 轮追加覆盖并通过（详见 §一.1 补充验证）；未做的仅剩多用户并发/弱网限速等专项性能压测（非本轮验收范畴）。</li>
+<li>老功能回归本轮按用户指示跳过（非盲区，是明确决策），详见附录 A.1。</li>
 </ul>
 <h2>四、发版内容（初稿，待人工定稿）</h2>
 <p><strong>影响强度</strong></p>
@@ -110,11 +119,19 @@ img{max-width:100%}
 在「项目动态看板」新增&quot;项目成本动态&quot; Tab，以标准、花费、产出、非产出、范围扩张五个维度统一呈现项目成本执行情况，支持按统计周期（天至年多档粒度）、项目经理、项目等维度筛选，并可切换&quot;成本总览&quot;与&quot;项目明细&quot;两种视图；<br>
 支持点击项目行或&quot;成本健康矩阵&quot;气泡下钻查看单项目&quot;成本画像&quot;，展示指标卡、命中告警与工时去向线索，并提供 AI 成本分析入口，辅助 PM 快速定位成本异常项目；<br>
 看板自带&quot;口径对齐表&quot;透明列出全部指标公式与阈值，方便 PM、产品跨模块核对时快速定位数据差异来源。</p>
+<blockquote>
+<p>说明：需求 2（飞书 51PM Agent 集成）由用户自行验证，其发版内容（如有）需用户自行补充，不在本初稿覆盖范围内。</p>
+</blockquote>
 <h2>附录 A：回归与测试证据（追溯用，非验收结论）</h2>
 <h3>A.1 老功能回归</h3>
-<p>本轮范围仅为新增看板（<code>project_risk_panel</code> 内新增 Tab + <code>data_export/get_project_cost_stat</code> 新接口），未改动既有页面/接口，且当前无覆盖该入口的既有 spec，故本轮未跑既有回归精准选集。建议下周正式发版轮补充：① 新增 <code>v2.3.3.spec.js</code>（UI 交互）+ <code>api-v2.3.3.spec.js</code>（接口契约）沉淀本轮验证点；② 跑一次 <code>@project_publish|@project_detail|@data_export</code> 精准选集确认无连带影响。</p>
+<p><strong>本轮按用户指示跳过老功能回归</strong>（&quot;对应的测试预发布版可落实为正式版本，无需走回归等步骤&quot;）。本轮范围仅为新增看板（<code>project_risk_panel</code> 内新增 Tab + <code>data_export/get_project_cost_stat</code> 新接口），未改动既有页面/接口，理论连带风险低。已新增 <code>regression/tests/v2.3.3.spec.js</code>（UI 交互，3 条）+ <code>regression/tests/api-v2.3.3.spec.js</code>（接口契约，10 条）沉淀本轮验证点（见 A.2），<strong>已用真实登录态实测跑通，13 条全绿</strong>：</p>
+<pre><code class="language-powershell">cd regression
+npx playwright test tests/v2.3.3.spec.js tests/api-v2.3.3.spec.js --reporter=list
+# 13 passed
+</code></pre>
+<p>如后续发现连带回归问题，再按 impact_map §B <code>data_export</code> 簇（产能数据看板/项目人员看板/测试数据看板等）补跑一次精准选集。</p>
 <h3>A.2 接口用例沉淀</h3>
-<p>核心接口：<code>GET data_export/get_project_cost_stat?period_type={day|week|month|quarter|half_year|year}&amp;period_key=&amp;group=&amp;pm=&amp;project_id=</code>，返回项目级明细 + 聚合汇总；<code>group</code> 参数含义待下轮补充探索。跨模块对照接口：<code>GET project_overview/get_header?project_id=</code> 的 <code>data.cost_compare.{algoA,algoB}</code>。均未沉淀为 <code>api-v2.3.3.spec.js</code>（本轮为预发布探索性验收，未到阶段 4 沉淀节点，遵循 V2.3.0-pre/V2.3.2-pre 惯例）。</p>
+<p>核心接口：<code>GET data_export/get_project_cost_stat?period_type={day|week|month|quarter|half|year}&amp;period_key=&amp;group=&amp;pm=&amp;project_id=</code>（⚠️半年档 period_type 实际取值为 <code>half</code>，非直觉的 <code>half_year</code>，真机 network 实测确认；<code>period_key</code> 为必填，格式 day=YYYY-MM-DD/week=YYYY-Www/month=YYYY-MM/quarter=YYYYQn/half=YYYYHn/year=YYYY，留空返回业务码 51「请选择统计周期」；<code>project_id</code> 传项目编号如 <code>SJ202605120002</code> 而非数字库 id），返回项目级明细 + 聚合汇总；<code>group</code> 参数含义待下轮补充探索。跨模块对照接口：<code>GET project_overview/get_header?project_id=</code> 的 <code>data.cost_compare.{algoA,algoB}</code>（此处 <code>project_id</code> 是数字库 id，如 6710，与前一个接口的项目编号不同源，需经 <code>project/get_project_list?sj_num=&lt;编号&gt;</code> 查表转换）。已沉淀为 <code>regression/tests/v2.3.3.spec.js</code>（UI，3 条）+ <code>regression/tests/api-v2.3.3.spec.js</code>（接口，10 条），<strong>已实测全绿（13 passed）</strong>（登录态复用集成浏览器活跃会话刷新 auth/state.json 后跑通，详见 A.1）。</p>
 <h3>A.3 验收产生的测试数据</h3>
 <p>本轮为纯只读验收，未产生新增测试数据；使用的既有项目样本：</p>
 <ul>

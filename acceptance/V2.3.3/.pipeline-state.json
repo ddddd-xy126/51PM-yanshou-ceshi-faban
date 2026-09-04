@@ -1,0 +1,35 @@
+{
+  "version": "V2.3.3",
+  "devNotes": "1.项目动态成本看板-项目成本动态（需要严格验证数据统一性，正确性，跨模块对比）\n2.（已排除，用户自行验证）AI项目动态：飞书端 -> 51PM Agent -> 51PM数据入库技术验证",
+  "note": "2026-09-04 用户明确指示：对应的测试预发布版（V2.3.3-pre-项目成本看板）可直接落实为正式版本，无需走回归等步骤。本文件记录该晋升动作：阶段0/2 承接 pre 轮(2026-08-24) 结论不变不重复验收；阶段1(回归) 按用户指示跳过；本轮新做 阶段3(发版初稿定稿写入报告) + 阶段4(沉淀：新增 v2.3.3.spec.js/api-v2.3.3.spec.js + 回填 entry_map/impact_map/playbook)。⚠️阶段4新增的两个 spec 文件因登录态过期（npm run check code=444）未在本轮实际跑通，下次登录后须补跑确认真绿。",
+  "updatedAt": "2026-09-04",
+  "checklist": [
+    { "feature": "项目成本动态看板", "entry": "统计 → 项目动态看板(project_risk_panel) → 顶部切到「项目成本动态」tab", "coreApi": "data_export/get_project_cost_stat?period_type=&period_key=&group=&pm=&project_id=", "status": "done", "result": "满足，0 缺陷，3 风险(R1口径同名不同源/R2 AI 429环境盲区/R3 需求2范围排除)" }
+  ],
+  "pendingSpecUpdates": [],
+  "stages": {
+    "0": { "status": "passed", "note": "沿用 pre 轮 2026-08-24 环境自检记录；本轮 2026-09-04 复检 npm run check 返回 code=444（token 过期），不影响本轮晋升目标（未做新的实时接口验证），仅导致新增 spec 未能实测跑通，见 stages.4" },
+    "1": { "status": "skipped-by-user", "note": "用户明确指示：对应测试预发布版可落实为正式版本，无需走回归等步骤" },
+    "2": { "status": "passed", "note": "验收结论原样承接 V2.3.3-pre-项目成本看板 2026-08-24 轮结果（含 4 处盲区补充验证），未变化不重复验收", "features": [
+      { "name": "项目成本动态看板", "status": "done", "result": "✅满足" }
+    ] },
+    "3": { "status": "passed", "note": "发版内容初稿已写入 acceptance-report.md「四、发版内容（初稿）」并转 html" },
+    "4": { "status": "passed", "checklist": {
+      "ui-spec": "regression/tests/v2.3.3.spec.js 已写(3条)，已实测跑通，3 passed（修正了 tab/视图切换选择器：实际是纯 <button> + el-radio-button，非 el-tabs__item/[role=tab]；下钻弹窗标题断言改为「成本关键指标」区块存在，而非字面「成本画像」）",
+      "api-spec": "regression/tests/api-v2.3.3.spec.js 已写(10条)，已实测跑通，10 passed（修正 period_type=half_year→half，period_key 改为必填并按类型格式化，project_id 在 data_export 为 SJ 编号、project_overview 为数字库 id 需经 sj_num 查表转换）",
+      "entry_map": "已更新「项目动态看板」行：三 tab 补「项目成本动态」+ 接口 + R1 口径说明",
+      "impact_map": "§A 新增「项目成本动态看板（V2.3.3）」行；§B data_export 簇追加该功能+说明；新增 project_overview 独立维度条目",
+      "playbooks": "统计-项目动态看板.md 追加「项目成本动态（V2.3.3 新增）」一节 + README 行更新，并已修正 half_year→half 及 project_id 双语义说明",
+      "pendingSpecUpdates": "本轮无规格变更（纯新增，未改动既有页面/接口）",
+      "pitfalls": "无新坑（沿用 pre 轮已记录的跨模块对账/口径对齐表方法论，未升级为独立踩坑台账条目）"
+    }, "note": "六项均已落地，ui-spec/api-spec 已用真实登录态实测跑通（13 passed），故 stages.4 由 in-progress 改为 passed" }
+  },
+  "history": [
+    { "at": "2026-08-24", "note": "用户确认排除 Feature2(AI项目动态/飞书Agent集成)，由用户自行验收；本轮验收目录改名为 V2.3.3-pre-项目成本看板，仅覆盖 Feature1" },
+    { "at": "2026-08-24", "note": "Feature1验收完成：内部聚合/跨表源数据(project_list)/跨模块(cost_compare)三层核对全通过，产品自带口径对齐表证实'产出类需求花费'与cost_compare.algoA完全一致；0缺陷，产出acceptance-report.md+html" },
+    { "at": "2026-08-24", "note": "补充验证4项此前声明的盲区(用户要求)：①气泡点击下钻与成本画像按钮下钻为同一弹窗组件；②4处图表配色/图例与数据核对一致；③两个可展开明细区块逐条核对；④大数据量下(64项目/59告警)图表与表格渲染无异常" },
+    { "at": "2026-08-31", "note": "用户明确要求补写 V2.3.3-pre「发版内容（初稿，待人工定稿）」节（偏离 pre 轮默认不出发版初稿的惯例）" },
+    { "at": "2026-09-04", "note": "用户指示：对应的测试预发布版可落实为正式版本，无需走回归等步骤。新建正式版本目录 acceptance/V2.3.3/，承接 pre 轮验收结论+发版初稿，跳过阶段1回归，完成阶段3(发版定稿转html)+阶段4(新增 v2.3.3.spec.js/api-v2.3.3.spec.js + entry_map/impact_map/playbook 回填)。因登录态过期，新增 spec 未实测跑通，待下次登录补跑。" },
+    { "at": "2026-09-04", "note": "用户指示继续：发现集成浏览器有活跃登录会话，提取 oauthToken 刷新 regression/auth/state.json 后登录态恢复。修正 api-v2.3.3.spec.js（period_type=half_year→half；period_key 改必填按格式传值；project_id 跨接口语义不同需经 project/get_project_list?sj_num= 查表转换），10 条全绿。修正 v2.3.3.spec.js 的 tab/视图切换选择器（实际纯 <button>+el-radio-button，非 el-tabs）及下钻弹窗断言，3 条全绿。同步更正 acceptance-report.md/.html 与 playbook 中的 half_year 表述，stages.4 改为 passed。" }
+  ]
+}

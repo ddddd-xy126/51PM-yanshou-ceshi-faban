@@ -1,0 +1,31 @@
+{
+  "version": "V2.3.5-pre-我的待办",
+  "devNotes": "我的待办：待办中心聚合入口，涉及很多跳转、数据的验证，内容比较多，保证功能、数据流转正常即可，只要涉及到模块的部分都需要进行其他模块对应的数据进行验证",
+  "note": "预发版本测试：本轮为阶段性先行验收，比照 V2.3.0-pre/V2.3.2-pre/V2.3.3-pre 惯例，仅做阶段0-2（环境自检+回归+验收出报告），不生成阶段3发版初稿，不做阶段4沉淀；待办中心为全新聚合类功能，entry_map/impact_map 暂不登记正式条目（若后续转正式发版再回填）",
+  "updatedAt": "2026-09-07",
+  "checklist": [
+    { "feature": "待办中心-顶部四态tab(待处理/待审批/未读通知/已逾期)", "entry": "我的地盘 → 我的待办（须先进 /my_board/main/main 再点左侧「我的待办」，直接 URL 会重定向）", "coreApi": "todo_center/get_count、todo_center/get_list?source_keys=&scope=pending&only_overdue=", "status": "done", "result": "3态正常互斥；「已逾期」态存在缺陷B1（叠加态不重置+与待处理组合时source_keys计算错误）" },
+    { "feature": "侧栏分类-发包待立项(outsource_establish)", "entry": "待办中心侧栏「待我审批→发包待立项」", "coreApi": "todo_center/get_list(source_keys=outsource_establish)、跨模块 outsource/get_package_list?sj_num=", "status": "done", "result": "满足；3条数据与源模块 outsource 逐条比对完全一致；跳转「前往原页面」精确定位到该条发包(共1条)" },
+    { "feature": "侧栏分类-发包待结项(outsource_close)", "entry": "待办中心侧栏「待我审批→发包待结项」", "coreApi": "todo_center/get_list(source_keys=outsource_close)、跨模块 outsource/get_package_list?sj_num=", "status": "done", "result": "数据一致，但跳转精度缺陷B2：只定位到项目层级(共5条)，未精确筛选到目标发包，需人工搜索" },
+    { "feature": "侧栏分类-动态提及我(moment_mention)", "entry": "待办中心侧栏「消息通知→动态提及我」", "coreApi": "todo_center/get_list(source_keys=moment_mention)、mark_read、跨模块 project_moment/get_list?project_id=", "status": "done", "result": "满足；6条数据与源模块 project_moment 逐条比对一致(user_ids含475)；mark_read落库持久化正确(未读7→6，跨tab/侧栏/刷新一致)" },
+    { "feature": "待我审批-父级分组聚合", "entry": "待办中心侧栏「待我审批」父级节点点击", "coreApi": "todo_center/get_list(source_keys=publish_approve,outsource_audit,outsource_establish,demand_accept,outsource_close,feedback_split)", "status": "done", "result": "满足；父级聚合=子分类并集(3+2=5)，与角标一致" },
+    { "feature": "已闭环/归档/已审批/已读通知", "entry": "待办中心侧栏「已闭环」及其三个子分组", "coreApi": "todo_center/get_list(scope=done, order_by=done_time, 10/11 source_keys)", "status": "done", "result": "满足；默认近30天窗口(start_date/end_date隐式限定)，抽样2条(哈工大第五批/第四批)与源模块 outsource 比对一致；风险R1:无可见UI控件调整/查看30天以外的历史闭环记录" },
+    { "feature": "零触发数据分类健壮性(7项)", "entry": "bug_assigned/bug_verify/moment_risk/publish_approve/outsource_audit/demand_accept/feedback_split", "coreApi": "todo_center/get_count、get_list", "status": "done", "result": "满足(轻量核实)；均返回code=0空数组，无报错；因当前账号无真实触发数据，未做端到端UI/跳转验证(未覆盖盲区声明)" },
+    { "feature": "口径与角色说明弹窗", "entry": "待办中心顶部「口径与角色」按钮", "coreApi": "无独立接口，前端静态文案", "status": "done", "result": "内容详尽覆盖10个source_key的推送条件与角色；风险R2(moment_mention已读caveat文案过时)、R3(task_review孤立未提及)、R4(hour_todo入口未说明)" },
+    { "feature": "接口回归冒烟(既有模块未受影响)", "entry": "regression/tests/api-*.spec.js 全量", "coreApi": "N/A", "status": "done", "result": "73 passed / 1 skipped(既有跳过) / 1 failed——失败项为 V2.3.2 AI自动填充(project_moment)接口回归，与本轮待办中心无关，判定为已知AI服务限流环境问题(非本轮引入)" }
+  ],
+  "pendingSpecUpdates": [],
+  "stages": {
+    "0": { "status": "passed", "note": "npm run check 通过，token 有效，后端 10.67.8.189:8888" },
+    "1": { "status": "passed", "note": "待办中心为纯聚合类新功能(除mark_read外无写操作)，回归用「跨模块独立核对」替代传统UI回归；另跑 api-*.spec.js 全量冒烟确认既有模块未受影响，73通过/1跳过/1失败(失败项与本轮无关，见checklist)" },
+    "2": { "status": "passed", "features": [
+      { "name": "待办中心整体", "status": "done", "result": "7个功能点：满足6/部分满足1；2项缺陷(B1已逾期状态叠加错误/B2发包待结项跳转不精确)，4项风险(R1~R4)+3处未覆盖盲区声明" }
+    ] },
+    "3": { "status": "skipped", "note": "预发版本测试，本轮不出发版初稿（报告§四仍按用户可能需要预留了初稿草稿）" },
+    "4": { "status": "skipped", "note": "预发版本测试，先行验收无沉淀（惯例见 V2.3.0-pre/V2.3.3-pre），entry_map/impact_map 暂不登记" }
+  },
+  "history": [
+    { "at": "2026-09-07", "note": "完成待办中心全量探索式验收：11个source_key结构梳理、跨模块数据一致性核对(outsource_establish/outsource_close/moment_mention/已闭环样本共4组，全部一致)、零计数分类健壮性、已闭环30天默认窗口发现、发包待结项跳转精度问题、已逾期tab叠加态缺陷精确复现；产出 acceptance-report.md + fix-handoff.md" },
+    { "at": "2026-09-07", "note": "截图交付：final-待办中心.jpg(定妆图,经集成浏览器已登录页签直接截取,已核对1920x1080)、01-待办中心-bug-已逾期状态叠加未重置.jpg(B1现场)、02-待办中心-bug-发包待结项跳转不精确.jpg(B2现场,项目#6710共5条未筛选)；撰写 acceptance-report.md(7功能点详情+2缺陷+4风险+未覆盖盲区声明+发版初稿草稿)与 fix-handoff.md(B1/B2技术细节)；node scripts/md2html.js 转出 acceptance-report.html。本轮交付完成：报告md+html、fix-handoff.md、3张截图、.pipeline-state.json，共7个产物。" }
+  ]
+}

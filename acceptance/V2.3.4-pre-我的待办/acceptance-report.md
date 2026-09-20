@@ -1,4 +1,4 @@
-# 51PM V2.3.5-pre（我的待办）验收报告
+# 51PM V2.3.4-pre（我的待办）验收报告
 
 - 验收时间：2026-09-07
 - 环境：测试 10.67.8.183:7777
@@ -10,7 +10,7 @@
 
 ## 0. 原始验收需求
 
-> 现在v2.3.5-pre-我的待办：我的待办设计到很多跳转，数据的验证，内容比较多， 保证功能、数据流转正常即可，只要涉及到模块的部分都需要进行其他模块对应的数据进行验证
+> 现在v2.3.4-pre-我的待办：我的待办设计到很多跳转，数据的验证，内容比较多， 保证功能、数据流转正常即可，只要涉及到模块的部分都需要进行其他模块对应的数据进行验证
 
 对应关系：本需求聚焦「待办中心」这一新增聚合入口 → 拆分为以下 7 个功能点逐项验收，映射到 §一.1~§一.7。
 
@@ -22,10 +22,10 @@
 - 结论：待办中心作为跨模块聚合入口，整体信息架构（顶部 4 态统计 + 侧栏分类树 + 中间列表 + 右侧详情面板三栏布局）实现完整、数据来源正确。但顶部「已逾期」态存在缺陷 **B1**：与其余 3 个互斥态不同，「已逾期」被点击后不会在切换到其他顶部 Tab 时正确清除自身高亮与筛选条件，导致「及时发现逾期待办」这一核心设计意图在特定操作序列下失效，故整体判「部分满足」。
 - 验证证据：
   - UI ✅ 待处理(0)/待审批(5)/未读通知(6)/已逾期(1) 四态角标数字与侧栏分类树数字（待我审批5=发包待立项3+发包待结项2；消息通知6=动态提及我6）逐项核对一致；「口径与角色」「刷新」按钮存在且可点击
-  - 边界 🟡 **精确复现 B1**：① 点击侧栏「发包待立项」（source_keys 收窄为 outsource_establish）→ ② 点击顶部「已逾期」（`.tcb-stat.is-alert` 变为 `is-active`，请求 `only_overdue=1` 正确套用在全量 11 key 上）→ ③ 点击顶部「待处理」（`.tcb-stat`[0] 变为 `is-active`，但「已逾期」**未被清除 `is-active`**，两个顶部 Tab 同时高亮）→ 此时实际请求 `source_keys=bug_assigned,bug_verify,moment_risk&only_overdue=1`（既非 11 项全量、也非任何一个侧栏分类的正常并集），页面显示「没有符合当前筛选条件的记录」，而「已逾期」角标仍显示"1"，造成数据丢失的错觉（截图 [01-待办中心-bug-已逾期状态叠加未重置.jpg](../V2.3.5-pre-我的待办/01-待办中心-bug-已逾期状态叠加未重置.jpg)）；对比：同样在「已逾期」激活态下点击「待审批」，source_keys 正确收窄为待审批的 6 个 key 且能正确查到真实逾期记录——证明"叠加筛选"逻辑本身在「待审批/未读通知」两条路径上是正确的，唯独「待处理」路径的 source_keys 计算存在错误
+  - 边界 🟡 **精确复现 B1**：① 点击侧栏「发包待立项」（source_keys 收窄为 outsource_establish）→ ② 点击顶部「已逾期」（`.tcb-stat.is-alert` 变为 `is-active`，请求 `only_overdue=1` 正确套用在全量 11 key 上）→ ③ 点击顶部「待处理」（`.tcb-stat`[0] 变为 `is-active`，但「已逾期」**未被清除 `is-active`**，两个顶部 Tab 同时高亮）→ 此时实际请求 `source_keys=bug_assigned,bug_verify,moment_risk&only_overdue=1`（既非 11 项全量、也非任何一个侧栏分类的正常并集），页面显示「没有符合当前筛选条件的记录」，而「已逾期」角标仍显示"1"，造成数据丢失的错觉（截图 [01-待办中心-bug-已逾期状态叠加未重置.jpg](../V2.3.4-pre-我的待办/01-待办中心-bug-已逾期状态叠加未重置.jpg)）；对比：同样在「已逾期」激活态下点击「待审批」，source_keys 正确收窄为待审批的 6 个 key 且能正确查到真实逾期记录——证明"叠加筛选"逻辑本身在「待审批/未读通知」两条路径上是正确的，唯独「待处理」路径的 source_keys 计算存在错误
   - 接口 ✅ 核心接口 `todo_center/get_count`（返回 12 个 source_key 的计数）、`todo_center/get_list?source_keys=&scope=pending&keyword=&order_by=due_time&only_unread=&only_overdue=&start_date=&end_date=&page=&limit=`，参数结构完整，非法组合未观察到 5xx（表现为空结果而非报错）
   - 数据 ✅ 待我审批父级分组点击验证「聚合=子分类并集」：请求 `source_keys=publish_approve,outsource_audit,outsource_establish,demand_accept,outsource_close,feedback_split`（待审批类目全部 6 个 key），返回 5 条记录=发包待立项(3)+发包待结项(2)，与角标"5"一致
-- 定妆图 [final-待办中心.jpg](../V2.3.5-pre-我的待办/final-待办中心.jpg) ｜ 关注：PM、前端开发 ｜ 关联缺陷 B1
+- 定妆图 [final-待办中心.jpg](../V2.3.4-pre-我的待办/final-待办中心.jpg) ｜ 关注：PM、前端开发 ｜ 关联缺陷 B1
 
 ### 2. 侧栏分类-发包待立项（outsource_establish，跨模块核对）— ✅ 满足
 
@@ -44,7 +44,7 @@
 - 结论：数据本身与源模块完全一致，无数据完整性问题；但跳转精度弱于「发包待立项」，判定为轻微缺陷 **B2**（不影响核心可用性，仅体验不一致）。
 - 验证证据：
   - UI ✅ 2 条待办（id=65/40，均 sj_num=SJ202605120002，project_id=6710「北交大铁路孪生项目」）字段展示完整，其中一条「20260810斜扫建模L3第三批」标红「逾期 25 天」
-  - 边界 🟡 **B2 复现**：点击「前往原页面」跳转到 `project/outsource_project?projectId=6710`，但**搜索框「搜索发包名称」为空、状态筛选仍为「全部状态」**，显示该项目全部「共 5 条」发包记录（含已结项/制作中等混合状态），需人工用发包名称手动搜索才能定位到目标记录（截图 [02-待办中心-bug-发包待结项跳转不精确.jpg](../V2.3.5-pre-我的待办/02-待办中心-bug-发包待结项跳转不精确.jpg)）；手动填入「20260810斜扫建模L3第三批」后確认「共 1 条」，各字段（合同金额¥4,000.00、8人天、UE5.5、制作中、2026-08-06~08-12）与待办中心展示完全一致
+  - 边界 🟡 **B2 复现**：点击「前往原页面」跳转到 `project/outsource_project?projectId=6710`，但**搜索框「搜索发包名称」为空、状态筛选仍为「全部状态」**，显示该项目全部「共 5 条」发包记录（含已结项/制作中等混合状态），需人工用发包名称手动搜索才能定位到目标记录（截图 [02-待办中心-bug-发包待结项跳转不精确.jpg](../V2.3.4-pre-我的待办/02-待办中心-bug-发包待结项跳转不精确.jpg)）；手动填入「20260810斜扫建模L3第三批」后確认「共 1 条」，各字段（合同金额¥4,000.00、8人天、UE5.5、制作中、2026-08-06~08-12）与待办中心展示完全一致
   - 接口 ✅ `todo_center/get_list(source_keys=outsource_close)` 与 `outsource/get_package_list?sj_num=SJ202605120002` 均无 5xx
   - 数据 ✅ **跨模块核对通过**：2 条待办的 id、status（=4）、art_leader_user_id（=131）、project_id（=6710）与源模块逐条比对完全一致
 - 定妆图：见截图 02（BUG 现场图兼作本功能证据）｜ 关注：PM、前端开发 ｜ 关联缺陷 B2
@@ -139,7 +139,7 @@
 
 ### A.2 接口用例沉淀
 
-核心接口：`GET todo_center/get_count`、`GET todo_center/get_list?source_keys=&scope={pending|done}&keyword=&order_by={due_time|done_time}&only_unread=&only_overdue=&start_date=&end_date=&page=&limit=`、`POST todo_center/mark_read`。跨模块核对接口：`outsource/get_package_list?sj_num=`、`project_moment/get_list?project_id=`。均未沉淀为 `api-v2.3.5.spec.js`（本轮为预发布探索性验收，未到阶段 4 沉淀节点，遵循 V2.3.0-pre/V2.3.2-pre/V2.3.3-pre 惯例）。
+核心接口：`GET todo_center/get_count`、`GET todo_center/get_list?source_keys=&scope={pending|done}&keyword=&order_by={due_time|done_time}&only_unread=&only_overdue=&start_date=&end_date=&page=&limit=`、`POST todo_center/mark_read`。跨模块核对接口：`outsource/get_package_list?sj_num=`、`project_moment/get_list?project_id=`。均未沉淀为 `api-v2.3.4.spec.js`（本轮为预发布探索性验收，未到阶段 4 沉淀节点，遵循 V2.3.0-pre/V2.3.2-pre/V2.3.3-pre 惯例）。
 
 ### A.3 验收产生的测试数据
 

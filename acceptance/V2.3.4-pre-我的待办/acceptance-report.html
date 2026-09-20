@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN"><head><meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>51PM V2.3.5-pre（我的待办）验收报告</title>
+<title>51PM V2.3.4-pre（我的待办）验收报告</title>
 <style>
 :root{color-scheme:light}
 body{margin:0 auto;max-width:920px;padding:40px 48px;font-family:-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;color:#1a1a1a;line-height:1.7;background:#fdfdfd}
@@ -24,7 +24,7 @@ li{margin:.2em 0}
 img{max-width:100%}
 </style></head>
 <body>
-<h1>51PM V2.3.5-pre（我的待办）验收报告</h1>
+<h1>51PM V2.3.4-pre（我的待办）验收报告</h1>
 <ul>
 <li>验收时间：2026-09-07</li>
 <li>环境：测试 10.67.8.183:7777</li>
@@ -37,7 +37,7 @@ img{max-width:100%}
 </blockquote>
 <h2>0. 原始验收需求</h2>
 <blockquote>
-<p>现在v2.3.5-pre-我的待办：我的待办设计到很多跳转，数据的验证，内容比较多， 保证功能、数据流转正常即可，只要涉及到模块的部分都需要进行其他模块对应的数据进行验证</p>
+<p>现在v2.3.4-pre-我的待办：我的待办设计到很多跳转，数据的验证，内容比较多， 保证功能、数据流转正常即可，只要涉及到模块的部分都需要进行其他模块对应的数据进行验证</p>
 </blockquote>
 <p>对应关系：本需求聚焦「待办中心」这一新增聚合入口 → 拆分为以下 7 个功能点逐项验收，映射到 §一.1~§一.7。</p>
 <h2>一、逐需求验收详情</h2>
@@ -48,12 +48,12 @@ img{max-width:100%}
 <li>验证证据：
 <ul>
 <li>UI ✅ 待处理(0)/待审批(5)/未读通知(6)/已逾期(1) 四态角标数字与侧栏分类树数字（待我审批5=发包待立项3+发包待结项2；消息通知6=动态提及我6）逐项核对一致；「口径与角色」「刷新」按钮存在且可点击</li>
-<li>边界 🟡 <strong>精确复现 B1</strong>：① 点击侧栏「发包待立项」（source_keys 收窄为 outsource_establish）→ ② 点击顶部「已逾期」（<code>.tcb-stat.is-alert</code> 变为 <code>is-active</code>，请求 <code>only_overdue=1</code> 正确套用在全量 11 key 上）→ ③ 点击顶部「待处理」（<code>.tcb-stat</code>[0] 变为 <code>is-active</code>，但「已逾期」<strong>未被清除 <code>is-active</code></strong>，两个顶部 Tab 同时高亮）→ 此时实际请求 <code>source_keys=bug_assigned,bug_verify,moment_risk&amp;only_overdue=1</code>（既非 11 项全量、也非任何一个侧栏分类的正常并集），页面显示「没有符合当前筛选条件的记录」，而「已逾期」角标仍显示&quot;1&quot;，造成数据丢失的错觉（截图 <a href="../V2.3.5-pre-%E6%88%91%E7%9A%84%E5%BE%85%E5%8A%9E/01-%E5%BE%85%E5%8A%9E%E4%B8%AD%E5%BF%83-bug-%E5%B7%B2%E9%80%BE%E6%9C%9F%E7%8A%B6%E6%80%81%E5%8F%A0%E5%8A%A0%E6%9C%AA%E9%87%8D%E7%BD%AE.jpg">01-待办中心-bug-已逾期状态叠加未重置.jpg</a>）；对比：同样在「已逾期」激活态下点击「待审批」，source_keys 正确收窄为待审批的 6 个 key 且能正确查到真实逾期记录——证明&quot;叠加筛选&quot;逻辑本身在「待审批/未读通知」两条路径上是正确的，唯独「待处理」路径的 source_keys 计算存在错误</li>
+<li>边界 🟡 <strong>精确复现 B1</strong>：① 点击侧栏「发包待立项」（source_keys 收窄为 outsource_establish）→ ② 点击顶部「已逾期」（<code>.tcb-stat.is-alert</code> 变为 <code>is-active</code>，请求 <code>only_overdue=1</code> 正确套用在全量 11 key 上）→ ③ 点击顶部「待处理」（<code>.tcb-stat</code>[0] 变为 <code>is-active</code>，但「已逾期」<strong>未被清除 <code>is-active</code></strong>，两个顶部 Tab 同时高亮）→ 此时实际请求 <code>source_keys=bug_assigned,bug_verify,moment_risk&amp;only_overdue=1</code>（既非 11 项全量、也非任何一个侧栏分类的正常并集），页面显示「没有符合当前筛选条件的记录」，而「已逾期」角标仍显示&quot;1&quot;，造成数据丢失的错觉（截图 <a href="../V2.3.4-pre-%E6%88%91%E7%9A%84%E5%BE%85%E5%8A%9E/01-%E5%BE%85%E5%8A%9E%E4%B8%AD%E5%BF%83-bug-%E5%B7%B2%E9%80%BE%E6%9C%9F%E7%8A%B6%E6%80%81%E5%8F%A0%E5%8A%A0%E6%9C%AA%E9%87%8D%E7%BD%AE.jpg">01-待办中心-bug-已逾期状态叠加未重置.jpg</a>）；对比：同样在「已逾期」激活态下点击「待审批」，source_keys 正确收窄为待审批的 6 个 key 且能正确查到真实逾期记录——证明&quot;叠加筛选&quot;逻辑本身在「待审批/未读通知」两条路径上是正确的，唯独「待处理」路径的 source_keys 计算存在错误</li>
 <li>接口 ✅ 核心接口 <code>todo_center/get_count</code>（返回 12 个 source_key 的计数）、<code>todo_center/get_list?source_keys=&amp;scope=pending&amp;keyword=&amp;order_by=due_time&amp;only_unread=&amp;only_overdue=&amp;start_date=&amp;end_date=&amp;page=&amp;limit=</code>，参数结构完整，非法组合未观察到 5xx（表现为空结果而非报错）</li>
 <li>数据 ✅ 待我审批父级分组点击验证「聚合=子分类并集」：请求 <code>source_keys=publish_approve,outsource_audit,outsource_establish,demand_accept,outsource_close,feedback_split</code>（待审批类目全部 6 个 key），返回 5 条记录=发包待立项(3)+发包待结项(2)，与角标&quot;5&quot;一致</li>
 </ul>
 </li>
-<li>定妆图 <a href="../V2.3.5-pre-%E6%88%91%E7%9A%84%E5%BE%85%E5%8A%9E/final-%E5%BE%85%E5%8A%9E%E4%B8%AD%E5%BF%83.jpg">final-待办中心.jpg</a> ｜ 关注：PM、前端开发 ｜ 关联缺陷 B1</li>
+<li>定妆图 <a href="../V2.3.4-pre-%E6%88%91%E7%9A%84%E5%BE%85%E5%8A%9E/final-%E5%BE%85%E5%8A%9E%E4%B8%AD%E5%BF%83.jpg">final-待办中心.jpg</a> ｜ 关注：PM、前端开发 ｜ 关联缺陷 B1</li>
 </ul>
 <h3>2. 侧栏分类-发包待立项（outsource_establish，跨模块核对）— ✅ 满足</h3>
 <ul>
@@ -76,7 +76,7 @@ img{max-width:100%}
 <li>验证证据：
 <ul>
 <li>UI ✅ 2 条待办（id=65/40，均 sj_num=SJ202605120002，project_id=6710「北交大铁路孪生项目」）字段展示完整，其中一条「20260810斜扫建模L3第三批」标红「逾期 25 天」</li>
-<li>边界 🟡 <strong>B2 复现</strong>：点击「前往原页面」跳转到 <code>project/outsource_project?projectId=6710</code>，但<strong>搜索框「搜索发包名称」为空、状态筛选仍为「全部状态」</strong>，显示该项目全部「共 5 条」发包记录（含已结项/制作中等混合状态），需人工用发包名称手动搜索才能定位到目标记录（截图 <a href="../V2.3.5-pre-%E6%88%91%E7%9A%84%E5%BE%85%E5%8A%9E/02-%E5%BE%85%E5%8A%9E%E4%B8%AD%E5%BF%83-bug-%E5%8F%91%E5%8C%85%E5%BE%85%E7%BB%93%E9%A1%B9%E8%B7%B3%E8%BD%AC%E4%B8%8D%E7%B2%BE%E7%A1%AE.jpg">02-待办中心-bug-发包待结项跳转不精确.jpg</a>）；手动填入「20260810斜扫建模L3第三批」后確认「共 1 条」，各字段（合同金额¥4,000.00、8人天、UE5.5、制作中、2026-08-06~08-12）与待办中心展示完全一致</li>
+<li>边界 🟡 <strong>B2 复现</strong>：点击「前往原页面」跳转到 <code>project/outsource_project?projectId=6710</code>，但<strong>搜索框「搜索发包名称」为空、状态筛选仍为「全部状态」</strong>，显示该项目全部「共 5 条」发包记录（含已结项/制作中等混合状态），需人工用发包名称手动搜索才能定位到目标记录（截图 <a href="../V2.3.4-pre-%E6%88%91%E7%9A%84%E5%BE%85%E5%8A%9E/02-%E5%BE%85%E5%8A%9E%E4%B8%AD%E5%BF%83-bug-%E5%8F%91%E5%8C%85%E5%BE%85%E7%BB%93%E9%A1%B9%E8%B7%B3%E8%BD%AC%E4%B8%8D%E7%B2%BE%E7%A1%AE.jpg">02-待办中心-bug-发包待结项跳转不精确.jpg</a>）；手动填入「20260810斜扫建模L3第三批」后確认「共 1 条」，各字段（合同金额¥4,000.00、8人天、UE5.5、制作中、2026-08-06~08-12）与待办中心展示完全一致</li>
 <li>接口 ✅ <code>todo_center/get_list(source_keys=outsource_close)</code> 与 <code>outsource/get_package_list?sj_num=SJ202605120002</code> 均无 5xx</li>
 <li>数据 ✅ <strong>跨模块核对通过</strong>：2 条待办的 id、status（=4）、art_leader_user_id（=131）、project_id（=6710）与源模块逐条比对完全一致</li>
 </ul>
@@ -225,7 +225,7 @@ img{max-width:100%}
 <h3>A.1 老功能回归</h3>
 <p>「我的待办」为跨模块只读聚合层（除 <code>mark_read</code> 标记已读一处写操作外无其他写路径），不修改任何既有模块自身的业务逻辑，故本轮以「逐分类跨模块独立取数核对」（详见 §一.2/§一.3/§一.4/§一.6，4 组抽样全部一致）替代传统「精准回归选集」。另跑 <code>npx playwright test &quot;tests/api-.*\.spec\.js&quot;</code> 全量接口冒烟：<strong>73 通过 / 1 跳过 / 1 失败</strong>。失败项 <code>tests\api-v2.3.2.spec.js:79</code> 断言 <code>ai_skill/execute(intent=moment_meeting_ai_fill)</code> 返回体应含 <code>data.status</code> 字段，实测返回空对象 <code>{}</code>；该接口属于 V2.3.2 版本的 AI 会议纪要自动填充功能，与本轮「我的待办」无代码交集，结合既往台账记录（P-15：AI 模型服务持续 429 限流）判定为已知环境问题，非本轮改动引入的回归。跳过项为既有用例的常规跳过（需「制作中」发包样本前置条件），与本轮无关。</p>
 <h3>A.2 接口用例沉淀</h3>
-<p>核心接口：<code>GET todo_center/get_count</code>、<code>GET todo_center/get_list?source_keys=&amp;scope={pending|done}&amp;keyword=&amp;order_by={due_time|done_time}&amp;only_unread=&amp;only_overdue=&amp;start_date=&amp;end_date=&amp;page=&amp;limit=</code>、<code>POST todo_center/mark_read</code>。跨模块核对接口：<code>outsource/get_package_list?sj_num=</code>、<code>project_moment/get_list?project_id=</code>。均未沉淀为 <code>api-v2.3.5.spec.js</code>（本轮为预发布探索性验收，未到阶段 4 沉淀节点，遵循 V2.3.0-pre/V2.3.2-pre/V2.3.3-pre 惯例）。</p>
+<p>核心接口：<code>GET todo_center/get_count</code>、<code>GET todo_center/get_list?source_keys=&amp;scope={pending|done}&amp;keyword=&amp;order_by={due_time|done_time}&amp;only_unread=&amp;only_overdue=&amp;start_date=&amp;end_date=&amp;page=&amp;limit=</code>、<code>POST todo_center/mark_read</code>。跨模块核对接口：<code>outsource/get_package_list?sj_num=</code>、<code>project_moment/get_list?project_id=</code>。均未沉淀为 <code>api-v2.3.4.spec.js</code>（本轮为预发布探索性验收，未到阶段 4 沉淀节点，遵循 V2.3.0-pre/V2.3.2-pre/V2.3.3-pre 惯例）。</p>
 <h3>A.3 验收产生的测试数据</h3>
 <p>本轮除标记 3 条 moment_mention 待办为已读（id=840/800/777，属「玉禾田集团深圳光明&amp;兰州城关智慧城市环保项目」#6651）外，无其他写操作产生的新增测试数据。使用的既有数据样本：</p>
 <ul>
